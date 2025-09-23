@@ -1008,7 +1008,7 @@ private function render_recent_templates_premium() {
             
             .builder-workspace {
                 display: grid;
-                grid-template-columns: 320px 1fr;
+                grid-template-columns: 340px 1fr;
                 height: calc(100vh - 140px);
                 gap: 0;
             }
@@ -1030,6 +1030,9 @@ private function render_recent_templates_premium() {
                 font-size: 14px;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
             }
             
             .sidebar-content {
@@ -1051,6 +1054,9 @@ private function render_recent_templates_premium() {
                 margin-bottom: 15px;
                 padding-bottom: 8px;
                 border-bottom: 1px solid #f3f4f6;
+                display: flex;
+                align-items: center;
+                gap: 8px;
             }
             
             .element-item {
@@ -1110,6 +1116,17 @@ private function render_recent_templates_premium() {
                 text-align: center;
             }
             
+            .element-description {
+                font-size: 11px;
+                color: #9ca3af;
+                font-weight: 400;
+                margin-top: 2px;
+            }
+            
+            .element-item:hover .element-description {
+                color: rgba(255,255,255,0.8);
+            }
+            
             .properties-panel {
                 background: white;
                 border-radius: 10px;
@@ -1125,6 +1142,121 @@ private function render_recent_templates_premium() {
                 margin-bottom: 20px;
                 padding-bottom: 10px;
                 border-bottom: 2px solid #f3f4f6;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .property-group {
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+                border-bottom: 1px solid #f3f4f6;
+            }
+            
+            .property-group:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+            }
+            
+            .property-group h6 {
+                margin-bottom: 12px;
+                font-size: 13px;
+                font-weight: 600;
+                color: #374151;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            
+            .property-label {
+                font-size: 11px;
+                font-weight: 600;
+                color: #6b7280;
+                margin-bottom: 4px;
+                display: block;
+            }
+            
+            .property-input, .property-select, .property-textarea {
+                width: 100%;
+                padding: 8px 12px;
+                border: 2px solid #e5e7eb;
+                border-radius: 6px;
+                font-size: 13px;
+                transition: all 0.3s ease;
+                background: white;
+            }
+            
+            .property-input:focus, .property-select:focus, .property-textarea:focus {
+                border-color: #667eea;
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+            
+            .property-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            
+            .property-grid-3 {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 8px;
+            }
+            
+            .file-upload-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 12px;
+                background: #667eea;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                font-size: 12px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            
+            .file-upload-btn:hover {
+                background: #4f46e5;
+                transform: translateY(-1px);
+            }
+            
+            .color-input-wrapper {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                border: 2px solid #e5e7eb;
+                border-radius: 6px;
+                padding: 4px;
+                background: white;
+                transition: all 0.3s ease;
+            }
+            
+            .color-input-wrapper:focus-within {
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+            
+            .color-preview {
+                width: 24px;
+                height: 24px;
+                border-radius: 4px;
+                border: 1px solid #d1d5db;
+                cursor: pointer;
+            }
+            
+            .color-input {
+                border: none;
+                background: transparent;
+                font-size: 13px;
+                flex: 1;
+                padding: 4px;
+            }
+            
+            .color-input:focus {
+                outline: none;
             }
             
             .builder-canvas {
@@ -1313,10 +1445,15 @@ private function render_recent_templates_premium() {
                 animation: spin 1s linear infinite;
             }
             
+            /* Hidden file input */
+            .hidden-file-input {
+                display: none;
+            }
+            
             /* Responsive Design */
             @media (max-width: 1024px) {
                 .builder-workspace {
-                    grid-template-columns: 280px 1fr;
+                    grid-template-columns: 300px 1fr;
                 }
             }
             
@@ -1330,7 +1467,7 @@ private function render_recent_templates_premium() {
                 .builder-sidebar {
                     border-right: none;
                     border-bottom: 1px solid #e5e7eb;
-                    max-height: 300px;
+                    max-height: 400px;
                 }
                 
                 .builder-controls {
@@ -1352,7 +1489,7 @@ private function render_recent_templates_premium() {
         
         <!-- Builder Header -->
         <div class="builder-header">
-            <h1><?php echo $template ? 'Edit Template: ' . esc_html($template->name) : '🎨 Create New Template'; ?></h1>
+            <h1><?php echo $template ? 'Edit Template: ' . esc_html($template->name) : '🎨 Create New PDF Template'; ?></h1>
             <div class="builder-controls">
                 <input type="text" id="template-name" class="builder-input" 
                        placeholder="Enter template name..." 
@@ -1386,76 +1523,151 @@ private function render_recent_templates_premium() {
             <div class="builder-sidebar">
                 <div class="sidebar-header">
                     <span class="dashicons dashicons-admin-tools"></span>
-                    Elements & Properties
+                    PDF Design Studio
                 </div>
                 
                 <div class="sidebar-content">
                     <!-- Element Library -->
                     <div class="element-library">
                         <div class="element-group">
-                            <div class="element-group-title">📝 Basic Elements</div>
+                            <div class="element-group-title">
+                                📝 Text & Content
+                            </div>
                             
                             <div class="element-item" data-type="text" draggable="true">
                                 <span class="element-icon dashicons dashicons-editor-textcolor"></span>
-                                Text Element
+                                <div>
+                                    <div>Text Element</div>
+                                    <div class="element-description">Add editable text content</div>
+                                </div>
+                            </div>
+                            
+                            <div class="element-item" data-type="heading" draggable="true">
+                                <span class="element-icon dashicons dashicons-heading"></span>
+                                <div>
+                                    <div>Heading</div>
+                                    <div class="element-description">Large title text</div>
+                                </div>
+                            </div>
+                            
+                            <div class="element-item" data-type="paragraph" draggable="true">
+                                <span class="element-icon dashicons dashicons-editor-paragraph"></span>
+                                <div>
+                                    <div>Paragraph</div>
+                                    <div class="element-description">Multi-line text block</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="element-group">
+                            <div class="element-group-title">
+                                🖼️ Media Elements
                             </div>
                             
                             <div class="element-item" data-type="image" draggable="true">
                                 <span class="element-icon dashicons dashicons-format-image"></span>
-                                Image
+                                <div>
+                                    <div>Image</div>
+                                    <div class="element-description">Upload and display images</div>
+                                </div>
                             </div>
                             
-                            <div class="element-item" data-type="line" draggable="true">
-                                <span class="element-icon dashicons dashicons-minus"></span>
-                                Horizontal Line
-                            </div>
-                            
-                            <div class="element-item" data-type="rectangle" draggable="true">
-                                <span class="element-icon dashicons dashicons-admin-page"></span>
-                                Rectangle
+                            <div class="element-item" data-type="logo" draggable="true">
+                                <span class="element-icon dashicons dashicons-businessperson"></span>
+                                <div>
+                                    <div>Logo</div>
+                                    <div class="element-description">Company or brand logo</div>
+                                </div>
                             </div>
                         </div>
                         
                         <div class="element-group">
-                            <div class="element-group-title">📋 Form Elements</div>
+                            <div class="element-group-title">
+                                📋 Form Data
+                            </div>
                             
                             <div class="element-item" data-type="form-field" draggable="true">
                                 <span class="element-icon dashicons dashicons-edit"></span>
-                                Form Field
+                                <div>
+                                    <div>Form Field</div>
+                                    <div class="element-description">Dynamic form data</div>
+                                </div>
                             </div>
                             
                             <div class="element-item" data-type="checkbox" draggable="true">
                                 <span class="element-icon dashicons dashicons-yes-alt"></span>
-                                Checkbox
+                                <div>
+                                    <div>Checkbox</div>
+                                    <div class="element-description">Checkable option</div>
+                                </div>
                             </div>
                             
                             <div class="element-item" data-type="signature" draggable="true">
                                 <span class="element-icon dashicons dashicons-edit-large"></span>
-                                Signature Field
+                                <div>
+                                    <div>Signature Field</div>
+                                    <div class="element-description">Digital signature area</div>
+                                </div>
                             </div>
                         </div>
                         
                         <div class="element-group">
-                            <div class="element-group-title">🔧 Advanced</div>
+                            <div class="element-group-title">
+                                🔧 Layout Elements
+                            </div>
+                            
+                            <div class="element-item" data-type="line" draggable="true">
+                                <span class="element-icon dashicons dashicons-minus"></span>
+                                <div>
+                                    <div>Line</div>
+                                    <div class="element-description">Horizontal divider</div>
+                                </div>
+                            </div>
+                            
+                            <div class="element-item" data-type="rectangle" draggable="true">
+                                <span class="element-icon dashicons dashicons-admin-page"></span>
+                                <div>
+                                    <div>Rectangle</div>
+                                    <div class="element-description">Shape container</div>
+                                </div>
+                            </div>
                             
                             <div class="element-item" data-type="table" draggable="true">
                                 <span class="element-icon dashicons dashicons-grid-view"></span>
-                                Table
+                                <div>
+                                    <div>Table</div>
+                                    <div class="element-description">Data table layout</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="element-group">
+                            <div class="element-group-title">
+                                📊 Advanced Elements
                             </div>
                             
                             <div class="element-item" data-type="qr-code" draggable="true">
                                 <span class="element-icon dashicons dashicons-screenoptions"></span>
-                                QR Code
+                                <div>
+                                    <div>QR Code</div>
+                                    <div class="element-description">Generate QR codes</div>
+                                </div>
                             </div>
                             
                             <div class="element-item" data-type="barcode" draggable="true">
                                 <span class="element-icon dashicons dashicons-admin-links"></span>
-                                Barcode
+                                <div>
+                                    <div>Barcode</div>
+                                    <div class="element-description">Product barcode</div>
+                                </div>
                             </div>
                             
-                            <div class="element-item" data-type="chart" draggable="true">
-                                <span class="element-icon dashicons dashicons-chart-line"></span>
-                                Chart
+                            <div class="element-item" data-type="date" draggable="true">
+                                <span class="element-icon dashicons dashicons-calendar-alt"></span>
+                                <div>
+                                    <div>Date Field</div>
+                                    <div class="element-description">Current date display</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1470,7 +1682,7 @@ private function render_recent_templates_premium() {
                             <div class="empty-state" style="padding: 30px 15px;">
                                 <div style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;">⚙️</div>
                                 <div style="font-size: 14px; color: #6b7280;">
-                                    Select an element to edit its properties
+                                    Select an element to customize its properties
                                 </div>
                             </div>
                         </div>
@@ -1500,10 +1712,10 @@ private function render_recent_templates_premium() {
                                 </div>
                                 <div class="empty-state">
                                     <div class="empty-icon">📄</div>
-                                    <div class="empty-title">Start Building Your Template</div>
+                                    <div class="empty-title">Start Building Your PDF Template</div>
                                     <div class="empty-text">
-                                        Drag elements from the sidebar to add them to your PDF template.
-                                        Create professional documents with our visual builder.
+                                        Drag elements from the left sidebar to add them to your PDF.
+                                        Build professional documents with our drag-and-drop designer.
                                     </div>
                                     <button type="button" class="builder-btn primary" onclick="addFirstElement()">
                                         <span class="dashicons dashicons-plus-alt2"></span>
@@ -1520,12 +1732,16 @@ private function render_recent_templates_premium() {
         <!-- Hidden Fields -->
         <input type="hidden" id="template-id" value="<?php echo $template_id; ?>" />
         <input type="hidden" id="template-data" value="<?php echo $template ? esc_attr($template->template_data) : ''; ?>" />
+        
+        <!-- Hidden File Inputs -->
+        <input type="file" id="image-file-input" class="hidden-file-input" accept="image/*" />
     </div>
 
     <script>
     jQuery(document).ready(function($) {
         let isDragging = false;
         let currentElementId = 0;
+        let selectedElement = null;
         
         // Initialize drag and drop
         $('.element-item').on('dragstart', function(e) {
@@ -1548,7 +1764,6 @@ private function render_recent_templates_premium() {
         });
         
         $(document).on('dragleave', '.pdf-page', function(e) {
-            // Only remove drop-zone if we're leaving the page element entirely
             if (!$(e.relatedTarget).closest('.pdf-page').length) {
                 $(this).removeClass('drop-zone');
             }
@@ -1574,54 +1789,15 @@ private function render_recent_templates_premium() {
             const elementId = 'element_' + Date.now() + '_' + currentElementId;
             
             let elementHtml = '';
-            let width = 150;
-            let height = 30;
-            let content = '';
+            let width = getDefaultElementWidth(type);
+            let height = getDefaultElementHeight(type);
+            let content = getDefaultElementContent(type);
             
-            switch(type) {
-                case 'text':
-                    content = 'Sample Text';
-                    elementHtml = `<div class="element-content" style="padding: 5px; word-wrap: break-word;">${content}</div>`;
-                    break;
-                case 'image':
-                    content = 'Image';
-                    elementHtml = '<div class="element-content" style="background: #f3f4f6; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 12px; border: 2px dashed #d1d5db;">📷 Image Placeholder</div>';
-                    height = 100;
-                    break;
-                case 'line':
-                    content = '';
-                    elementHtml = '<div class="element-content" style="border-top: 2px solid #000; width: 100%; height: 2px; margin-top: 50%;"></div>';
-                    height = 5;
-                    width = 200;
-                    break;
-                case 'rectangle':
-                    content = 'Rectangle';
-                    elementHtml = '<div class="element-content" style="border: 2px solid #000; width: 100%; height: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 12px;">Rectangle</div>';
-                    height = 100;
-                    break;
-                case 'form-field':
-                    content = '{field_name}';
-                    elementHtml = `<div class="element-content" style="padding: 5px; background: #f9fafb; border: 1px solid #d1d5db; border-radius: 4px;">${content}</div>`;
-                    break;
-                case 'qr-code':
-                    content = 'https://example.com';
-                    elementHtml = '<div class="element-content" style="background: #000; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">QR</div>';
-                    width = 100;
-                    height = 100;
-                    break;
-                case 'barcode':
-                    content = '123456789';
-                    elementHtml = '<div class="element-content" style="background: repeating-linear-gradient(90deg, #000 0px, #000 2px, #fff 2px, #fff 4px); height: 60%; margin-bottom: 5px;"></div><div style="text-align: center; font-size: 10px;">123456789</div>';
-                    width = 200;
-                    height = 60;
-                    break;
-                default:
-                    content = type.charAt(0).toUpperCase() + type.slice(1);
-                    elementHtml = '<div class="element-content" style="padding: 5px;">' + content + '</div>';
-            }
+            elementHtml = generateElementHtml(type, content, width, height);
             
             const $element = $(`
                 <div class="pdf-element" data-id="${elementId}" data-type="${type}" data-content="${content}"
+                     data-image-src="" data-font-size="14" data-font-weight="normal" data-text-color="#000000" data-bg-color="transparent"
                      style="left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px;">
                     ${elementHtml}
                     <div class="element-controls">
@@ -1632,23 +1808,106 @@ private function render_recent_templates_premium() {
             `);
             
             $page.append($element);
-            
-            // Make element interactive
             makeElementInteractive($element);
-            
-            // Auto-select new element
             selectElement($element);
-            
-            // Update template data
             updateTemplateData();
-            
-            // Show success message
             showNotification('Added ' + type + ' element successfully!', 'success');
+        }
+        
+        function getDefaultElementWidth(type) {
+            const widths = {
+                'text': 200, 'heading': 300, 'paragraph': 400,
+                'image': 200, 'logo': 150,
+                'form-field': 200, 'checkbox': 20, 'signature': 200,
+                'line': 300, 'rectangle': 200, 'table': 400,
+                'qr-code': 100, 'barcode': 200, 'date': 150
+            };
+            return widths[type] || 150;
+        }
+        
+        function getDefaultElementHeight(type) {
+            const heights = {
+                'text': 25, 'heading': 35, 'paragraph': 60,
+                'image': 150, 'logo': 80,
+                'form-field': 30, 'checkbox': 20, 'signature': 60,
+                'line': 2, 'rectangle': 100, 'table': 120,
+                'qr-code': 100, 'barcode': 50, 'date': 25
+            };
+            return heights[type] || 30;
+        }
+        
+        function getDefaultElementContent(type) {
+            const contents = {
+                'text': 'Sample Text',
+                'heading': 'Heading Text',
+                'paragraph': 'This is a paragraph of text that can span multiple lines and contain detailed information.',
+                'image': 'image.jpg',
+                'logo': 'logo.png',
+                'form-field': '{field_name}',
+                'checkbox': '☐',
+                'signature': '{signature}',
+                'line': '',
+                'rectangle': '',
+                'table': 'Table Content',
+                'qr-code': 'https://example.com',
+                'barcode': '123456789',
+                'date': '{current_date}'
+            };
+            return contents[type] || type;
+        }
+        
+        function generateElementHtml(type, content, width, height) {
+            switch(type) {
+                case 'text':
+                case 'form-field':
+                    return `<div class="element-content" style="padding: 5px; word-wrap: break-word; font-size: 14px;">${content}</div>`;
+                
+                case 'heading':
+                    return `<div class="element-content" style="padding: 5px; font-size: 24px; font-weight: bold; word-wrap: break-word;">${content}</div>`;
+                
+                case 'paragraph':
+                    return `<div class="element-content" style="padding: 5px; line-height: 1.5; word-wrap: break-word; font-size: 14px;">${content}</div>`;
+                
+                case 'image':
+                case 'logo':
+                    return `<div class="element-content" style="background: #f3f4f6; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 12px; border: 2px dashed #d1d5db; width: 100%; height: 100%; box-sizing: border-box;">📷 Click to upload image</div>`;
+                
+                case 'line':
+                    return `<div class="element-content" style="border-top: 2px solid #000; width: 100%; height: 2px; margin-top: 50%;"></div>`;
+                
+                case 'rectangle':
+                    return `<div class="element-content" style="border: 2px solid #000; width: 100%; height: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 12px;">Rectangle</div>`;
+                
+                case 'checkbox':
+                    return `<div class="element-content" style="font-size: 16px; display: flex; align-items: center; justify-content: center;">☐</div>`;
+                
+                case 'signature':
+                    return `<div class="element-content" style="border-bottom: 2px solid #000; height: 100%; display: flex; align-items: end; padding-bottom: 5px; font-size: 12px; color: #666;">Signature: ________________</div>`;
+                
+                case 'qr-code':
+                    return `<div class="element-content" style="background: #000; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; width: 100%; height: 100%;">QR</div>`;
+                
+                case 'barcode':
+                    return `<div class="element-content" style="width: 100%; height: 100%;"><div style="background: repeating-linear-gradient(90deg, #000 0px, #000 2px, #fff 2px, #fff 4px); height: 70%; margin-bottom: 5px;"></div><div style="text-align: center; font-size: 10px;">123456789</div></div>`;
+                
+                case 'date':
+                    return `<div class="element-content" style="padding: 5px; font-size: 14px;">${new Date().toLocaleDateString()}</div>`;
+                
+                case 'table':
+                    return `<div class="element-content" style="font-size: 12px; padding: 5px;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr><th style="border: 1px solid #ddd; padding: 4px;">Header 1</th><th style="border: 1px solid #ddd; padding: 4px;">Header 2</th></tr>
+                            <tr><td style="border: 1px solid #ddd; padding: 4px;">Data 1</td><td style="border: 1px solid #ddd; padding: 4px;">Data 2</td></tr>
+                        </table>
+                    </div>`;
+                
+                default:
+                    return `<div class="element-content" style="padding: 5px;">${content}</div>`;
+            }
         }
         
         // Make element interactive
         function makeElementInteractive($element) {
-            // Click to select
             $element.off('click').on('click', function(e) {
                 e.stopPropagation();
                 selectElement($(this));
@@ -1657,20 +1916,22 @@ private function render_recent_templates_premium() {
             // Make draggable
             $element.draggable({
                 containment: 'parent',
-                grid: [10, 10],
+                grid: [5, 5],
                 stop: function() {
                     updateTemplateData();
                     updatePropertiesPanel($element);
                 }
             });
             
-            // Make resizable
+            // Make resizable with better constraints
             $element.resizable({
                 containment: 'parent',
-                grid: [10, 10],
+                grid: [5, 5],
                 handles: 'n, e, s, w, ne, nw, se, sw',
                 minWidth: 20,
                 minHeight: 10,
+                maxWidth: 575, // Page width minus margin
+                maxHeight: 822, // Page height minus margin
                 stop: function() {
                     updateTemplateData();
                     updatePropertiesPanel($element);
@@ -1682,131 +1943,262 @@ private function render_recent_templates_premium() {
         function selectElement($element) {
             $('.pdf-element').removeClass('selected');
             $element.addClass('selected');
+            selectedElement = $element;
             updatePropertiesPanel($element);
         }
         
-        // Update properties panel
+        // Update properties panel with enhanced options
         function updatePropertiesPanel($element) {
             if (!$element || !$element.length) {
-                $('#element-properties').html(`
-                    <div class="empty-state" style="padding: 30px 15px;">
-                        <div style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;">⚙️</div>
-                        <div style="font-size: 14px; color: #6b7280;">
-                            Select an element to edit its properties
-                        </div>
-                    </div>
-                `);
+                $('#element-properties').html(getEmptyPropertiesHtml());
                 return;
             }
             
             const type = $element.data('type');
             const content = $element.data('content') || $element.find('.element-content').text();
+            const imageSrc = $element.data('image-src') || '';
+            const fontSize = $element.data('font-size') || '14';
+            const fontWeight = $element.data('font-weight') || 'normal';
+            const textColor = $element.data('text-color') || '#000000';
+            const bgColor = $element.data('bg-color') || 'transparent';
             
             let propertiesHtml = `
-                <div class="property-group" style="margin-bottom: 20px;">
-                    <h6 style="margin-bottom: 12px; font-size: 13px; font-weight: 600; color: #374151;">Position & Size</h6>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                <div class="property-group">
+                    <h6><span class="dashicons dashicons-move"></span> Position & Size</h6>
+                    <div class="property-grid">
                         <div>
-                            <label style="font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 4px; display: block;">X Position</label>
-                            <input type="number" class="property-input" data-property="x" value="${parseInt($element.css('left'))}" style="width: 100%; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 13px;">
+                            <label class="property-label">X Position</label>
+                            <input type="number" class="property-input" data-property="x" value="${parseInt($element.css('left'))}" min="0" max="575">
                         </div>
                         <div>
-                            <label style="font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 4px; display: block;">Y Position</label>
-                            <input type="number" class="property-input" data-property="y" value="${parseInt($element.css('top'))}" style="width: 100%; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 13px;">
+                            <label class="property-label">Y Position</label>
+                            <input type="number" class="property-input" data-property="y" value="${parseInt($element.css('top'))}" min="0" max="822">
                         </div>
                         <div>
-                            <label style="font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 4px; display: block;">Width</label>
-                            <input type="number" class="property-input" data-property="width" value="${$element.width()}" style="width: 100%; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 13px;">
+                            <label class="property-label">Width</label>
+                            <input type="number" class="property-input" data-property="width" value="${$element.width()}" min="20" max="575">
                         </div>
                         <div>
-                            <label style="font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 4px; display: block;">Height</label>
-                            <input type="number" class="property-input" data-property="height" value="${$element.height()}" style="width: 100%; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 13px;">
+                            <label class="property-label">Height</label>
+                            <input type="number" class="property-input" data-property="height" value="${$element.height()}" min="10" max="822">
                         </div>
                     </div>
                 </div>
             `;
             
-            if (type === 'text' || type === 'form-field' || type === 'qr-code' || type === 'barcode') {
+            // Content properties for text-based elements
+            if (['text', 'heading', 'paragraph', 'form-field', 'qr-code', 'barcode', 'date'].includes(type)) {
                 propertiesHtml += `
-                    <div class="property-group" style="margin-bottom: 20px;">
-                        <h6 style="margin-bottom: 12px; font-size: 13px; font-weight: 600; color: #374151;">Content</h6>
-                        <textarea class="property-input" data-property="content" rows="3" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 13px; resize: vertical;">${content}</textarea>
+                    <div class="property-group">
+                        <h6><span class="dashicons dashicons-editor-textcolor"></span> Content</h6>
+                        <label class="property-label">Text Content</label>
+                        <textarea class="property-textarea" data-property="content" rows="3" placeholder="Enter your text content...">${content}</textarea>
                     </div>
                 `;
             }
             
-            if (type === 'text') {
+            // Image properties for image elements
+            if (['image', 'logo'].includes(type)) {
                 propertiesHtml += `
                     <div class="property-group">
-                        <h6 style="margin-bottom: 12px; font-size: 13px; font-weight: 600; color: #374151;">Typography</h6>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <h6><span class="dashicons dashicons-format-image"></span> Image</h6>
+                        <label class="property-label">Image Source</label>
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <button type="button" class="file-upload-btn" onclick="selectImageFile()">
+                                <span class="dashicons dashicons-upload"></span>
+                                Choose Image
+                            </button>
+                            <button type="button" class="file-upload-btn" onclick="removeImage()" style="background: #ef4444;">
+                                <span class="dashicons dashicons-no"></span>
+                                Remove
+                            </button>
+                        </div>
+                        <input type="url" class="property-input" data-property="image-src" value="${imageSrc}" placeholder="Or enter image URL...">
+                        ${imageSrc ? `<div style="margin-top: 10px;"><img src="${imageSrc}" style="max-width: 100%; max-height: 100px; border-radius: 4px; border: 1px solid #e5e7eb;"></div>` : ''}
+                    </div>
+                `;
+            }
+            
+            // Typography properties for text elements
+            if (['text', 'heading', 'paragraph', 'form-field'].includes(type)) {
+                propertiesHtml += `
+                    <div class="property-group">
+                        <h6><span class="dashicons dashicons-editor-bold"></span> Typography</h6>
+                        <div class="property-grid">
                             <div>
-                                <label style="font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 4px; display: block;">Font Size</label>
-                                <input type="number" class="property-input" data-property="fontSize" value="14" style="width: 100%; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 13px;">
+                                <label class="property-label">Font Size</label>
+                                <input type="number" class="property-input" data-property="font-size" value="${fontSize}" min="8" max="72">
                             </div>
                             <div>
-                                <label style="font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 4px; display: block;">Font Weight</label>
-                                <select class="property-input" data-property="fontWeight" style="width: 100%; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 13px;">
-                                    <option value="normal">Normal</option>
-                                    <option value="bold">Bold</option>
-                                    <option value="600">Semi Bold</option>
+                                <label class="property-label">Font Weight</label>
+                                <select class="property-select" data-property="font-weight">
+                                    <option value="normal" ${fontWeight === 'normal' ? 'selected' : ''}>Normal</option>
+                                    <option value="bold" ${fontWeight === 'bold' ? 'selected' : ''}>Bold</option>
+                                    <option value="600" ${fontWeight === '600' ? 'selected' : ''}>Semi Bold</option>
+                                    <option value="300" ${fontWeight === '300' ? 'selected' : ''}>Light</option>
                                 </select>
                             </div>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <label class="property-label">Text Alignment</label>
+                            <select class="property-select" data-property="text-align">
+                                <option value="left">Left</option>
+                                <option value="center">Center</option>
+                                <option value="right">Right</option>
+                                <option value="justify">Justify</option>
+                            </select>
                         </div>
                     </div>
                 `;
             }
             
+            // Color properties
+            propertiesHtml += `
+                <div class="property-group">
+                    <h6><span class="dashicons dashicons-art"></span> Colors & Style</h6>
+                    <div class="property-grid">
+                        <div>
+                            <label class="property-label">Text Color</label>
+                            <div class="color-input-wrapper">
+                                <div class="color-preview" style="background-color: ${textColor};" onclick="$(this).next().trigger('click')"></div>
+                                <input type="color" class="property-input" data-property="text-color" value="${textColor}" style="border: none; padding: 0;">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="property-label">Background</label>
+                            <div class="color-input-wrapper">
+                                <div class="color-preview" style="background-color: ${bgColor === 'transparent' ? '#ffffff' : bgColor};" onclick="$(this).next().trigger('click')"></div>
+                                <input type="color" class="property-input" data-property="bg-color" value="${bgColor === 'transparent' ? '#ffffff' : bgColor}">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button type="button" class="file-upload-btn" onclick="clearBackground()" style="background: #6b7280; font-size: 11px; padding: 6px 10px;">
+                            <span class="dashicons dashicons-dismiss"></span>
+                            Clear Background
+                        </button>
+                    </div>
+                </div>
+            `;
+            
             $('#element-properties').html(propertiesHtml);
             
             // Bind property changes
-            $('.property-input').off('input change').on('input change', function() {
-                const property = $(this).data('property');
-                const value = $(this).val();
-                
-                switch(property) {
-                    case 'x':
-                        $element.css('left', Math.max(0, value) + 'px');
-                        break;
-                    case 'y':
-                        $element.css('top', Math.max(0, value) + 'px');
-                        break;
-                    case 'width':
-                        $element.width(Math.max(20, value));
-                        break;
-                    case 'height':
-                        $element.height(Math.max(10, value));
-                        break;
-                    case 'content':
-                        $element.data('content', value);
-                        if (type === 'text' || type === 'form-field') {
-                            $element.find('.element-content').text(value);
-                        }
-                        break;
-                    case 'fontSize':
-                        $element.find('.element-content').css('font-size', value + 'px');
-                        break;
-                    case 'fontWeight':
-                        $element.find('.element-content').css('font-weight', value);
-                        break;
-                }
-                
-                updateTemplateData();
+            $('.property-input, .property-select, .property-textarea').off('input change').on('input change', function() {
+                updateElementProperty($(this), $element);
             });
         }
+        
+        function updateElementProperty($input, $element) {
+            const property = $input.data('property');
+            const value = $input.val();
+            
+            switch(property) {
+                case 'x':
+                    $element.css('left', Math.max(0, Math.min(575, value)) + 'px');
+                    break;
+                case 'y':
+                    $element.css('top', Math.max(0, Math.min(822, value)) + 'px');
+                    break;
+                case 'width':
+                    $element.width(Math.max(20, Math.min(575, value)));
+                    break;
+                case 'height':
+                    $element.height(Math.max(10, Math.min(822, value)));
+                    break;
+                case 'content':
+                    $element.data('content', value);
+                    if (['text', 'heading', 'paragraph', 'form-field', 'date'].includes($element.data('type'))) {
+                        $element.find('.element-content').text(value);
+                    }
+                    break;
+                case 'image-src':
+                    $element.data('image-src', value);
+                    if (value && ['image', 'logo'].includes($element.data('type'))) {
+                        $element.find('.element-content').html(`<img src="${value}" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.parentElement.innerHTML='📷 Image not found';">`);
+                    }
+                    break;
+                case 'font-size':
+                    $element.data('font-size', value);
+                    $element.find('.element-content').css('font-size', value + 'px');
+                    break;
+                case 'font-weight':
+                    $element.data('font-weight', value);
+                    $element.find('.element-content').css('font-weight', value);
+                    break;
+                case 'text-color':
+                    $element.data('text-color', value);
+                    $element.find('.element-content').css('color', value);
+                    $input.prev('.color-preview').css('background-color', value);
+                    break;
+                case 'bg-color':
+                    $element.data('bg-color', value);
+                    $element.find('.element-content').css('background-color', value);
+                    $input.prev('.color-preview').css('background-color', value);
+                    break;
+                case 'text-align':
+                    $element.find('.element-content').css('text-align', value);
+                    break;
+            }
+            
+            updateTemplateData();
+        }
+        
+        function getEmptyPropertiesHtml() {
+            return `
+                <div class="empty-state" style="padding: 30px 15px;">
+                    <div style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;">⚙️</div>
+                    <div style="font-size: 14px; color: #6b7280;">
+                        Select an element to customize its properties
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Image selection functions
+        window.selectImageFile = function() {
+            $('#image-file-input').trigger('click');
+        };
+        
+        $('#image-file-input').on('change', function(e) {
+            const file = e.target.files[0];
+            if (file && selectedElement) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageSrc = e.target.result;
+                    selectedElement.data('image-src', imageSrc);
+                    selectedElement.find('.element-content').html(`<img src="${imageSrc}" style="width: 100%; height: 100%; object-fit: contain;">`);
+                    updatePropertiesPanel(selectedElement);
+                    updateTemplateData();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        window.removeImage = function() {
+            if (selectedElement) {
+                selectedElement.data('image-src', '');
+                selectedElement.find('.element-content').html('📷 Click to upload image');
+                updatePropertiesPanel(selectedElement);
+                updateTemplateData();
+            }
+        };
+        
+        window.clearBackground = function() {
+            if (selectedElement) {
+                selectedElement.data('bg-color', 'transparent');
+                selectedElement.find('.element-content').css('background-color', 'transparent');
+                updatePropertiesPanel(selectedElement);
+                updateTemplateData();
+            }
+        };
         
         // Clear selection when clicking canvas
         $(document).on('click', '.pdf-page', function(e) {
             if (e.target === this || $(e.target).hasClass('empty-state') || $(e.target).parent().hasClass('empty-state')) {
                 $('.pdf-element').removeClass('selected');
-                $('#element-properties').html(`
-                    <div class="empty-state" style="padding: 30px 15px;">
-                        <div style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;">⚙️</div>
-                        <div style="font-size: 14px; color: #6b7280;">
-                            Select an element to edit its properties
-                        </div>
-                    </div>
-                `);
+                selectedElement = null;
+                $('#element-properties').html(getEmptyPropertiesHtml());
             }
         });
         
@@ -1815,14 +2207,8 @@ private function render_recent_templates_premium() {
             e.stopPropagation();
             if (confirm('Are you sure you want to delete this element?')) {
                 $(this).closest('.pdf-element').remove();
-                $('#element-properties').html(`
-                    <div class="empty-state" style="padding: 30px 15px;">
-                        <div style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;">⚙️</div>
-                        <div style="font-size: 14px; color: #6b7280;">
-                            Select an element to edit its properties
-                        </div>
-                    </div>
-                `);
+                selectedElement = null;
+                $('#element-properties').html(getEmptyPropertiesHtml());
                 updateTemplateData();
                 showNotification('Element deleted', 'success');
             }
@@ -1842,14 +2228,10 @@ private function render_recent_templates_premium() {
             // Update ID
             currentElementId++;
             const newId = 'element_' + Date.now() + '_' + currentElementId;
-            $clone.data('id', newId);
-            $clone.attr('data-id', newId);
+            $clone.data('id', newId).attr('data-id', newId);
             
             $original.parent().append($clone);
-            
-            // Re-initialize interactions
             makeElementInteractive($clone);
-            
             selectElement($clone);
             updateTemplateData();
             showNotification('Element duplicated', 'success');
@@ -1904,7 +2286,6 @@ private function render_recent_templates_premium() {
                         showNotification('Template saved successfully! ✨', 'success');
                         if (!$('#template-id').val() && response.data.template_id) {
                             $('#template-id').val(response.data.template_id);
-                            // Update URL
                             const newUrl = new URL(window.location);
                             newUrl.searchParams.set('template_id', response.data.template_id);
                             history.replaceState({}, '', newUrl);
@@ -1944,7 +2325,8 @@ private function render_recent_templates_premium() {
                         test_name: 'John Doe', 
                         test_email: 'john@example.com',
                         test_message: 'This is a test message for PDF generation.',
-                        field_name: 'Sample Field Value'
+                        field_name: 'Sample Field Value',
+                        current_date: new Date().toLocaleDateString()
                     },
                     nonce: '<?php echo wp_create_nonce('reverse2pdf_nonce'); ?>'
                 },
@@ -1980,8 +2362,6 @@ private function render_recent_templates_premium() {
             $('#pdf-canvas').append($newPage);
             showNotification('New page added successfully', 'success');
             updateTemplateData();
-            
-            // Scroll to new page
             $newPage[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
         
@@ -1993,7 +2373,6 @@ private function render_recent_templates_premium() {
                 return;
             }
             
-            // Create a simple preview window
             const previewWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes');
             const previewHtml = generatePreviewHtml(templateData);
             
@@ -2024,8 +2403,11 @@ private function render_recent_templates_premium() {
                         width: $el.width(),
                         height: $el.height(),
                         content: $el.data('content') || $el.find('.element-content').text() || '',
-                        fontSize: parseInt($el.find('.element-content').css('font-size')) || 14,
-                        fontWeight: $el.find('.element-content').css('font-weight') || 'normal'
+                        imageSrc: $el.data('image-src') || '',
+                        fontSize: $el.data('font-size') || '14',
+                        fontWeight: $el.data('font-weight') || 'normal',
+                        textColor: $el.data('text-color') || '#000000',
+                        bgColor: $el.data('bg-color') || 'transparent'
                     });
                 });
                 
@@ -2054,9 +2436,13 @@ private function render_recent_templates_premium() {
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>Template Preview</title>
+                    <title>Template Preview - Reverse2PDF</title>
                     <style>
-                        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+                        body { 
+                            font-family: Arial, sans-serif; 
+                            margin: 20px; 
+                            background: #f5f5f5; 
+                        }
                         .preview-page { 
                             background: white; 
                             width: 595px; 
@@ -2066,13 +2452,21 @@ private function render_recent_templates_premium() {
                             position: relative;
                             page-break-after: always;
                         }
-                        .preview-element { position: absolute; }
+                        .preview-element { 
+                            position: absolute; 
+                            overflow: hidden;
+                        }
+                        .preview-element img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: contain;
+                        }
                     </style>
                 </head>
                 <body>
             `;
             
-            templateData.pages.forEach((page, pageIndex) => {
+            templateData.pages.forEach((page) => {
                 html += `<div class="preview-page">`;
                 
                 if (page.elements) {
@@ -2080,8 +2474,15 @@ private function render_recent_templates_premium() {
                         let elementStyle = `left: ${element.x}px; top: ${element.y}px; width: ${element.width}px; height: ${element.height}px;`;
                         if (element.fontSize) elementStyle += ` font-size: ${element.fontSize}px;`;
                         if (element.fontWeight) elementStyle += ` font-weight: ${element.fontWeight};`;
+                        if (element.textColor) elementStyle += ` color: ${element.textColor};`;
+                        if (element.bgColor && element.bgColor !== 'transparent') elementStyle += ` background-color: ${element.bgColor};`;
                         
-                        html += `<div class="preview-element" style="${elementStyle}">${element.content || element.type}</div>`;
+                        let elementContent = element.content || element.type;
+                        if (element.imageSrc && ['image', 'logo'].includes(element.type)) {
+                            elementContent = `<img src="${element.imageSrc}" style="width: 100%; height: 100%; object-fit: contain;">`;
+                        }
+                        
+                        html += `<div class="preview-element" style="${elementStyle}">${elementContent}</div>`;
                     });
                 }
                 
@@ -2145,36 +2546,13 @@ private function render_recent_templates_premium() {
                 
                 if (page.elements && page.elements.length) {
                     page.elements.forEach(element => {
-                        let elementHtml = '';
-                        
-                        switch(element.type) {
-                            case 'text':
-                                elementHtml = `<div class="element-content" style="padding: 5px; font-size: ${element.fontSize || 14}px; font-weight: ${element.fontWeight || 'normal'};">${element.content || 'Text'}</div>`;
-                                break;
-                            case 'image':
-                                elementHtml = '<div class="element-content" style="background: #f3f4f6; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 12px; border: 2px dashed #d1d5db;">📷 Image</div>';
-                                break;
-                            case 'line':
-                                elementHtml = '<div class="element-content" style="border-top: 2px solid #000; width: 100%; height: 2px; margin-top: 50%;"></div>';
-                                break;
-                            case 'rectangle':
-                                elementHtml = '<div class="element-content" style="border: 2px solid #000; width: 100%; height: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 12px;">Rectangle</div>';
-                                break;
-                            case 'form-field':
-                                elementHtml = `<div class="element-content" style="padding: 5px; background: #f9fafb; border: 1px solid #d1d5db; border-radius: 4px;">${element.content || '{field}'}</div>`;
-                                break;
-                            case 'qr-code':
-                                elementHtml = '<div class="element-content" style="background: #000; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">QR</div>';
-                                break;
-                            case 'barcode':
-                                elementHtml = '<div class="element-content" style="background: repeating-linear-gradient(90deg, #000 0px, #000 2px, #fff 2px, #fff 4px); height: 60%; margin-bottom: 5px;"></div><div style="text-align: center; font-size: 10px;">123456789</div>';
-                                break;
-                            default:
-                                elementHtml = `<div class="element-content" style="padding: 5px;">${element.content || element.type}</div>`;
-                        }
+                        const elementHtml = generateElementHtml(element.type, element.content, element.width, element.height);
                         
                         const $element = $(`
                             <div class="pdf-element" data-id="${element.id}" data-type="${element.type}" data-content="${element.content || ''}"
+                                 data-image-src="${element.imageSrc || ''}" data-font-size="${element.fontSize || '14'}" 
+                                 data-font-weight="${element.fontWeight || 'normal'}" data-text-color="${element.textColor || '#000000'}" 
+                                 data-bg-color="${element.bgColor || 'transparent'}"
                                  style="left: ${element.x}px; top: ${element.y}px; width: ${element.width}px; height: ${element.height}px;">
                                 ${elementHtml}
                                 <div class="element-controls">
@@ -2183,6 +2561,15 @@ private function render_recent_templates_premium() {
                                 </div>
                             </div>
                         `);
+                        
+                        // Apply saved styles
+                        if (element.fontSize) $element.find('.element-content').css('font-size', element.fontSize + 'px');
+                        if (element.fontWeight) $element.find('.element-content').css('font-weight', element.fontWeight);
+                        if (element.textColor) $element.find('.element-content').css('color', element.textColor);
+                        if (element.bgColor && element.bgColor !== 'transparent') $element.find('.element-content').css('background-color', element.bgColor);
+                        if (element.imageSrc && ['image', 'logo'].includes(element.type)) {
+                            $element.find('.element-content').html(`<img src="${element.imageSrc}" style="width: 100%; height: 100%; object-fit: contain;">`);
+                        }
                         
                         $page.append($element);
                         makeElementInteractive($element);
