@@ -163,72 +163,622 @@ class Reverse2PDF_Admin {
     }
     
     public function dashboard_page() {
-        ?>
-        <div class="wrap">
-            <h1 class="wp-heading-inline">Reverse2PDF Dashboard</h1>
+    global $wpdb;
+    
+    // Get statistics
+    $stats = array(
+        'templates' => $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}" . REVERSE2PDF_TABLE_TEMPLATES),
+        'pdfs_today' => $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}" . REVERSE2PDF_TABLE_LOGS . " WHERE DATE(created_date) = CURDATE() AND action = 'pdf_generated'"),
+        'integrations' => $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}" . REVERSE2PDF_TABLE_INTEGRATIONS . " WHERE active = 1"),
+        'total_pdfs' => $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}" . REVERSE2PDF_TABLE_LOGS . " WHERE action = 'pdf_generated'")
+    );
+    ?>
+    <div class="wrap">
+        <style>
+            .reverse2pdf-dashboard {
+                background: #f8f9fa;
+                margin: -10px -20px;
+                padding: 0;
+                min-height: 100vh;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            }
             
-            <div class="reverse2pdf-dashboard">
-                <div class="welcome-panel">
-                    <div class="welcome-panel-content">
-                        <h2>Welcome to Reverse2PDF Pro!</h2>
-                        <p class="about-description">Create professional PDF documents with our powerful visual builder and form integrations.</p>
-                        
-                        <div class="welcome-panel-column-container">
-                            <div class="welcome-panel-column">
-                                <h3>🎨 Get Started</h3>
-                                <ul>
-                                    <li><a href="<?php echo admin_url('admin.php?page=reverse2pdf-builder'); ?>" class="button button-primary">Create New Template</a></li>
-                                    <li><a href="<?php echo admin_url('admin.php?page=reverse2pdf-templates'); ?>">View Templates</a></li>
-                                    <li><a href="<?php echo admin_url('admin.php?page=reverse2pdf-integrations'); ?>">Setup Form Integration</a></li>
-                                </ul>
+            .reverse2pdf-hero {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 60px 0 80px;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .reverse2pdf-hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="0,0 0,100 1000,100"/></svg>') no-repeat center bottom;
+                background-size: 100% 100px;
+            }
+            
+            .reverse2pdf-hero-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 30px;
+                text-align: center;
+                position: relative;
+                z-index: 2;
+            }
+            
+            .reverse2pdf-hero h1 {
+                font-size: 3.5rem;
+                font-weight: 800;
+                margin: 0 0 20px 0;
+                text-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                background: linear-gradient(45deg, #fff, #f0f8ff);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+            
+            .reverse2pdf-hero p {
+                font-size: 1.25rem;
+                margin: 0 0 40px 0;
+                opacity: 0.95;
+                max-width: 600px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            
+            .reverse2pdf-stats-row {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 30px;
+                margin-top: 40px;
+            }
+            
+            .reverse2pdf-hero-stat {
+                text-align: center;
+                padding: 20px;
+                background: rgba(255,255,255,0.15);
+                border-radius: 16px;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255,255,255,0.2);
+            }
+            
+            .reverse2pdf-hero-stat-number {
+                display: block;
+                font-size: 2.5rem;
+                font-weight: 800;
+                line-height: 1;
+                margin-bottom: 8px;
+            }
+            
+            .reverse2pdf-hero-stat-label {
+                font-size: 0.875rem;
+                opacity: 0.9;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                font-weight: 500;
+            }
+            
+            .reverse2pdf-container {
+                max-width: 1200px;
+                margin: -40px auto 0;
+                padding: 0 30px 60px;
+                position: relative;
+                z-index: 3;
+            }
+            
+            .reverse2pdf-actions-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 24px;
+                margin-bottom: 50px;
+            }
+            
+            .reverse2pdf-action-card {
+                background: white;
+                border-radius: 20px;
+                padding: 40px 30px;
+                text-align: center;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                border: 1px solid #e2e8f0;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                text-decoration: none;
+                color: inherit;
+                position: relative;
+                overflow: hidden;
+                min-height: 220px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            
+            .reverse2pdf-action-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                opacity: 0;
+                transition: all 0.3s ease;
+                z-index: 1;
+            }
+            
+            .reverse2pdf-action-card:hover {
+                transform: translateY(-8px) scale(1.02);
+                box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+                text-decoration: none;
+                color: white;
+            }
+            
+            .reverse2pdf-action-card:hover::before {
+                opacity: 1;
+            }
+            
+            .reverse2pdf-action-card > * {
+                position: relative;
+                z-index: 2;
+            }
+            
+            .reverse2pdf-action-icon {
+                font-size: 4rem;
+                margin-bottom: 20px;
+                display: block;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                transition: all 0.3s ease;
+            }
+            
+            .reverse2pdf-action-card:hover .reverse2pdf-action-icon {
+                -webkit-text-fill-color: white;
+                transform: scale(1.1);
+            }
+            
+            .reverse2pdf-action-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin: 0 0 12px 0;
+                color: #1a202c;
+            }
+            
+            .reverse2pdf-action-card:hover .reverse2pdf-action-title {
+                color: white;
+            }
+            
+            .reverse2pdf-action-description {
+                font-size: 1rem;
+                color: #64748b;
+                margin: 0;
+                line-height: 1.6;
+            }
+            
+            .reverse2pdf-action-card:hover .reverse2pdf-action-description {
+                color: rgba(255,255,255,0.9);
+            }
+            
+            .reverse2pdf-content-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 30px;
+                margin-bottom: 40px;
+            }
+            
+            .reverse2pdf-card {
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+                border: 1px solid #e2e8f0;
+                overflow: hidden;
+                transition: all 0.3s ease;
+            }
+            
+            .reverse2pdf-card:hover {
+                box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+                transform: translateY(-2px);
+            }
+            
+            .reverse2pdf-card-header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 24px 30px;
+                border-bottom: none;
+            }
+            
+            .reverse2pdf-card-title {
+                font-size: 1.375rem;
+                font-weight: 700;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .reverse2pdf-card-body {
+                padding: 30px;
+            }
+            
+            .reverse2pdf-empty-state {
+                text-align: center;
+                padding: 40px 20px;
+                color: #64748b;
+            }
+            
+            .reverse2pdf-empty-icon {
+                font-size: 4rem;
+                margin-bottom: 16px;
+                opacity: 0.5;
+            }
+            
+            .reverse2pdf-empty-title {
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: #374151;
+                margin: 0 0 8px 0;
+            }
+            
+            .reverse2pdf-empty-text {
+                font-size: 1rem;
+                margin: 0 0 24px 0;
+            }
+            
+            .reverse2pdf-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 12px 24px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 0.875rem;
+                transition: all 0.3s ease;
+                border: none;
+                cursor: pointer;
+            }
+            
+            .reverse2pdf-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+                color: white;
+                text-decoration: none;
+            }
+            
+            .reverse2pdf-system-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 16px 0;
+                border-bottom: 1px solid #f1f5f9;
+            }
+            
+            .reverse2pdf-system-item:last-child {
+                border-bottom: none;
+            }
+            
+            .reverse2pdf-system-label {
+                font-weight: 500;
+                color: #374151;
+            }
+            
+            .reverse2pdf-system-value {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 0.875rem;
+            }
+            
+            .reverse2pdf-status-good {
+                color: #10b981;
+                font-weight: 600;
+            }
+            
+            .reverse2pdf-status-warning {
+                color: #f59e0b;
+                font-weight: 600;
+            }
+            
+            @media (max-width: 768px) {
+                .reverse2pdf-hero h1 {
+                    font-size: 2.5rem;
+                }
+                
+                .reverse2pdf-hero-content {
+                    padding: 0 20px;
+                }
+                
+                .reverse2pdf-container {
+                    padding: 0 20px 40px;
+                }
+                
+                .reverse2pdf-content-grid {
+                    grid-template-columns: 1fr;
+                }
+                
+                .reverse2pdf-actions-grid {
+                    grid-template-columns: 1fr;
+                }
+                
+                .reverse2pdf-action-card {
+                    min-height: 180px;
+                    padding: 30px 24px;
+                }
+                
+                .reverse2pdf-action-icon {
+                    font-size: 3rem;
+                }
+            }
+        </style>
+        
+        <div class="reverse2pdf-dashboard">
+            <!-- Hero Section -->
+            <div class="reverse2pdf-hero">
+                <div class="reverse2pdf-hero-content">
+                    <h1>🚀 Reverse2PDF Pro</h1>
+                    <p>The most advanced PDF generation platform for WordPress. Create stunning documents with ease.</p>
+                    
+                    <div class="reverse2pdf-stats-row">
+                        <div class="reverse2pdf-hero-stat">
+                            <span class="reverse2pdf-hero-stat-number"><?php echo number_format($stats['templates']); ?></span>
+                            <span class="reverse2pdf-hero-stat-label">Templates</span>
+                        </div>
+                        <div class="reverse2pdf-hero-stat">
+                            <span class="reverse2pdf-hero-stat-number"><?php echo number_format($stats['pdfs_today']); ?></span>
+                            <span class="reverse2pdf-hero-stat-label">PDFs Today</span>
+                        </div>
+                        <div class="reverse2pdf-hero-stat">
+                            <span class="reverse2pdf-hero-stat-number"><?php echo number_format($stats['integrations']); ?></span>
+                            <span class="reverse2pdf-hero-stat-label">Integrations</span>
+                        </div>
+                        <div class="reverse2pdf-hero-stat">
+                            <span class="reverse2pdf-hero-stat-number"><?php echo number_format($stats['total_pdfs']); ?></span>
+                            <span class="reverse2pdf-hero-stat-label">Total Generated</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="reverse2pdf-container">
+                <!-- Quick Actions -->
+                <div class="reverse2pdf-actions-grid">
+                    <a href="<?php echo admin_url('admin.php?page=reverse2pdf-builder'); ?>" class="reverse2pdf-action-card">
+                        <span class="reverse2pdf-action-icon">✨</span>
+                        <h3 class="reverse2pdf-action-title">Create Template</h3>
+                        <p class="reverse2pdf-action-description">Design professional PDFs with our drag-and-drop visual builder</p>
+                    </a>
+
+                    <a href="<?php echo admin_url('admin.php?page=reverse2pdf-templates'); ?>" class="reverse2pdf-action-card">
+                        <span class="reverse2pdf-action-icon">📄</span>
+                        <h3 class="reverse2pdf-action-title">Manage Templates</h3>
+                        <p class="reverse2pdf-action-description">View, edit, and organize all your PDF templates</p>
+                    </a>
+
+                    <a href="<?php echo admin_url('admin.php?page=reverse2pdf-integrations'); ?>" class="reverse2pdf-action-card">
+                        <span class="reverse2pdf-action-icon">🔗</span>
+                        <h3 class="reverse2pdf-action-title">Form Integrations</h3>
+                        <p class="reverse2pdf-action-description">Connect forms to automatically generate PDFs on submission</p>
+                    </a>
+
+                    <a href="<?php echo admin_url('admin.php?page=reverse2pdf-settings'); ?>" class="reverse2pdf-action-card">
+                        <span class="reverse2pdf-action-icon">⚙️</span>
+                        <h3 class="reverse2pdf-action-title">Settings</h3>
+                        <p class="reverse2pdf-action-description">Configure PDF generation and advanced plugin options</p>
+                    </a>
+                </div>
+
+                <!-- Content Grid -->
+                <div class="reverse2pdf-content-grid">
+                    <!-- Recent Templates -->
+                    <div class="reverse2pdf-card">
+                        <div class="reverse2pdf-card-header">
+                            <h3 class="reverse2pdf-card-title">
+                                <span>📄</span> Recent Templates
+                            </h3>
+                        </div>
+                        <div class="reverse2pdf-card-body">
+                            <?php
+                            $recent_templates = $wpdb->get_results(
+                                "SELECT * FROM {$wpdb->prefix}" . REVERSE2PDF_TABLE_TEMPLATES . " ORDER BY created_date DESC LIMIT 5"
+                            );
+                            
+                            if ($recent_templates) {
+                                foreach ($recent_templates as $template) {
+                                    echo '<div class="reverse2pdf-system-item">';
+                                    echo '<div class="reverse2pdf-system-label">' . esc_html($template->name) . '</div>';
+                                    echo '<div class="reverse2pdf-system-value">';
+                                    echo '<a href="' . admin_url('admin.php?page=reverse2pdf-builder&template_id=' . $template->id) . '" class="reverse2pdf-btn">Edit</a>';
+                                    echo '</div>';
+                                    echo '</div>';
+                                }
+                            } else {
+                                echo '<div class="reverse2pdf-empty-state">';
+                                echo '<div class="reverse2pdf-empty-icon">📄</div>';
+                                echo '<h4 class="reverse2pdf-empty-title">No Templates Yet</h4>';
+                                echo '<p class="reverse2pdf-empty-text">Create your first template to get started</p>';
+                                echo '<a href="' . admin_url('admin.php?page=reverse2pdf-builder') . '" class="reverse2pdf-btn">Create Template</a>';
+                                echo '</div>';
+                            }
+                            ?>
+                        </div>
+                    </div>
+
+                    <!-- System Status -->
+                    <div class="reverse2pdf-card">
+                        <div class="reverse2pdf-card-header">
+                            <h3 class="reverse2pdf-card-title">
+                                <span>🏥</span> System Health
+                            </h3>
+                        </div>
+                        <div class="reverse2pdf-card-body">
+                            <div class="reverse2pdf-system-item">
+                                <div class="reverse2pdf-system-label">PHP Version</div>
+                                <div class="reverse2pdf-system-value">
+                                    <span class="<?php echo version_compare(PHP_VERSION, '7.4', '>=') ? 'reverse2pdf-status-good' : 'reverse2pdf-status-warning'; ?>">
+                                        <?php echo PHP_VERSION; ?>
+                                        <?php echo version_compare(PHP_VERSION, '7.4', '>=') ? '✅' : '⚠️'; ?>
+                                    </span>
+                                </div>
                             </div>
                             
-                            <div class="welcome-panel-column">
-                                <h3>📊 Quick Stats</h3>
-                                <?php
-                                global $wpdb;
-                                $templates_count = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}" . REVERSE2PDF_TABLE_TEMPLATES);
-                                $logs_count = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}" . REVERSE2PDF_TABLE_LOGS . " WHERE DATE(created_date) = CURDATE()");
-                                ?>
-                                <ul>
-                                    <li><strong><?php echo $templates_count; ?></strong> Templates Created</li>
-                                    <li><strong><?php echo $logs_count; ?></strong> PDFs Generated Today</li>
-                                    <li><strong><?php echo REVERSE2PDF_VERSION; ?></strong> Plugin Version</li>
-                                </ul>
+                            <div class="reverse2pdf-system-item">
+                                <div class="reverse2pdf-system-label">WordPress Version</div>
+                                <div class="reverse2pdf-system-value">
+                                    <span class="reverse2pdf-status-good">
+                                        <?php echo get_bloginfo('version'); ?> ✅
+                                    </span>
+                                </div>
                             </div>
                             
-                            <div class="welcome-panel-column">
-                                <h3>🔧 System Status</h3>
-                                <ul>
-                                    <li><strong>PHP:</strong> <?php echo PHP_VERSION; ?> 
-                                        <?php echo version_compare(PHP_VERSION, '7.4', '>=') ? '✅' : '❌'; ?>
-                                    </li>
-                                    <li><strong>WordPress:</strong> <?php echo get_bloginfo('version'); ?> ✅</li>
-                                    <li><strong>GD Extension:</strong> 
-                                        <?php echo extension_loaded('gd') ? '✅ Available' : '⚠️ Missing'; ?>
-                                    </li>
-                                    <li><strong>Memory Limit:</strong> <?php echo ini_get('memory_limit'); ?></li>
-                                </ul>
+                            <div class="reverse2pdf-system-item">
+                                <div class="reverse2pdf-system-label">Memory Limit</div>
+                                <div class="reverse2pdf-system-value">
+                                    <span class="reverse2pdf-status-good">
+                                        <?php echo ini_get('memory_limit'); ?> ✅
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="reverse2pdf-system-item">
+                                <div class="reverse2pdf-system-label">GD Extension</div>
+                                <div class="reverse2pdf-system-value">
+                                    <span class="<?php echo extension_loaded('gd') ? 'reverse2pdf-status-good' : 'reverse2pdf-status-warning'; ?>">
+                                        <?php echo extension_loaded('gd') ? 'Available ✅' : 'Missing ⚠️'; ?>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <div class="reverse2pdf-cards">
-                    <div class="reverse2pdf-card">
-                        <h3>📄 Recent Templates</h3>
-                        <?php $this->render_recent_templates(); ?>
-                    </div>
-                    
-                    <div class="reverse2pdf-card">
-                        <h3>📈 Recent Activity</h3>
-                        <?php $this->render_recent_activity(); ?>
-                    </div>
-                </div>
+            </div>
+        </div>
+    </div>
+    <?php
+}
+
+private function render_recent_templates_premium() {
+    global $wpdb;
+    $templates = $wpdb->get_results(
+        "SELECT * FROM {$wpdb->prefix}" . REVERSE2PDF_TABLE_TEMPLATES . " ORDER BY created_date DESC LIMIT 5"
+    );
+    
+    if ($templates) {
+        foreach ($templates as $template) {
+            echo '<div class="template-item">';
+            echo '<div class="template-info">';
+            echo '<h4>' . esc_html($template->name) . '</h4>';
+            echo '<p>' . esc_html($template->description) . '</p>';
+            echo '</div>';
+            echo '<a href="' . admin_url('admin.php?page=reverse2pdf-builder&template_id=' . $template->id) . '" class="reverse2pdf-btn reverse2pdf-btn-sm">Edit</a>';
+            echo '</div>';
+        }
+    } else {
+        echo '<div class="reverse2pdf-empty-state">';
+        echo '<div class="reverse2pdf-empty-icon">📄</div>';
+        echo '<h4 class="reverse2pdf-empty-title">No Templates Yet</h4>';
+        echo '<p class="reverse2pdf-empty-text">Create your first template to get started</p>';
+        echo '<a href="' . admin_url('admin.php?page=reverse2pdf-builder') . '" class="reverse2pdf-btn">Create Template</a>';
+        echo '</div>';
+    }
+}
+
+    private function render_system_health() {
+        ?>
+        <div class="health-item">
+            <span>PHP Version</span>
+            <span class="health-status <?php echo version_compare(PHP_VERSION, '7.4', '>=') ? 'good' : 'warning'; ?>">
+                <?php echo PHP_VERSION; ?>
+            </span>
+        </div>
+        <div class="health-item">
+            <span>WordPress</span>
+            <span class="health-status good"><?php echo get_bloginfo('version'); ?></span>
+        </div>
+        <div class="health-item">
+            <span>Memory Limit</span>
+            <span class="health-status good"><?php echo ini_get('memory_limit'); ?></span>
+        </div>
+        <div class="health-item">
+            <span>GD Extension</span>
+            <span class="health-status <?php echo extension_loaded('gd') ? 'good' : 'warning'; ?>">
+                <?php echo extension_loaded('gd') ? 'Available' : 'Missing'; ?>
+            </span>
+        </div>
+        <?php
+    }
+
+    private function render_quick_setup() {
+        global $wpdb;
+        $templates_count = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}" . REVERSE2PDF_TABLE_TEMPLATES);
+        $integrations_count = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}" . REVERSE2PDF_TABLE_INTEGRATIONS);
+        
+        $progress = 0;
+        if ($templates_count > 0) $progress += 33;
+        if ($integrations_count > 0) $progress += 33;
+        $progress += 34; // Plugin installed
+        ?>
+        
+        <div class="setup-progress">
+            <div class="setup-progress-bar" style="width: <?php echo $progress; ?>%"></div>
+        </div>
+        
+        <div class="setup-step <?php echo $progress >= 34 ? 'completed' : 'pending'; ?>">
+            <div class="setup-step-icon"><?php echo $progress >= 34 ? '✓' : '1'; ?></div>
+            <div>
+                <strong>Plugin Installed</strong><br>
+                <small>Reverse2PDF is active and ready</small>
+            </div>
+        </div>
+        
+        <div class="setup-step <?php echo $templates_count > 0 ? 'completed' : ($progress >= 34 ? 'current' : 'pending'); ?>">
+            <div class="setup-step-icon"><?php echo $templates_count > 0 ? '✓' : '2'; ?></div>
+            <div>
+                <strong>Create Template</strong><br>
+                <small><?php echo $templates_count > 0 ? $templates_count . ' templates created' : 'Design your first PDF template'; ?></small>
+            </div>
+        </div>
+        
+        <div class="setup-step <?php echo $integrations_count > 0 ? 'completed' : 'pending'; ?>">
+            <div class="setup-step-icon"><?php echo $integrations_count > 0 ? '✓' : '3'; ?></div>
+            <div>
+                <strong>Connect Forms</strong><br>
+                <small><?php echo $integrations_count > 0 ? $integrations_count . ' integrations active' : 'Connect forms for automation'; ?></small>
             </div>
         </div>
         <?php
     }
+
+    private function render_activity_timeline() {
+        global $wpdb;
+        $logs = $wpdb->get_results(
+            "SELECT * FROM {$wpdb->prefix}" . REVERSE2PDF_TABLE_LOGS . " ORDER BY created_date DESC LIMIT 10"
+        );
+        
+        if ($logs) {
+            echo '<div class="activity-timeline">';
+            foreach ($logs as $log) {
+                $status_class = $log->status === 'success' ? 'success' : ($log->status === 'error' ? 'error' : 'warning');
+                echo '<div class="activity-item ' . $status_class . '">';
+                echo '<div class="activity-title">' . esc_html($log->action) . '</div>';
+                echo '<div class="activity-time">' . esc_html($log->created_date) . '</div>';
+                echo '</div>';
+            }
+            echo '</div>';
+        } else {
+            echo '<div class="reverse2pdf-empty-state">';
+            echo '<div class="reverse2pdf-empty-icon">📊</div>';
+            echo '<h4 class="reverse2pdf-empty-title">No Activity Yet</h4>';
+            echo '<p class="reverse2pdf-empty-text">Start creating PDFs to see activity here</p>';
+            echo '</div>';
+        }
+    }
+
     
     public function templates_page() {
         global $wpdb;

@@ -1,548 +1,765 @@
-/**
- * Reverse2PDF Frontend JavaScript
- */
+/* ==========================================================================
+   Reverse2PDF Pro - Frontend JavaScript
+   ========================================================================== */
 
 (function($) {
     'use strict';
-    
-    // Global frontend object
-    window.Reverse2PDF_Frontend = {
+
+    // Global namespace
+    window.Reverse2PDF = window.Reverse2PDF || {};
+    const R2PDF = window.Reverse2PDF;
+
+    // Frontend Object
+    R2PDF.Frontend = {
+        
         init: function() {
             this.bindEvents();
-            this.initViewers();
-            this.loadStoredPDFs();
+            this.initComponents();
+            
+            console.log('🚀 Reverse2PDF Frontend initialized');
         },
-        
+
         bindEvents: function() {
-            // AJAX download buttons
-            $(document).on('click', '.reverse2pdf-ajax-download', this.handleAjaxDownload);
+            // PDF Generation buttons
+            $(document).on('click', '.reverse2pdf-generate', this.handlePDFGeneration);
             
-            // PDF viewers
-            $(document).on('click', '.pdf-viewer-controls .viewer-btn', this.handleViewerControls);
-            
-            // Form submission handling
+            // Form submissions
             $(document).on('submit', '.reverse2pdf-form', this.handleFormSubmission);
             
-            // Copy field names
-            $(document).on('click', '.copy-field-name', this.copyFieldName);
+            // Download buttons
+            $(document).on('click', '.reverse2pdf-download', this.handleDownload);
             
-            // PDF generation progress
-            $(document).on('reverse2pdf:generation-started', this.showProgress);
-            $(document).on('reverse2pdf:generation-completed', this.hideProgress);
-            $(document).on('reverse2pdf:generation-failed', this.showError);
+            // Print buttons
+            $(document).on('click', '.reverse2pdf-print', this.handlePrint);
+            
+            // View buttons
+            $(document).on('click', '.reverse2pdf-view', this.handleView);
         },
-        
-        initViewers: function() {
-            $('.reverse2pdf-pdf-viewer').each(function() {
-                var $viewer = $(this);
-                var templateId = $viewer.data('template-id');
-                var datasetId = $viewer.data('dataset-id') || 0;
-                
-                if (templateId) {
-                    Reverse2PDF_Frontend.loadPDFViewer($viewer, templateId, datasetId);
-                }
-            });
+
+        initComponents: function() {
+            this.initProgressBars();
+            this.initTooltips();
+            this.setupFormValidation();
         },
-        
-        loadStoredPDFs: function() {
-            // Check for stored PDFs from form submissions
-            var sessionId = this.getSessionId();
-            if (sessionId) {
-                this.checkForStoredPDF(sessionId);
-            }
-        },
-        
-        handleAjaxDownload: function(e) {
+
+        handlePDFGeneration: function(e) {
             e.preventDefault();
             
-            var $btn = $(this);
-            var templateId = $btn.data('template-id');
-            var datasetId = $btn.data('dataset-id') || 0;
-            var filename = $btn.data('filename') || '';
-            var format = $btn.data('format') || 'pdf';
+            const $button = $(this);
+            const templateId = $button.data('template-id');
+            const formData = R2PDF.Frontend.collectFormData($button);
+            const originalText = $button.html();
             
             if (!templateId) {
-                Reverse2PDF_Frontend.showNotification('Template ID required', 'error');
+                R2PDF.Frontend.showNotification('Template ID is required', 'error');
                 return;
             }
-            
-            var originalText = $btn.html();
-            $btn.prop('disabled', true).html('<span class="spinner"></span> Generating...');
-            
-            // Trigger generation started event
-            $(document).trigger('reverse2pdf:generation-started', [templateId, datasetId]);
-            
+
+            // Show loading state
+            $button.prop('disabled', true)
+                   .html('<span class="reverse2pdf-spin">⟳</span> Generating PDF...')
+                   .addClass('reverse2pdf-loading');
+
+            // Show progress bar if configured
+            const $progress = R2PDF.Frontend.showProgress($button);
+
             $.ajax({
                 url: reverse2pdf_ajax.ajax_url,
                 type: 'POST',
                 data: {
-                    action: 'reverse2pdf_generate',
+                    action: 'reverse2pdf_generate_pdf',
                     template_id: templateId,
-                    dataset_id: datasetId,
-                    format: format,
-                    filename: filename,
+                    form_data: formData,
                     nonce: reverse2pdf_ajax.nonce
                 },
-                timeout: 60000, // 60 seconds timeout
+                xhr: function() {
+                    const xhr = new window.XMLHttpRequest();
+                    // Upload progress
+                    xhr.upload.addEventListener("progress", function(evt) {
+                        if (evt.lengthComputable && $progress) {
+                            const percentComplete = (evt.loaded / evt.total) * 100;
+                            R2PDF.Frontend.updateProgress($progress, percentComplete);
+                        }
+                    }, false);
+                    return xhr;
+                },
                 success: function(response) {
                     if (response.success) {
-                        // Trigger generation completed event
-                        $(document).trigger('reverse2pdf:generation-completed', [response.data]);
+                        R2PDF.Frontend.showNotification('PDF generated successfully! 🎉', 'success');
                         
-                        // Start download
-                        Reverse2PDF_Frontend.downloadFile(response.data.pdf_url, filename || 'document.pdf');
+                        // Show download options
+                        R2PDF.Frontend.showDownloadOptions($button, response.data);
                         
-                        Reverse2PDF_Frontend.showNotification('PDF generated successfully!', 'success');
+                        // Trigger custom event
+                        $(document).trigger('reverse2pdf:generated', [response.data, templateId]);
+                        
                     } else {
-                        $(document).trigger('reverse2pdf:generation-failed', [response.data]);
-                        Reverse2PDF_Frontend.showNotification('Error: ' + response.data, 'error');
+                        R2PDF.Frontend.showNotification('Generation failed: ' + (response.data || 'Unknown error'), 'error');
                     }
                 },
                 error: function(xhr, status, error) {
-                    $(document).trigger('reverse2pdf:generation-failed', [error]);
-                    
-                    if (status === 'timeout') {
-                        Reverse2PDF_Frontend.showNotification('PDF generation timed out. Please try again.', 'error');
-                    } else {
-                        Reverse2PDF_Frontend.showNotification('An error occurred while generating PDF.', 'error');
-                    }
+                    console.error('PDF Generation Error:', error);
+                    R2PDF.Frontend.showNotification('Request failed. Please try again.', 'error');
                 },
                 complete: function() {
-                    $btn.prop('disabled', false).html(originalText);
+                    $button.prop('disabled', false)
+                           .html(originalText)
+                           .removeClass('reverse2pdf-loading');
+                    
+                    if ($progress) {
+                        setTimeout(() => {
+                            $progress.fadeOut(500, function() {
+                                $(this).remove();
+                            });
+                        }, 1000);
+                    }
                 }
             });
         },
-        
-        loadPDFViewer: function($viewer, templateId, datasetId) {
-            var $loading = $viewer.find('.pdf-loading');
+
+        handleFormSubmission: function(e) {
+            e.preventDefault();
             
-            $loading.html('<div class="loading-animation"><div class="spinner"></div><p>Loading PDF...</p></div>');
+            const $form = $(this);
+            const templateId = $form.data('template-id');
+            const $submitBtn = $form.find('button[type="submit"], input[type="submit"]');
             
+            if (!templateId) {
+                R2PDF.Frontend.showNotification('Form is not configured for PDF generation', 'warning');
+                return;
+            }
+
+            // Validate form
+            if (!R2PDF.Frontend.validateForm($form)) {
+                return;
+            }
+
+            const formData = R2PDF.Frontend.serializeForm($form);
+            const originalText = $submitBtn.val() || $submitBtn.text();
+            
+            // Show loading
+            $submitBtn.prop('disabled', true);
+            if ($submitBtn.is('button')) {
+                $submitBtn.html('<span class="reverse2pdf-spin">⟳</span> Processing...');
+            } else {
+                $submitBtn.val('Processing...');
+            }
+
             $.ajax({
                 url: reverse2pdf_ajax.ajax_url,
                 type: 'POST',
                 data: {
-                    action: 'reverse2pdf_generate',
+                    action: 'reverse2pdf_generate_pdf',
                     template_id: templateId,
-                    dataset_id: datasetId,
-                    preview: true,
+                    form_data: formData,
                     nonce: reverse2pdf_ajax.nonce
                 },
                 success: function(response) {
                     if (response.success) {
-                        var pdfUrl = response.data.pdf_url;
+                        // Show success message
+                        R2PDF.Frontend.showNotification('Form submitted and PDF generated! 📄', 'success');
                         
-                        // Create iframe for PDF display
-                        var iframe = '<iframe src="' + pdfUrl + '" style="width: 100%; height: 100%; border: none;" frameborder="0"></iframe>';
+                        // Show download link
+                        R2PDF.Frontend.showDownloadOptions($form, response.data);
                         
-                        $viewer.html(iframe);
-                        
-                        // Add viewer controls if enabled
-                        var $container = $viewer.closest('.reverse2pdf-viewer-container');
-                        var $controls = $container.find('.pdf-viewer-controls');
-                        
-                        if ($controls.length) {
-                            Reverse2PDF_Frontend.initViewerControls($controls, pdfUrl);
+                        // Reset form if configured
+                        if ($form.data('reset-after-submit')) {
+                            $form[0].reset();
                         }
+                        
+                        // Trigger custom event
+                        $(document).trigger('reverse2pdf:form-submitted', [response.data, formData]);
+                        
                     } else {
-                        $loading.html('<div class="pdf-error"><p>Failed to load PDF: ' + response.data + '</p></div>');
+                        R2PDF.Frontend.showNotification('Submission failed: ' + (response.data || 'Unknown error'), 'error');
                     }
                 },
                 error: function() {
-                    $loading.html('<div class="pdf-error"><p>Failed to load PDF viewer.</p></div>');
+                    R2PDF.Frontend.showNotification('Submission failed. Please try again.', 'error');
+                },
+                complete: function() {
+                    $submitBtn.prop('disabled', false);
+                    if ($submitBtn.is('button')) {
+                        $submitBtn.html(originalText);
+                    } else {
+                        $submitBtn.val(originalText);
+                    }
                 }
             });
         },
-        
-        initViewerControls: function($controls, pdfUrl) {
-            $controls.find('[data-action="download"]').off('click').on('click', function() {
-                Reverse2PDF_Frontend.downloadFile(pdfUrl, 'document.pdf');
-            });
-            
-            $controls.find('[data-action="print"]').off('click').on('click', function() {
-                var printWindow = window.open(pdfUrl, '_blank');
-                printWindow.addEventListener('load', function() {
-                    printWindow.print();
-                });
-            });
-            
-            // Zoom controls
-            var currentZoom = 100;
-            $controls.find('[data-action="zoom-in"]').off('click').on('click', function() {
-                currentZoom = Math.min(currentZoom + 25, 200);
-                Reverse2PDF_Frontend.updateZoom($controls, currentZoom);
-            });
-            
-            $controls.find('[data-action="zoom-out"]').off('click').on('click', function() {
-                currentZoom = Math.max(currentZoom - 25, 25);
-                Reverse2PDF_Frontend.updateZoom($controls, currentZoom);
-            });
-            
-            // Page navigation (if supported)
-            $controls.find('[data-action="previous-page"]').off('click').on('click', function() {
-                // Implementation depends on PDF viewer
-                console.log('Previous page');
-            });
-            
-            $controls.find('[data-action="next-page"]').off('click').on('click', function() {
-                // Implementation depends on PDF viewer
-                console.log('Next page');
-            });
-        },
-        
-        updateZoom: function($controls, zoomLevel) {
-            $controls.find('.zoom-level').text(zoomLevel + '%');
-            
-            // Update iframe zoom if possible
-            var $iframe = $controls.closest('.reverse2pdf-viewer-container').find('iframe');
-            $iframe.css('transform', 'scale(' + (zoomLevel / 100) + ')');
-        },
-        
-        handleViewerControls: function(e) {
+
+        handleDownload: function(e) {
             e.preventDefault();
             
-            var $btn = $(this);
-            var action = $btn.data('action');
-            var $container = $btn.closest('.reverse2pdf-viewer-container');
+            const $link = $(this);
+            const pdfUrl = $link.attr('href') || $link.data('pdf-url');
             
-            switch (action) {
-                case 'fullscreen':
-                    Reverse2PDF_Frontend.toggleFullscreen($container);
-                    break;
-                case 'refresh':
-                    Reverse2PDF_Frontend.refreshViewer($container);
-                    break;
-                case 'share':
-                    Reverse2PDF_Frontend.sharePDF($container);
-                    break;
+            if (!pdfUrl) {
+                R2PDF.Frontend.showNotification('Download URL not found', 'error');
+                return;
+            }
+
+            // Create temporary download link
+            const downloadLink = document.createElement('a');
+            downloadLink.href = pdfUrl;
+            downloadLink.download = $link.data('filename') || 'document.pdf';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+            
+            R2PDF.Frontend.showNotification('Download started 📥', 'info', 2000);
+        },
+
+        handlePrint: function(e) {
+            e.preventDefault();
+            
+            const $button = $(this);
+            const pdfUrl = $button.data('pdf-url');
+            
+            if (!pdfUrl) {
+                R2PDF.Frontend.showNotification('PDF URL not found', 'error');
+                return;
+            }
+
+            // Open in new window for printing
+            const printWindow = window.open(pdfUrl, '_blank');
+            
+            if (printWindow) {
+                printWindow.onload = function() {
+                    printWindow.print();
+                };
+            } else {
+                R2PDF.Frontend.showNotification('Pop-up blocked. Please allow pop-ups and try again.', 'warning');
             }
         },
-        
-        handleFormSubmission: function(e) {
-            var $form = $(this);
-            var generatePDF = $form.data('generate-pdf');
-            var templateId = $form.data('template-id');
+
+        handleView: function(e) {
+            e.preventDefault();
             
-            if (generatePDF && templateId) {
-                e.preventDefault();
-                
-                var formData = new FormData(this);
-                formData.append('action', 'reverse2pdf_process_form');
-                formData.append('template_id', templateId);
-                formData.append('nonce', reverse2pdf_ajax.nonce);
-                
-                var $submitBtn = $form.find('input[type="submit"], button[type="submit"]');
-                var originalText = $submitBtn.val() || $submitBtn.text();
-                
-                $submitBtn.prop('disabled', true);
-                if ($submitBtn.is('input')) {
-                    $submitBtn.val('Processing...');
-                } else {
-                    $submitBtn.text('Processing...');
-                }
-                
-                $.ajax({
-                    url: reverse2pdf_ajax.ajax_url,
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        if (response.success) {
-                            Reverse2PDF_Frontend.showNotification('Form submitted and PDF generated!', 'success');
-                            
-                            // Provide download link
-                            if (response.data.pdf_url) {
-                                var downloadBtn = '<a href="' + response.data.pdf_url + '" target="_blank" class="pdf-download-link">Download Your PDF</a>';
-                                $form.after('<div class="pdf-result">' + downloadBtn + '</div>');
-                            }
-                            
-                            // Reset form if configured
-                            if ($form.data('reset-after-submit')) {
-                                $form[0].reset();
+            const $button = $(this);
+            const pdfUrl = $button.data('pdf-url');
+            const inline = $button.data('inline');
+            
+            if (!pdfUrl) {
+                R2PDF.Frontend.showNotification('PDF URL not found', 'error');
+                return;
+            }
+
+            if (inline) {
+                // Show inline viewer
+                R2PDF.Frontend.showInlineViewer(pdfUrl, $button);
+            } else {
+                // Open in new tab
+                window.open(pdfUrl, '_blank');
+            }
+        },
+
+        // Utility Functions
+        collectFormData: function($context) {
+            const formData = {};
+            
+            // Find the closest form or use the context
+            const $form = $context.closest('form').length ? $context.closest('form') : $context.closest('.reverse2pdf-form');
+            
+            if ($form.length) {
+                $form.find('input, select, textarea').each(function() {
+                    const $field = $(this);
+                    const name = $field.attr('name');
+                    const type = $field.attr('type');
+                    
+                    if (name && type !== 'submit' && type !== 'button') {
+                        if (type === 'checkbox' || type === 'radio') {
+                            if ($field.is(':checked')) {
+                                formData[name] = $field.val();
                             }
                         } else {
-                            Reverse2PDF_Frontend.showNotification('Error: ' + response.data, 'error');
-                        }
-                    },
-                    error: function() {
-                        Reverse2PDF_Frontend.showNotification('Form submission failed. Please try again.', 'error');
-                    },
-                    complete: function() {
-                        $submitBtn.prop('disabled', false);
-                        if ($submitBtn.is('input')) {
-                            $submitBtn.val(originalText);
-                        } else {
-                            $submitBtn.text(originalText);
+                            formData[name] = $field.val();
                         }
                     }
                 });
             }
+            
+            // Add current page info
+            formData.page_url = window.location.href;
+            formData.page_title = document.title;
+            formData.user_agent = navigator.userAgent;
+            formData.timestamp = new Date().toISOString();
+            
+            return formData;
         },
-        
-        copyFieldName: function(e) {
-            e.preventDefault();
+
+        serializeForm: function($form) {
+            const formData = {};
+            const serialized = $form.serializeArray();
             
-            var fieldName = $(this).data('field');
-            var placeholder = '{' + fieldName + '}';
+            $.each(serialized, function(index, field) {
+                if (formData[field.name]) {
+                    // Handle multiple values (like checkboxes)
+                    if (!$.isArray(formData[field.name])) {
+                        formData[field.name] = [formData[field.name]];
+                    }
+                    formData[field.name].push(field.value);
+                } else {
+                    formData[field.name] = field.value;
+                }
+            });
             
-            // Create temporary input to copy text
-            var $temp = $('<input>');
-            $('body').append($temp);
-            $temp.val(placeholder).select();
-            document.execCommand('copy');
-            $temp.remove();
-            
-            // Show feedback
-            var $btn = $(this);
-            var originalHTML = $btn.html();
-            $btn.html('<span class="dashicons dashicons-yes"></span>').addClass('copied');
-            
-            setTimeout(function() {
-                $btn.html(originalHTML).removeClass('copied');
-            }, 1500);
-            
-            Reverse2PDF_Frontend.showNotification('Field name copied: ' + placeholder, 'info', 2000);
+            return formData;
         },
-        
-        downloadFile: function(url, filename) {
-            // Create invisible download link
-            var link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            link.style.display = 'none';
+
+        validateForm: function($form) {
+            let isValid = true;
             
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        },
-        
-        showProgress: function(e, templateId, datasetId) {
-            // Show global progress indicator
-            if (!$('#reverse2pdf-progress').length) {
-                var progressHTML = '<div id="reverse2pdf-progress" class="reverse2pdf-progress-overlay">' +
-                    '<div class="progress-modal">' +
-                    '<div class="progress-content">' +
-                    '<div class="progress-spinner"></div>' +
-                    '<h3>Generating PDF...</h3>' +
-                    '<p>Please wait while your PDF is being created.</p>' +
-                    '<div class="progress-bar"><div class="progress-fill"></div></div>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>';
+            // Remove previous error states
+            $form.find('.field-error').removeClass('field-error');
+            $form.find('.error-message').remove();
+            
+            // Check required fields
+            $form.find('[required]').each(function() {
+                const $field = $(this);
+                const value = $field.val().trim();
                 
-                $('body').append(progressHTML);
+                if (!value) {
+                    isValid = false;
+                    $field.addClass('field-error');
+                    $field.after('<div class="error-message" style="color: #ef4444; font-size: 0.875rem; margin-top: 4px;">This field is required</div>');
+                }
+            });
+            
+            // Check email fields
+            $form.find('input[type="email"]').each(function() {
+                const $field = $(this);
+                const value = $field.val().trim();
+                
+                if (value && !R2PDF.Frontend.isValidEmail(value)) {
+                    isValid = false;
+                    $field.addClass('field-error');
+                    $field.after('<div class="error-message" style="color: #ef4444; font-size: 0.875rem; margin-top: 4px;">Please enter a valid email address</div>');
+                }
+            });
+            
+            if (!isValid) {
+                R2PDF.Frontend.showNotification('Please correct the errors in the form', 'warning');
+                
+                // Scroll to first error
+                const $firstError = $form.find('.field-error').first();
+                if ($firstError.length) {
+                    $('html, body').animate({
+                        scrollTop: $firstError.offset().top - 100
+                    }, 300);
+                    $firstError.focus();
+                }
             }
             
-            $('#reverse2pdf-progress').fadeIn();
-            
-            // Simulate progress
-            var progress = 0;
-            var progressInterval = setInterval(function() {
-                progress += Math.random() * 15;
-                if (progress > 90) progress = 90;
-                
-                $('#reverse2pdf-progress .progress-fill').css('width', progress + '%');
-            }, 500);
-            
-            // Store interval for cleanup
-            $('#reverse2pdf-progress').data('interval', progressInterval);
+            return isValid;
         },
-        
-        hideProgress: function(e, data) {
-            var progressInterval = $('#reverse2pdf-progress').data('interval');
-            if (progressInterval) {
-                clearInterval(progressInterval);
+
+        isValidEmail: function(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        },
+
+        showProgress: function($context) {
+            const $progress = $(`
+                <div class="reverse2pdf-progress-container" style="margin-top: 12px;">
+                    <div class="reverse2pdf-progress">
+                        <div class="reverse2pdf-progress-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-text" style="text-align: center; font-size: 0.875rem; color: #6b7280; margin-top: 8px;">
+                        Preparing PDF generation...
+                    </div>
+                </div>
+            `);
+            
+            $context.after($progress);
+            return $progress;
+        },
+
+        updateProgress: function($progress, percentage) {
+            if ($progress && $progress.length) {
+                $progress.find('.reverse2pdf-progress-bar').css('width', percentage + '%');
+                
+                let text = 'Preparing PDF generation...';
+                if (percentage > 20) text = 'Processing template...';
+                if (percentage > 50) text = 'Generating PDF...';
+                if (percentage > 80) text = 'Finalizing document...';
+                if (percentage >= 100) text = 'Complete!';
+                
+                $progress.find('.progress-text').text(text);
             }
+        },
+
+        showDownloadOptions: function($context, data) {
+            const downloadHtml = `
+                <div class="reverse2pdf-download-options" style="margin-top: 16px; padding: 16px; background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 1px solid #a7f3d0; border-radius: 8px; text-align: center; animation: slideInDown 0.3s ease;">
+                    <div style="margin-bottom: 12px; color: #065f46; font-weight: 600;">
+                        ✅ PDF Generated Successfully!
+                    </div>
+                    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                        <a href="${data.pdf_url}" target="_blank" class="reverse2pdf-btn reverse2pdf-btn-primary reverse2pdf-btn-sm">
+                            <span style="margin-right: 6px;">👁️</span> View PDF
+                        </a>
+                        <a href="${data.pdf_url}" download class="reverse2pdf-btn reverse2pdf-btn-secondary reverse2pdf-btn-sm reverse2pdf-download" data-pdf-url="${data.pdf_url}">
+                            <span style="margin-right: 6px;">📥</span> Download
+                        </a>
+                        <button type="button" class="reverse2pdf-btn reverse2pdf-btn-secondary reverse2pdf-btn-sm reverse2pdf-print" data-pdf-url="${data.pdf_url}">
+                            <span style="margin-right: 6px;">🖨️</span> Print
+                        </button>
+                    </div>
+                    <button type="button" onclick="$(this).parent().fadeOut()" style="position: absolute; top: 8px; right: 8px; background: none; border: none; color: #065f46; opacity: 0.7; cursor: pointer; font-size: 16px;">×</button>
+                </div>
+            `;
             
-            // Complete progress bar
-            $('#reverse2pdf-progress .progress-fill').css('width', '100%');
+            // Remove existing download options
+            $('.reverse2pdf-download-options').remove();
             
-            setTimeout(function() {
-                $('#reverse2pdf-progress').fadeOut(function() {
+            $context.after(downloadHtml);
+            
+            // Auto-remove after 30 seconds
+            setTimeout(() => {
+                $('.reverse2pdf-download-options').fadeOut(500, function() {
                     $(this).remove();
                 });
-            }, 500);
+            }, 30000);
         },
-        
-        showError: function(e, error) {
-            var progressInterval = $('#reverse2pdf-progress').data('interval');
-            if (progressInterval) {
-                clearInterval(progressInterval);
-            }
+
+        showInlineViewer: function(pdfUrl, $context) {
+            const viewerHtml = `
+                <div class="reverse2pdf-viewer" style="margin-top: 20px;">
+                    <div style="background: #f3f4f6; padding: 12px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0;">
+                        <span style="font-weight: 600; color: #374151;">PDF Viewer</span>
+                        <button type="button" onclick="$(this).closest('.reverse2pdf-viewer').fadeOut()" style="background: none; border: none; color: #6b7280; cursor: pointer;">✕</button>
+                    </div>
+                    <iframe src="${pdfUrl}" style="width: 100%; height: 600px; border: none; border-radius: 0 0 8px 8px;"></iframe>
+                </div>
+            `;
             
-            $('#reverse2pdf-progress .progress-content').html(
-                '<div class="error-icon">⚠</div>' +
-                '<h3>PDF Generation Failed</h3>' +
-                '<p>' + error + '</p>' +
-                '<button class="button" onclick="$(\'#reverse2pdf-progress\').fadeOut();">Close</button>'
-            );
+            // Remove existing viewers
+            $('.reverse2pdf-viewer').remove();
+            
+            $context.after(viewerHtml);
         },
-        
-        showNotification: function(message, type, duration) {
-            type = type || 'info';
-            duration = duration || 4000;
-            
-            // Remove existing notifications
-            $('.reverse2pdf-notification').remove();
-            
-            var $notification = $('<div class="reverse2pdf-notification ' + type + '">' + message + '</div>');
-            
-            // Style the notification
-            $notification.css({
-                position: 'fixed',
-                top: '20px',
-                right: '20px',
-                padding: '15px 20px',
-                borderRadius: '4px',
-                color: '#fff',
-                fontSize: '14px',
-                fontWeight: '500',
-                zIndex: '999999',
-                maxWidth: '350px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                opacity: '0',
-                transform: 'translateX(100%)',
-                transition: 'all 0.3s ease'
-            });
-            
-            // Set colors based on type
-            var colors = {
-                success: '#28a745',
-                error: '#dc3545',
-                warning: '#ffc107',
-                info: '#17a2b8'
+
+        showNotification: function(message, type = 'info', duration = 5000) {
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
             };
-            
-            $notification.css('backgroundColor', colors[type] || colors.info);
-            
+
+            const $notification = $(`
+                <div class="reverse2pdf-notification ${type}" style="position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 350px; animation: slideInRight 0.3s ease;">
+                    <span style="margin-right: 8px;">${icons[type]}</span>
+                    <span>${message}</span>
+                    <button type="button" onclick="$(this).parent().fadeOut()" style="margin-left: auto; background: none; border: none; opacity: 0.7; cursor: pointer;">×</button>
+                </div>
+            `);
+
             $('body').append($notification);
-            
-            // Animate in
-            setTimeout(function() {
-                $notification.css({
-                    opacity: '1',
-                    transform: 'translateX(0)'
-                });
-            }, 10);
-            
+
             // Auto remove
-            setTimeout(function() {
-                $notification.css({
-                    opacity: '0',
-                    transform: 'translateX(100%)'
+            setTimeout(() => {
+                $notification.fadeOut(300, function() {
+                    $(this).remove();
                 });
-                
-                setTimeout(function() {
-                    $notification.remove();
-                }, 300);
             }, duration);
-            
-            // Click to dismiss
-            $notification.on('click', function() {
-                $(this).css({
-                    opacity: '0',
-                    transform: 'translateX(100%)'
-                });
+
+            return $notification;
+        },
+
+        initProgressBars: function() {
+            // Animate any existing progress bars
+            $('.reverse2pdf-progress-bar').each(function() {
+                const $bar = $(this);
+                const width = $bar.data('width') || '0%';
+                $bar.animate({ width: width }, 1000);
             });
         },
-        
-        getSessionId: function() {
-            // Simple session ID generation
-            var sessionId = sessionStorage.getItem('reverse2pdf_session');
-            if (!sessionId) {
-                sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-                sessionStorage.setItem('reverse2pdf_session', sessionId);
-            }
-            return sessionId;
-        },
-        
-        checkForStoredPDF: function(sessionId) {
-            $.ajax({
-                url: reverse2pdf_ajax.ajax_url,
-                type: 'POST',
-                data: {
-                    action: 'reverse2pdf_check_stored_pdf',
-                    session_id: sessionId,
-                    nonce: reverse2pdf_ajax.nonce
-                },
-                success: function(response) {
-                    if (response.success && response.data.pdf_url) {
-                        // Show download notification for stored PDF
-                        var downloadHTML = '<div class="stored-pdf-notification">' +
-                            '<h4>Your PDF is Ready!</h4>' +
-                            '<p>A PDF was generated from your recent form submission.</p>' +
-                            '<a href="' + response.data.pdf_url + '" class="button button-primary" target="_blank">Download PDF</a>' +
-                            '<button class="button dismiss-notification" onclick="$(this).closest(\'.stored-pdf-notification\').fadeOut();">Dismiss</button>' +
-                            '</div>';
+
+        initTooltips: function() {
+            // Simple tooltip implementation
+            $('[data-tooltip]').hover(
+                function() {
+                    const title = $(this).data('tooltip');
+                    if (title) {
+                        const $tooltip = $('<div class="reverse2pdf-tooltip">')
+                            .text(title)
+                            .css({
+                position: 'absolute',
+                background: '#1f2937',
+                color: 'white',
+                padding: '6px 10px',
+                borderRadius: '4px',
+                fontSize: '12px',
+                zIndex: 9999,
+                whiteSpace: 'nowrap',
+                pointerEvents: 'none'
+            });
                         
-                        $('body').append(downloadHTML);
-                        
-                        // Position the notification
-                        $('.stored-pdf-notification').css({
-                            position: 'fixed',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            background: '#fff',
-                            padding: '20px',
-                            borderRadius: '8px',
-                            boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-                            zIndex: '999999',
-                            textAlign: 'center',
-                            minWidth: '300px'
+                        const pos = $(this).offset();
+                        $tooltip.appendTo('body').css({
+                            top: pos.top - $tooltip.outerHeight() - 8,
+                            left: pos.left + ($(this).outerWidth() / 2) - ($tooltip.outerWidth() / 2)
                         });
                     }
+                },
+                function() {
+                    $('.reverse2pdf-tooltip').remove();
+                }
+            );
+        },
+
+        setupFormValidation: function() {
+            // Real-time form validation
+            $('.reverse2pdf-form input, .reverse2pdf-form select, .reverse2pdf-form textarea').on('blur', function() {
+                R2PDF.Frontend.validateField($(this));
+            });
+            
+            // Clear errors on focus
+            $('.reverse2pdf-form input, .reverse2pdf-form select, .reverse2pdf-form textarea').on('focus', function() {
+                $(this).removeClass('field-error').next('.error-message').remove();
+            });
+        },
+
+        validateField: function($field) {
+            let isValid = true;
+            const value = $field.val().trim();
+            
+            // Clear previous errors
+            $field.removeClass('field-error').next('.error-message').remove();
+            
+            // Required field validation
+            if ($field.attr('required') && !value) {
+                isValid = false;
+                $field.addClass('field-error')
+                      .after('<div class="error-message" style="color: #ef4444; font-size: 0.875rem; margin-top: 4px;">This field is required</div>');
+            }
+            
+            // Email validation
+            if ($field.attr('type') === 'email' && value && !R2PDF.Frontend.isValidEmail(value)) {
+                isValid = false;
+                $field.addClass('field-error')
+                      .after('<div class="error-message" style="color: #ef4444; font-size: 0.875rem; margin-top: 4px;">Please enter a valid email address</div>');
+            }
+            
+            // URL validation
+            if ($field.attr('type') === 'url' && value && !R2PDF.Frontend.isValidUrl(value)) {
+                isValid = false;
+                $field.addClass('field-error')
+                      .after('<div class="error-message" style="color: #ef4444; font-size: 0.875rem; margin-top: 4px;">Please enter a valid URL</div>');
+            }
+            
+            // Phone validation
+            if ($field.attr('type') === 'tel' && value && !R2PDF.Frontend.isValidPhone(value)) {
+                isValid = false;
+                $field.addClass('field-error')
+                      .after('<div class="error-message" style="color: #ef4444; font-size: 0.875rem; margin-top: 4px;">Please enter a valid phone number</div>');
+            }
+            
+            return isValid;
+        },
+
+        isValidUrl: function(url) {
+            try {
+                new URL(url);
+                return true;
+            } catch {
+                return false;
+            }
+        },
+
+        isValidPhone: function(phone) {
+            const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+            return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
+        },
+
+        // Shortcode functions
+        processShortcodes: function() {
+            // Process any reverse2pdf shortcodes on the page
+            $('.reverse2pdf-shortcode').each(function() {
+                const $shortcode = $(this);
+                const type = $shortcode.data('type');
+                const value = $shortcode.data('value');
+                
+                switch (type) {
+                    case 'date':
+                        $shortcode.text(R2PDF.Frontend.formatDate(value));
+                        break;
+                    case 'currency':
+                        $shortcode.text(R2PDF.Frontend.formatCurrency(value));
+                        break;
+                    case 'number':
+                        $shortcode.text(R2PDF.Frontend.formatNumber(value));
+                        break;
                 }
             });
         },
-        
-        toggleFullscreen: function($container) {
-            if (!document.fullscreenElement) {
-                $container[0].requestFullscreen().catch(err => {
-                    console.log('Error attempting to enable fullscreen:', err);
-                });
-            } else {
-                document.exitFullscreen();
-            }
-        },
-        
-        refreshViewer: function($container) {
-            var $viewer = $container.find('.reverse2pdf-pdf-viewer');
-            var templateId = $viewer.data('template-id');
-            var datasetId = $viewer.data('dataset-id') || 0;
+
+        formatDate: function(date, format = 'long') {
+            const d = new Date(date);
+            const options = {
+                short: { year: 'numeric', month: 'short', day: 'numeric' },
+                long: { year: 'numeric', month: 'long', day: 'numeric' },
+                full: { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+            };
             
-            $viewer.html('<div class="pdf-loading">Refreshing...</div>');
-            this.loadPDFViewer($viewer, templateId, datasetId);
+            return d.toLocaleDateString('en-US', options[format] || options.long);
         },
-        
-        sharePDF: function($container) {
-            var $iframe = $container.find('iframe');
-            if ($iframe.length) {
-                var pdfUrl = $iframe.attr('src');
-                
-                if (navigator.share) {
-                    navigator.share({
-                        title: 'PDF Document',
-                        url: pdfUrl
-                    });
-                } else {
-                    // Fallback: copy to clipboard
-                    var $temp = $('<input>');
-                    $('body').append($temp);
-                    $temp.val(pdfUrl).select();
-                    document.execCommand('copy');
-                    $temp.remove();
-                    
-                    this.showNotification('PDF link copied to clipboard!', 'info');
-                }
-            }
+
+        formatCurrency: function(amount, currency = 'USD') {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: currency
+            }).format(amount);
+        },
+
+        formatNumber: function(number, decimals = 0) {
+            return new Intl.NumberFormat('en-US', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            }).format(number);
+        },
+
+        // Event handlers for custom events
+        onPDFGenerated: function(callback) {
+            $(document).on('reverse2pdf:generated', callback);
+        },
+
+        onFormSubmitted: function(callback) {
+            $(document).on('reverse2pdf:form-submitted', callback);
+        },
+
+        // Utility functions
+        debounce: function(func, wait, immediate) {
+            let timeout;
+            return function executedFunction() {
+                const context = this;
+                const args = arguments;
+                const later = function() {
+                    timeout = null;
+                    if (!immediate) func.apply(context, args);
+                };
+                const callNow = immediate && !timeout;
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+                if (callNow) func.apply(context, args);
+            };
+        },
+
+        getCookie: function(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        },
+
+        setCookie: function(name, value, days = 7) {
+            const expires = new Date(Date.now() + days * 864e5).toUTCString();
+            document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+        },
+
+        // Browser detection
+        getBrowserInfo: function() {
+            const ua = navigator.userAgent;
+            return {
+                isChrome: /Chrome/.test(ua) && /Google Inc/.test(navigator.vendor),
+                isFirefox: /Firefox/.test(ua),
+                isSafari: /Safari/.test(ua) && /Apple Computer/.test(navigator.vendor),
+                isEdge: /Edg/.test(ua),
+                isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)
+            };
         }
     };
-    
+
     // Initialize when document is ready
     $(document).ready(function() {
-        Reverse2PDF_Frontend.init();
+        R2PDF.Frontend.init();
+        R2PDF.Frontend.processShortcodes();
+        
+        // Handle WordPress AJAX in frontend
+        if (typeof reverse2pdf_ajax !== 'undefined') {
+            console.log('Reverse2PDF AJAX configuration loaded');
+        }
     });
-    
+
+    // Public API
+    window.Reverse2PDF = R2PDF;
+
 })(jQuery);
+
+// Additional CSS for frontend
+const frontendCSS = `
+<style>
+.reverse2pdf-tooltip {
+    pointer-events: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.field-error {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.reverse2pdf-progress-container {
+    opacity: 0;
+    animation: fadeInUp 0.3s ease forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.reverse2pdf-download-options {
+    position: relative;
+}
+
+.reverse2pdf-notification {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+@media (max-width: 480px) {
+    .reverse2pdf-download-options div:last-child {
+        flex-direction: column;
+    }
+    
+    .reverse2pdf-notification {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
+</style>
+`;
+
+document.head.insertAdjacentHTML('beforeend', frontendCSS);

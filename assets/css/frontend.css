@@ -1,502 +1,363 @@
-/**
- * Reverse2PDF Frontend Styles
- */
+/* ==========================================================================
+   Reverse2PDF Pro - Frontend Styles
+   ========================================================================== */
 
-/* PDF Download Buttons */
-.reverse2pdf-download-btn {
-    display: inline-block;
-    background: #007cba;
-    color: #ffffff;
-    padding: 12px 20px;
-    text-decoration: none;
-    border-radius: 4px;
-    font-weight: 500;
-    font-size: 14px;
+/* CSS Variables */
+:root {
+    --r2pdf-primary: #6366f1;
+    --r2pdf-primary-hover: #4f46e5;
+    --r2pdf-success: #10b981;
+    --r2pdf-warning: #f59e0b;
+    --r2pdf-danger: #ef4444;
+    --r2pdf-white: #ffffff;
+    --r2pdf-gray-100: #f3f4f6;
+    --r2pdf-gray-200: #e5e7eb;
+    --r2pdf-gray-300: #d1d5db;
+    --r2pdf-gray-500: #6b7280;
+    --r2pdf-gray-700: #374151;
+    --r2pdf-gray-900: #111827;
+    
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --radius: 8px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* PDF Generation Forms */
+.reverse2pdf-form {
+    max-width: 600px;
+    margin: 20px 0;
+    padding: 24px;
+    background: var(--r2pdf-white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--r2pdf-gray-200);
+}
+
+.reverse2pdf-form-group {
+    margin-bottom: 20px;
+}
+
+.reverse2pdf-form-label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: var(--r2pdf-gray-700);
+    font-size: 0.875rem;
+}
+
+.reverse2pdf-form-input,
+.reverse2pdf-form-select,
+.reverse2pdf-form-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--r2pdf-gray-200);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    transition: var(--transition);
+    background: var(--r2pdf-white);
+}
+
+.reverse2pdf-form-input:focus,
+.reverse2pdf-form-select:focus,
+.reverse2pdf-form-textarea:focus {
+    border-color: var(--r2pdf-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.reverse2pdf-form-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Buttons */
+.reverse2pdf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: var(--radius);
     border: none;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 124, 186, 0.2);
-}
-
-.reverse2pdf-download-btn:hover {
-    background: #005a87;
-    color: #ffffff;
+    transition: var(--transition);
     text-decoration: none;
+    line-height: 1;
+    font-family: inherit;
+}
+
+.reverse2pdf-btn-primary {
+    background: linear-gradient(135deg, var(--r2pdf-primary) 0%, #4f46e5 100%);
+    color: white;
+    box-shadow: var(--shadow);
+}
+
+.reverse2pdf-btn-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 124, 186, 0.3);
+    box-shadow: var(--shadow-md);
+    color: white;
+    text-decoration: none;
 }
 
-.reverse2pdf-download-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0, 124, 186, 0.2);
+.reverse2pdf-btn-secondary {
+    background: var(--r2pdf-white);
+    color: var(--r2pdf-gray-700);
+    border: 2px solid var(--r2pdf-gray-200);
 }
 
-.reverse2pdf-download-btn:disabled {
-    background: #ccc;
+.reverse2pdf-btn-secondary:hover {
+    border-color: var(--r2pdf-primary);
+    color: var(--r2pdf-primary);
+    text-decoration: none;
+}
+
+.reverse2pdf-btn:disabled {
+    opacity: 0.6;
     cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
+    transform: none !important;
 }
 
-.reverse2pdf-download-btn .spinner {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top-color: #ffffff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-right: 8px;
-}
-
-/* PDF Viewer Container */
-.reverse2pdf-viewer-container {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: #ffffff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    overflow: hidden;
-}
-
-/* PDF Viewer Controls */
-.pdf-viewer-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #f8f9fa;
-    padding: 10px 15px;
-    border-bottom: 1px solid #dee2e6;
-}
-
-.viewer-controls-left,
-.viewer-controls-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.viewer-btn {
-    background: #ffffff;
-    border: 1px solid #ced4da;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    transition: all 0.2s ease;
-}
-
-.viewer-btn:hover {
-    background: #e9ecef;
-    border-color: #adb5bd;
-}
-
-.viewer-btn.primary {
-    background: #007cba;
-    color: #ffffff;
-    border-color: #007cba;
-}
-
-.viewer-btn.primary:hover {
-    background: #005a87;
-    border-color: #005a87;
-}
-
-.page-navigation {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-}
-
-.page-input {
-    width: 40px;
-    padding: 4px 6px;
-    border: 1px solid #ced4da;
-    border-radius: 3px;
-    text-align: center;
-    font-size: 12px;
-}
-
-.zoom-level {
-    font-size: 11px;
-    font-weight: 500;
-    color: #495057;
-    min-width: 35px;
-    text-align: center;
-}
-
-/* PDF Viewer */
-.reverse2pdf-pdf-viewer {
+/* PDF Generation Trigger */
+.reverse2pdf-generate {
     position: relative;
-    background: #f8f9fa;
-    min-height: 400px;
-}
-
-.pdf-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 400px;
-    color: #6c757d;
-}
-
-.loading-animation {
-    text-align: center;
-}
-
-.loading-animation .spinner {
-    display: inline-block;
-    width: 32px;
-    height: 32px;
-    border: 3px solid #e9ecef;
-    border-top-color: #007cba;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 15px;
-}
-
-.pdf-error {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 400px;
-    color: #dc3545;
-    text-align: center;
-}
-
-/* Progress Overlay */
-.reverse2pdf-progress-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 999999;
-    display: none;
-}
-
-.progress-modal {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #ffffff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    text-align: center;
-    min-width: 300px;
-    max-width: 400px;
-}
-
-.progress-spinner {
-    width: 48px;
-    height: 48px;
-    border: 4px solid #e9ecef;
-    border-top-color: #007cba;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 20px;
-}
-
-.progress-modal h3 {
-    margin: 0 0 10px 0;
-    color: #333;
-    font-size: 18px;
-}
-
-.progress-modal p {
-    margin: 0 0 20px 0;
-    color: #666;
-    font-size: 14px;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 8px;
-    background: #e9ecef;
-    border-radius: 4px;
     overflow: hidden;
-    margin-top: 20px;
 }
 
-.progress-fill {
+.reverse2pdf-generate::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, #007cba, #0056b3);
-    width: 0%;
-    transition: width 0.3s ease;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
 }
 
-.error-icon {
-    font-size: 48px;
-    margin-bottom: 15px;
-    color: #dc3545;
+.reverse2pdf-generate:hover::before {
+    left: 100%;
+}
+
+/* Download Links */
+.reverse2pdf-download-link {
+    margin: 16px 0;
+    padding: 16px;
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 1px solid #a7f3d0;
+    border-radius: var(--radius);
+    text-align: center;
+    animation: slideInDown 0.3s ease;
+}
+
+.reverse2pdf-download-link a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #065f46;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.reverse2pdf-download-link a:hover {
+    color: #047857;
+    text-decoration: underline;
 }
 
 /* Notifications */
 .reverse2pdf-notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 15px 20px;
-    border-radius: 4px;
-    color: #ffffff;
-    font-size: 14px;
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    margin: 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-weight: 500;
-    z-index: 999999;
-    max-width: 350px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    cursor: pointer;
+    animation: slideInDown 0.3s ease;
 }
 
 .reverse2pdf-notification.success {
-    background: #28a745;
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    color: #065f46;
+    border: 1px solid #a7f3d0;
 }
 
 .reverse2pdf-notification.error {
-    background: #dc3545;
+    background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+    color: #991b1b;
+    border: 1px solid #fca5a5;
 }
 
 .reverse2pdf-notification.warning {
-    background: #ffc107;
-    color: #212529;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    color: #92400e;
+    border: 1px solid #fcd34d;
 }
 
 .reverse2pdf-notification.info {
-    background: #17a2b8;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    color: #1e40af;
+    border: 1px solid #93c5fd;
 }
 
-/* Stored PDF Notification */
-.stored-pdf-notification {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #ffffff;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    z-index: 999999;
-    text-align: center;
-    min-width: 300px;
-}
-
-.stored-pdf-notification h4 {
-    margin: 0 0 10px 0;
-    color: #28a745;
-    font-size: 18px;
-}
-
-.stored-pdf-notification p {
-    margin: 0 0 20px 0;
-    color: #666;
-    font-size: 14px;
-}
-
-.stored-pdf-notification .button {
-    margin: 0 5px;
-}
-
-/* Form Integration */
-.reverse2pdf-form {
+/* Loading States */
+.reverse2pdf-loading {
     position: relative;
+    opacity: 0.7;
+    pointer-events: none;
 }
 
-.pdf-result {
-    margin-top: 20px;
-    padding: 15px;
-    background: #d4edda;
-    border: 1px solid #c3e6cb;
-    border-radius: 4px;
-    text-align: center;
+.reverse2pdf-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+    animation: shimmer 1.5s infinite;
 }
 
-.pdf-download-link {
+.reverse2pdf-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* PDF Viewer */
+.reverse2pdf-viewer {
+    max-width: 100%;
+    margin: 20px 0;
+    border: 1px solid var(--r2pdf-gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.reverse2pdf-viewer iframe {
+    width: 100%;
+    height: 600px;
+    border: none;
+}
+
+/* Shortcode Styles */
+.reverse2pdf-shortcode {
+    margin: 16px 0;
+}
+
+.reverse2pdf-field-value {
     display: inline-block;
-    background: #28a745;
-    color: #ffffff;
-    padding: 10px 20px;
-    text-decoration: none;
+    padding: 4px 8px;
+    background: var(--r2pdf-gray-100);
     border-radius: 4px;
-    font-weight: 500;
-    transition: background-color 0.3s ease;
+    font-family: monospace;
+    font-size: 0.875rem;
+    color: var(--r2pdf-gray-700);
 }
 
-.pdf-download-link:hover {
-    background: #218838;
-    color: #ffffff;
-    text-decoration: none;
-}
-
-/* Field Copy Functionality */
-.copy-field-name {
-    transition: all 0.2s ease;
-}
-
-.copy-field-name.copied {
-    background: #28a745;
-    color: #ffffff;
-    border-color: #28a745;
-}
-
-.field-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 12px;
-    border: 1px solid #e9ecef;
+/* Progress Indicators */
+.reverse2pdf-progress {
+    width: 100%;
+    height: 8px;
+    background: var(--r2pdf-gray-200);
     border-radius: 4px;
-    margin-bottom: 4px;
-    font-size: 13px;
+    overflow: hidden;
+    margin: 12px 0;
 }
 
-.field-info strong {
-    display: block;
-    font-size: 13px;
-    margin-bottom: 2px;
+.reverse2pdf-progress-bar {
+    height: 100%;
+    background: linear-gradient(135deg, var(--r2pdf-primary) 0%, #4f46e5 100%);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    animation: shimmer 2s infinite;
 }
 
-.field-info small {
-    color: #6c757d;
-    font-size: 11px;
+/* Animations */
+@keyframes slideInDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
-.field-actions {
-    flex-shrink: 0;
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .pdf-viewer-controls {
-        flex-direction: column;
-        gap: 10px;
-        align-items: stretch;
+    .reverse2pdf-form {
+        padding: 20px;
+        margin: 16px 0;
     }
     
-    .viewer-controls-left,
-    .viewer-controls-right {
-        justify-content: center;
+    .reverse2pdf-btn {
+        padding: 10px 20px;
+        font-size: 0.8125rem;
     }
     
-    .reverse2pdf-notification {
-        left: 10px;
-        right: 10px;
-        max-width: none;
-    }
-    
-    .progress-modal,
-    .stored-pdf-notification {
-        left: 10px;
-        right: 10px;
-        transform: translateY(-50%);
-        max-width: none;
+    .reverse2pdf-viewer iframe {
+        height: 400px;
     }
 }
 
 @media (max-width: 480px) {
-    .reverse2pdf-download-btn {
-        width: 100%;
-        text-align: center;
-        margin-bottom: 10px;
+    .reverse2pdf-form {
+        padding: 16px;
     }
     
-    .viewer-btn {
-        padding: 8px 10px;
-        font-size: 11px;
-    }
-    
-    .page-navigation {
-        flex-wrap: wrap;
-        justify-content: center;
+    .reverse2pdf-form-input,
+    .reverse2pdf-form-select,
+    .reverse2pdf-form-textarea {
+        padding: 10px 14px;
     }
 }
 
 /* Print Styles */
 @media print {
-    .reverse2pdf-download-btn,
-    .pdf-viewer-controls,
+    .reverse2pdf-btn,
     .reverse2pdf-notification,
-    .progress-overlay {
+    .reverse2pdf-form {
         display: none !important;
-    }
-    
-    .reverse2pdf-pdf-viewer {
-        width: 100% !important;
-        height: auto !important;
-    }
-}
-
-/* Animations */
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(100%);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes slideInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-100%);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
     }
 }
 
 /* Accessibility */
-.reverse2pdf-download-btn:focus,
-.viewer-btn:focus {
-    outline: 2px solid #007cba;
+.reverse2pdf-btn:focus,
+.reverse2pdf-form-input:focus,
+.reverse2pdf-form-select:focus,
+.reverse2pdf-form-textarea:focus {
+    outline: 2px solid var(--r2pdf-primary);
     outline-offset: 2px;
 }
 
-.reverse2pdf-notification[role="alert"] {
-    /* Screen reader announcement */
-}
-
-/* High contrast mode support */
+/* High Contrast Mode */
 @media (prefers-contrast: high) {
-    .reverse2pdf-download-btn {
-        border: 2px solid currentColor;
-    }
-    
-    .pdf-viewer-controls {
-        border: 1px solid currentColor;
-    }
-    
-    .viewer-btn {
-        border-width: 2px;
+    .reverse2pdf-btn,
+    .reverse2pdf-form-input,
+    .reverse2pdf-notification {
+        border-width: 3px;
     }
 }
 
-/* Reduced motion support */
+/* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
-    .reverse2pdf-download-btn,
-    .viewer-btn,
-    .reverse2pdf-notification,
-    .loading-animation .spinner,
-    .progress-spinner {
-        transition: none;
-        animation: none;
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }

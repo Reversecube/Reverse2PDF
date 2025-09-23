@@ -1,687 +1,811 @@
-/**
- * Reverse2PDF Template Builder JavaScript
- */
+/* ==========================================================================
+   Reverse2PDF Pro - Visual Template Builder
+   ========================================================================== */
 
 (function($) {
     'use strict';
-    
-    // Main Builder Object
-    window.Reverse2PDF_Builder = {
+
+    // Template Builder namespace
+    window.Reverse2PDF = window.Reverse2PDF || {};
+    const R2PDF = window.Reverse2PDF;
+
+    R2PDF.Builder = {
         
-        // Properties
-        canvas: null,
+        currentTemplate: null,
         selectedElement: null,
-        templateData: { pages: [{ elements: [] }] },
-        currentPage: 1,
-        totalPages: 1,
+        canvas: null,
         zoom: 1,
-        gridSize: 10,
-        snapToGrid: true,
-        showGrid: true,
-        history: [],
-        historyIndex: -1,
+        grid: 10,
         
-        // Initialize builder
         init: function() {
-            this.canvas = $('#builder-canvas');
-            this.setupEventHandlers();
-            this.setupDragDrop();
-            this.setupCanvas();
-            this.loadTemplateData();
-            this.updateUI();
+            this.canvas = $('#pdf-canvas');
+            this.bindEvents();
+            this.initDragDrop();
+            this.initResizable();
+            this.loadTemplate();
+            
+            console.log('🎨 Template Builder initialized');
         },
-        
-        setupEventHandlers: function() {
-            var self = this;
-            
-            // Toolbar buttons
-            $('#save-template').on('click', function() { self.saveTemplate(); });
-            $('#preview-btn').on('click', function() { self.previewTemplate(); });
-            $('#undo-btn').on('click', function() { self.undo(); });
-            $('#redo-btn').on('click', function() { self.redo(); });
-            
-            // Zoom controls
-            $('#zoom-level').on('change', function() {
-                self.setZoom(parseFloat($(this).val()));
-            });
-            $('#zoom-in').on('click', function() { self.zoomIn(); });
-            $('#zoom-out').on('click', function() { self.zoomOut(); });
-            $('#fit-to-page').on('click', function() { self.fitToPage(); });
-            
-            // Page controls
-            $('#add-page').on('click', function() { self.addPage(); });
-            $('#delete-page').on('click', function() { self.deletePage(); });
-            $('#prev-page').on('click', function() { self.previousPage(); });
-            $('#next-page').on('click', function() { self.nextPage(); });
-            
-            // Canvas controls
-            $('#show-grid').on('change', function() { self.toggleGrid(); });
-            $('#snap-to-grid').on('change', function() { self.toggleSnap(); });
-            $('#show-rulers').on('change', function() { self.toggleRulers(); });
-            
-            // Paper settings
-            $('#paper-size').on('change', function() { self.updatePaperSize(); });
-            $('#orientation').on('change', function() { self.updateOrientation(); });
-            
-            // Element selection
-            $(document).on('click', '.template-element', function(e) {
-                e.stopPropagation();
-                self.selectElement($(this));
-            });
-            
-            // Canvas click to deselect
-            this.canvas.on('click', function(e) {
-                if (e.target === this) {
-                    self.deselectElement();
-                }
-            });
-            
-            // Sidebar tabs
-            $('.sidebar-tab').on('click', function() {
-                var tab = $(this).data('tab');
-                self.switchSidebarTab($(this), tab);
-            });
-            
-            // Category toggles
-            $(document).on('click', '.category-title', function() {
-                $(this).closest('.element-category').toggleClass('collapsed');
-            });
+
+        bindEvents: function() {
+            // Canvas events
+            $(document).on('click', '.pdf-element', this.selectElement.bind(this));
+            $(document).on('click', '.pdf-canvas', this.deselectAll.bind(this));
             
             // Property changes
-            $(document).on('change', '.property-field input, .property-field select, .property-field textarea', function() {
-                self.updateElementProperty($(this));
-            });
+            $(document).on('change', '.property-input', this.updateElementProperty.bind(this));
             
-            // Layer controls
-            $('#layer-up').on('click', function() { self.moveLayerUp(); });
-            $('#layer-down').on('click', function() { self.moveLayerDown(); });
-            $('#layer-duplicate').on('click', function() { self.duplicateElement(); });
-            $('#layer-delete').on('click', function() { self.deleteElement(); });
+            // Toolbar actions
+            $(document).on('click', '#add-page', this.addPage.bind(this));
+            $(document).on('click', '#delete-element', this.deleteElement.bind(this));
+            $(document).on('click', '#duplicate-element', this.duplicateElement.bind(this));
+            
+            // Zoom controls
+            $(document).on('click', '#zoom-in', this.zoomIn.bind(this));
+            $(document).on('click', '#zoom-out', this.zoomOut.bind(this));
+            $(document).on('click', '#zoom-fit', this.zoomFit.bind(this));
             
             // Keyboard shortcuts
-            $(document).on('keydown', function(e) {
-                self.handleKeyboardShortcuts(e);
-            });
-            
-            // Elements search
-            $('#elements-search').on('input', function() {
-                self.searchElements($(this).val());
-            });
+            $(document).keydown(this.handleKeyboard.bind(this));
         },
-        
-        setupDragDrop: function() {
-            var self = this;
-            
-            // Make element items draggable
+
+        initDragDrop: function() {
+            // Make elements draggable
             $('.element-item').draggable({
                 helper: 'clone',
                 appendTo: 'body',
-                zIndex: 10000,
+                zIndex: 1000,
+                cursor: 'grabbing',
                 start: function(event, ui) {
                     ui.helper.addClass('dragging');
                 }
             });
-            
+
             // Make canvas droppable
-            $('.pdf-page').droppable({
+            $('.pdf-canvas .page').droppable({
                 accept: '.element-item',
-                drop: function(event, ui) {
-                    var elementType = ui.helper.data('type');
-                    var offset = $(this).offset();
-                    var x = (event.pageX - offset.left) / self.zoom;
-                    var y = (event.pageY - offset.top) / self.zoom;
-                    
-                    if (self.snapToGrid) {
-                        x = Math.round(x / self.gridSize) * self.gridSize;
-                        y = Math.round(y / self.gridSize) * self.gridSize;
-                    }
-                    
-                    self.createElement(elementType, x, y);
-                }
+                tolerance: 'pointer',
+                over: function(event, ui) {
+                    $(this).addClass('drop-hover');
+                },
+                out: function(event, ui) {
+                    $(this).removeClass('drop-hover');
+                },
+                drop: this.handleElementDrop.bind(this)
             });
         },
-        
-        setupCanvas: function() {
-            this.updateCanvasSize();
-            this.updateGrid();
-            this.updateRulers();
-        },
-        
-        createElement: function(type, x, y) {
-            var elementId = this.generateElementId();
-            var elementData = this.getElementDefaults(type);
-            
-            elementData.id = elementId;
-            elementData.type = type;
-            elementData.x = x;
-            elementData.y = y;
-            
-            // Add to current page
-            this.templateData.pages[this.currentPage - 1].elements.push(elementData);
-            
-            // Render element
-            this.renderElement(elementData);
-            
-            // Select new element
-            this.selectElement($('[data-element-id="' + elementId + '"]'));
-            
-            // Save state
-            this.saveState();
-            this.updateLayers();
-        },
-        
-        getElementDefaults: function(type) {
-            var defaults = {
-                width: 100,
-                height: 25,
-                fontSize: 12,
-                fontFamily: 'Arial',
-                color: '#000000'
-            };
-            
-            switch(type) {
-                case 'text':
-                    defaults.content = 'Sample Text';
-                    defaults.width = 200;
-                    break;
-                case 'image':
-                    defaults.src = '';
-                    defaults.width = 100;
-                    defaults.height = 100;
-                    break;
-                case 'line':
-                    defaults.thickness = 1;
-                    defaults.width = 100;
-                    defaults.height = 1;
-                    break;
-                case 'rectangle':
-                    defaults.fillColor = 'transparent';
-                    defaults.borderColor = '#000000';
-                    defaults.borderWidth = 1;
-                    defaults.width = 100;
-                    defaults.height = 50;
-                    break;
-            }
-            
-            return defaults;
-        },
-        
-        renderElement: function(elementData) {
-            var $element = $('<div>')
-                .addClass('template-element')
-                .attr('data-element-id', elementData.id)
-                .attr('data-element-type', elementData.type)
-                .css({
-                    position: 'absolute',
-                    left: elementData.x + 'px',
-                    top: elementData.y + 'px',
-                    width: elementData.width + 'px',
-                    height: elementData.height + 'px'
-                });
-            
-            // Add content based on type
-            this.updateElementContent($element, elementData);
-            
-            // Add to page
-            this.getCurrentPage().find('.page-content').append($element);
-            
-            // Make interactive
-            this.makeElementInteractive($element);
-        },
-        
-        makeElementInteractive: function($element) {
-            var self = this;
-            
-            $element.draggable({
-                containment: $element.closest('.pdf-page'),
-                grid: self.snapToGrid ? [self.gridSize, self.gridSize] : null,
-                start: function() {
-                    self.selectElement($element);
-                },
-                drag: function(event, ui) {
-                    self.updateElementData($element, {
-                        x: ui.position.left,
-                        y: ui.position.top
+
+        initResizable: function() {
+            // Make elements resizable
+            $(document).on('mouseenter', '.pdf-element', function() {
+                if (!$(this).hasClass('ui-resizable')) {
+                    $(this).resizable({
+                        containment: 'parent',
+                        handles: 'n, e, s, w, ne, nw, se, sw',
+                        grid: [R2PDF.Builder.grid, R2PDF.Builder.grid],
+                        resize: function(event, ui) {
+                            R2PDF.Builder.updateElementData($(this));
+                        }
                     });
-                },
-                stop: function() {
-                    self.saveState();
-                }
-            });
-            
-            $element.resizable({
-                handles: 'n,s,e,w,ne,nw,se,sw',
-                grid: self.snapToGrid ? [self.gridSize, self.gridSize] : null,
-                start: function() {
-                    self.selectElement($element);
-                },
-                resize: function(event, ui) {
-                    self.updateElementData($element, {
-                        width: ui.size.width,
-                        height: ui.size.height
-                    });
-                },
-                stop: function() {
-                    self.saveState();
                 }
             });
         },
-        
-        updateElementContent: function($element, elementData) {
-            var content = '';
-            
-            switch(elementData.type) {
-                case 'text':
-                    content = '<div class="text-content">' + (elementData.content || 'Text') + '</div>';
-                    break;
-                case 'image':
-                    if (elementData.src) {
-                        content = '<img src="' + elementData.src + '" style="max-width: 100%; max-height: 100%;">';
-                    } else {
-                        content = '<div class="image-placeholder">📷 Image</div>';
-                    }
-                    break;
-                case 'line':
-                    content = '<div style="width: 100%; height: ' + (elementData.thickness || 1) + 'px; background: ' + (elementData.color || '#000') + ';"></div>';
-                    break;
-                case 'rectangle':
-                    var style = 'width: 100%; height: 100%;';
-                    if (elementData.fillColor && elementData.fillColor !== 'transparent') {
-                        style += 'background: ' + elementData.fillColor + ';';
-                    }
-                    if (elementData.borderWidth > 0) {
-                        style += 'border: ' + elementData.borderWidth + 'px solid ' + (elementData.borderColor || '#000') + ';';
-                    }
-                    content = '<div style="' + style + '"></div>';
-                    break;
-            }
-            
-            $element.html(content);
-            
-            // Apply styling
-            if (elementData.fontSize) $element.css('fontSize', elementData.fontSize + 'px');
-            if (elementData.fontFamily) $element.css('fontFamily', elementData.fontFamily);
-            if (elementData.color) $element.css('color', elementData.color);
-            if (elementData.textAlign) $element.css('textAlign', elementData.textAlign);
-        },
-        
-        selectElement: function($element) {
-            // Deselect previous
-            $('.template-element').removeClass('selected');
-            
-            // Select new
-            $element.addClass('selected');
-            this.selectedElement = $element;
-            
-            // Update properties panel
-            this.updatePropertiesPanel();
-            
-            // Update layers
-            this.updateLayerSelection();
-        },
-        
-        deselectElement: function() {
-            $('.template-element').removeClass('selected');
-            this.selectedElement = null;
-            this.updatePropertiesPanel();
-            this.updateLayerSelection();
-        },
-        
-        updatePropertiesPanel: function() {
-            var $content = $('.properties-content');
-            
-            if (!this.selectedElement) {
-                $content.html('<div class="no-selection"><span class="dashicons dashicons-admin-settings"></span><p>Select an element to edit its properties</p></div>');
-                return;
-            }
-            
-            var elementId = this.selectedElement.attr('data-element-id');
-            var elementData = this.getElementData(elementId);
-            
-            if (!elementData) return;
-            
-            var html = this.generatePropertiesHTML(elementData);
-            $content.html(html);
-            
-            // Initialize color pickers
-            if (typeof $.fn.wpColorPicker !== 'undefined') {
-                $content.find('.color-picker').wpColorPicker();
-            }
-        },
-        
-        generatePropertiesHTML: function(elementData) {
-            var html = '<div class="property-groups">';
-            
-            // Position and Size
-            html += '<div class="property-group">';
-            html += '<h4 class="property-group-title">Position & Size</h4>';
-            html += '<div class="property-fields">';
-            
-            html += '<div class="property-field-group">';
-            html += '<div class="property-field">';
-            html += '<label>X</label>';
-            html += '<input type="number" class="property-field" data-property="x" value="' + (elementData.x || 0) + '">';
-            html += '</div>';
-            html += '<div class="property-field">';
-            html += '<label>Y</label>';
-            html += '<input type="number" class="property-field" data-property="y" value="' + (elementData.y || 0) + '">';
-            html += '</div>';
-            html += '</div>';
-            
-            html += '<div class="property-field-group">';
-            html += '<div class="property-field">';
-            html += '<label>Width</label>';
-            html += '<input type="number" class="property-field" data-property="width" value="' + (elementData.width || 100) + '">';
-            html += '</div>';
-            html += '<div class="property-field">';
-            html += '<label>Height</label>';
-            html += '<input type="number" class="property-field" data-property="height" value="' + (elementData.height || 25) + '">';
-            html += '</div>';
-            html += '</div>';
-            
-            html += '</div>';
-            html += '</div>';
-            
-            // Type-specific properties
-            html += this.getTypeSpecificPropertiesHTML(elementData);
-            
-            html += '</div>';
-            
-            return html;
-        },
-        
-        getTypeSpecificPropertiesHTML: function(elementData) {
-            var html = '<div class="property-group">';
-            html += '<h4 class="property-group-title">' + elementData.type.charAt(0).toUpperCase() + elementData.type.slice(1) + ' Properties</h4>';
-            html += '<div class="property-fields">';
-            
-            switch(elementData.type) {
-                case 'text':
-                    html += '<div class="property-field">';
-                    html += '<label>Content</label>';
-                    html += '<textarea class="property-field" data-property="content">' + (elementData.content || '') + '</textarea>';
-                    html += '</div>';
-                    
-                    html += '<div class="property-field">';
-                    html += '<label>Font Size</label>';
-                    html += '<input type="number" class="property-field" data-property="fontSize" value="' + (elementData.fontSize || 12) + '">';
-                    html += '</div>';
-                    
-                    html += '<div class="property-field">';
-                    html += '<label>Font Family</label>';
-                    html += '<select class="property-field" data-property="fontFamily">';
-                    var fonts = ['Arial', 'Times New Roman', 'Helvetica', 'Georgia', 'Verdana'];
-                    fonts.forEach(function(font) {
-                        var selected = elementData.fontFamily === font ? 'selected' : '';
-                        html += '<option value="' + font + '" ' + selected + '>' + font + '</option>';
-                    });
-                    html += '</select>';
-                    html += '</div>';
-                    
-                    html += '<div class="property-field">';
-                    html += '<label>Text Color</label>';
-                    html += '<input type="text" class="property-field color-picker" data-property="color" value="' + (elementData.color || '#000000') + '">';
-                    html += '</div>';
-                    break;
-                    
-                case 'image':
-                    html += '<div class="property-field">';
-                    html += '<label>Image URL</label>';
-                    html += '<div class="media-field">';
-                    html += '<input type="text" class="property-field" data-property="src" value="' + (elementData.src || '') + '">';
-                    html += '<button type="button" class="media-upload-btn">Browse</button>';
-                    html += '</div>';
-                    html += '</div>';
-                    break;
-            }
-            
-            html += '</div>';
-            html += '</div>';
-            
-            return html;
-        },
-        
-        updateElementProperty: function($input) {
-            if (!this.selectedElement) return;
-            
-            var property = $input.data('property');
-            var value = $input.val();
-            var elementId = this.selectedElement.attr('data-element-id');
-            
-            // Update data
-            this.updateElementData(this.selectedElement, {[property]: value});
-            
-            // Update visual
-            this.updateElementVisual(elementId);
-        },
-        
-        updateElementData: function($element, data) {
-            var elementId = $element.attr('data-element-id');
-            var elementData = this.getElementData(elementId);
-            
-            if (elementData) {
-                Object.assign(elementData, data);
-            }
-        },
-        
-        updateElementVisual: function(elementId) {
-            var $element = $('[data-element-id="' + elementId + '"]');
-            var elementData = this.getElementData(elementId);
-            
-            if (!$element.length || !elementData) return;
-            
-            // Update position and size
-            $element.css({
-                left: elementData.x + 'px',
-                top: elementData.y + 'px',
-                width: elementData.width + 'px',
-                height: elementData.height + 'px'
-            });
-            
-            // Update content
-            this.updateElementContent($element, elementData);
-        },
-        
-        getElementData: function(elementId) {
-            var currentPageData = this.templateData.pages[this.currentPage - 1];
-            return currentPageData.elements.find(function(el) {
-                return el.id === elementId;
-            });
-        },
-        
-        getCurrentPage: function() {
-            return $('.pdf-page[data-page="' + this.currentPage + '"]');
-        },
-        
-        generateElementId: function() {
-            return 'element_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        },
-        
-        // Save and load functionality
-        saveTemplate: function() {
-            var templateName = $('#template-name').val();
-            var templateDescription = $('#template-description').val();
-            var templateId = $('#template-id').val();
-            
-            if (!templateName) {
-                alert('Please enter a template name');
-                return;
-            }
-            
-            var $btn = $('#save-template');
-            var originalText = $btn.text();
-            $btn.prop('disabled', true).text('Saving...');
-            
-            $.post(reverse2pdf_builder.ajax_url, {
-                action: 'reverse2pdf_save_template_data',
-                template_id: templateId,
-                template_name: templateName,
-                template_description: templateDescription,
-                template_data: JSON.stringify(this.templateData),
-                nonce: reverse2pdf_builder.nonce
-            })
-            .done(function(response) {
-                if (response.success) {
-                    if (!templateId) {
-                        $('#template-id').val(response.data.template_id);
-                    }
-                    Reverse2PDF_Builder.showNotification('Template saved successfully!', 'success');
-                } else {
-                    Reverse2PDF_Builder.showNotification('Error: ' + response.data, 'error');
-                }
-            })
-            .fail(function() {
-                Reverse2PDF_Builder.showNotification('Save failed. Please try again.', 'error');
-            })
-            .always(function() {
-                $btn.prop('disabled', false).text(originalText);
-            });
-        },
-        
-        loadTemplateData: function() {
-            var templateData = $('#template-data').val();
+
+        loadTemplate: function() {
+            const templateData = $('#template-data').val();
             if (templateData) {
                 try {
-                    this.templateData = JSON.parse(templateData);
+                    this.currentTemplate = JSON.parse(templateData);
                     this.renderTemplate();
-                } catch(e) {
-                    console.error('Failed to parse template data');
+                } catch (e) {
+                    console.warn('Invalid template data:', e);
+                    this.currentTemplate = this.getDefaultTemplate();
                 }
-            }
-        },
-        
-        renderTemplate: function() {
-            var self = this;
-            
-            // Clear canvas
-            $('.pdf-page').remove();
-            
-            // Render pages
-            this.templateData.pages.forEach(function(pageData, index) {
-                self.addPageToCanvas(index + 1);
-                
-                pageData.elements.forEach(function(elementData) {
-                    self.renderElement(elementData);
-                });
-            });
-            
-            this.totalPages = this.templateData.pages.length;
-            this.updateUI();
-        },
-        
-        addPageToCanvas: function(pageNumber) {
-            var $page = $('<div class="pdf-page" data-page="' + pageNumber + '">' +
-                '<div class="page-background"></div>' +
-                '<div class="page-content"></div>' +
-                '<div class="page-overlay"></div>' +
-                '</div>');
-            
-            this.canvas.append($page);
-            
-            $page.droppable({
-                accept: '.element-item',
-                drop: function(event, ui) {
-                    // Handle drop
-                }
-            });
-        },
-        
-        // Additional utility methods
-        showNotification: function(message, type) {
-            var $notification = $('<div class="builder-notification ' + type + '">' + message + '</div>');
-            $('body').append($notification);
-            
-            setTimeout(function() {
-                $notification.fadeOut(function() {
-                    $(this).remove();
-                });
-            }, 3000);
-        },
-        
-        updateUI: function() {
-            $('#current-page').text(this.currentPage);
-            $('#total-pages').text(this.totalPages);
-            $('#prev-page').prop('disabled', this.currentPage <= 1);
-            $('#next-page').prop('disabled', this.currentPage >= this.totalPages);
-            
-            this.updateLayers();
-        },
-        
-        updateLayers: function() {
-            var $layersList = $('.layers-list');
-            $layersList.empty();
-            
-            var currentPageData = this.templateData.pages[this.currentPage - 1];
-            if (currentPageData && currentPageData.elements) {
-                currentPageData.elements.forEach(function(element) {
-                    var $layer = $('<div class="layer-item" data-element-id="' + element.id + '">' +
-                        '<span class="dashicons dashicons-admin-generic"></span>' +
-                        '<span class="layer-name">' + (element.id || 'Element') + '</span>' +
-                        '<span class="layer-type">' + element.type + '</span>' +
-                        '</div>');
-                    
-                    $layersList.append($layer);
-                });
-            }
-        },
-        
-        // State management
-        saveState: function() {
-            this.history = this.history.slice(0, this.historyIndex + 1);
-            this.history.push(JSON.stringify(this.templateData));
-            
-            if (this.history.length > 50) {
-                this.history.shift();
             } else {
-                this.historyIndex++;
+                this.currentTemplate = this.getDefaultTemplate();
             }
         },
-        
-        undo: function() {
-            if (this.historyIndex > 0) {
-                this.historyIndex--;
-                this.templateData = JSON.parse(this.history[this.historyIndex]);
-                this.renderTemplate();
-            }
-        },
-        
-        redo: function() {
-            if (this.historyIndex < this.history.length - 1) {
-                this.historyIndex++;
-                this.templateData = JSON.parse(this.history[this.historyIndex]);
-                this.renderTemplate();
-            }
-        },
-        
-        handleKeyboardShortcuts: function(e) {
-            if (e.ctrlKey || e.metaKey) {
-                switch(e.key) {
-                    case 's':
-                        e.preventDefault();
-                        this.saveTemplate();
-                        break;
-                    case 'z':
-                        e.preventDefault();
-                        if (e.shiftKey) {
-                            this.redo();
-                        } else {
-                            this.undo();
-                        }
-                        break;
+
+        getDefaultTemplate: function() {
+            return {
+                pages: [{
+                    id: 'page_1',
+                    width: 595,
+                    height: 842,
+                    elements: []
+                }],
+                settings: {
+                    paperSize: 'A4',
+                    orientation: 'portrait',
+                    margins: { top: 20, right: 15, bottom: 20, left: 15 }
                 }
+            };
+        },
+
+        renderTemplate: function() {
+            if (!this.currentTemplate || !this.currentTemplate.pages) return;
+
+            this.canvas.empty();
+            
+            this.currentTemplate.pages.forEach((page, index) => {
+                const $page = this.createPageElement(page, index);
+                this.canvas.append($page);
+                
+                // Render elements
+                if (page.elements) {
+                    page.elements.forEach(element => {
+                        const $element = this.createElement(element);
+                        $page.append($element);
+                    });
+                }
+            });
+        },
+
+        createPageElement: function(page, index) {
+            return $(`
+                <div class="page" data-page="${index + 1}" style="width: ${page.width}px; height: ${page.height}px;">
+                    <div class="page-overlay">
+                        <div class="page-number">Page ${index + 1}</div>
+                    </div>
+                </div>
+            `);
+        },
+
+        createElement: function(element) {
+            const $element = $(`
+                <div class="pdf-element" 
+                     data-id="${element.id}" 
+                     data-type="${element.type}"
+                     style="position: absolute; 
+                            left: ${element.x}px; 
+                            top: ${element.y}px; 
+                            width: ${element.width}px; 
+                            height: ${element.height}px;
+                            ${this.getElementStyles(element)}">
+                    ${this.getElementContent(element)}
+                    <div class="element-controls">
+                        <button type="button" class="control-btn duplicate-btn" title="Duplicate">⧉</button>
+                        <button type="button" class="control-btn delete-btn" title="Delete">✕</button>
+                    </div>
+                </div>
+            `);
+            
+            this.makeElementDraggable($element);
+            return $element;
+        },
+
+        getElementStyles: function(element) {
+            let styles = '';
+            
+            if (element.fontSize) styles += `font-size: ${element.fontSize}px; `;
+            if (element.fontWeight) styles += `font-weight: ${element.fontWeight}; `;
+            if (element.color) styles += `color: ${element.color}; `;
+            if (element.backgroundColor) styles += `background-color: ${element.backgroundColor}; `;
+            if (element.textAlign) styles += `text-align: ${element.textAlign}; `;
+            if (element.borderWidth) styles += `border: ${element.borderWidth}px solid ${element.borderColor || '#000'}; `;
+            if (element.borderRadius) styles += `border-radius: ${element.borderRadius}px; `;
+            
+            return styles;
+        },
+
+        getElementContent: function(element) {
+            switch (element.type) {
+                case 'text':
+                    return `<div class="element-text">${element.content || 'Text Element'}</div>`;
+                case 'image':
+                    return `<img src="${element.src || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeD0iMyIgeT0iMyIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4IiByeD0iMiIgc3Ryb2tlPSIjOWNhM2FmIiBzdHJva2Utd2lkdGg9IjIiLz4KPGNpcmNsZSBjeD0iOC41IiBjeT0iOC41IiByPSIxLjUiIGZpbGw9IiM5Y2EzYWYiLz4KPHBhdGggZD0ibTkgMTIgMyAzIDYtNiIgc3Ryb2tlPSIjOWNhM2FmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4K'}" style="width: 100%; height: 100%; object-fit: contain;" alt="Image">`;
+                case 'line':
+                    return '<div class="element-line" style="width: 100%; height: 1px; background: #000;"></div>';
+                case 'rectangle':
+                    return `<div class="element-rectangle" style="width: 100%; height: 100%; border: 1px solid #000;">${element.content || ''}</div>`;
+                case 'qr-code':
+                    return `<div class="element-qr" style="width: 100%; height: 100%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 12px;">QR: ${element.content || 'data'}</div>`;
+                case 'barcode':
+                    return `<div class="element-barcode" style="width: 100%; height: 100%; background: repeating-linear-gradient(90deg, #000 0px, #000 2px, #fff 2px, #fff 4px); display: flex; align-items: end; justify-content: center; font-size: 10px;">${element.content || '123456'}</div>`;
+                default:
+                    return `<div class="element-default">${element.content || element.type}</div>`;
+            }
+        },
+
+        makeElementDraggable: function($element) {
+            $element.draggable({
+                containment: 'parent',
+                grid: [this.grid, this.grid],
+                drag: (event, ui) => {
+                    this.updateElementData($element);
+                },
+                stop: (event, ui) => {
+                    this.updateElementData($element);
+                }
+            });
+        },
+
+        handleElementDrop: function(event, ui) {
+            const elementType = ui.draggable.data('type');
+            const $page = $(event.target);
+            const pageOffset = $page.offset();
+            
+            const dropPos = {
+                x: Math.round((event.pageX - pageOffset.left) / this.grid) * this.grid,
+                y: Math.round((event.pageY - pageOffset.top) / this.grid) * this.grid
+            };
+            
+            this.addElement(elementType, dropPos, $page);
+            $page.removeClass('drop-hover');
+        },
+
+        addElement: function(type, position, $page) {
+            const elementId = 'element_' + Date.now();
+            const element = {
+                id: elementId,
+                type: type,
+                x: position.x,
+                y: position.y,
+                width: this.getDefaultWidth(type),
+                height: this.getDefaultHeight(type),
+                content: this.getDefaultContent(type)
+            };
+            
+            // Add to template data
+            const pageIndex = parseInt($page.data('page')) - 1;
+            if (!this.currentTemplate.pages[pageIndex].elements) {
+                this.currentTemplate.pages[pageIndex].elements = [];
+            }
+            this.currentTemplate.pages[pageIndex].elements.push(element);
+            
+            // Create and add element to DOM
+            const $element = this.createElement(element);
+            $page.append($element);
+            
+            // Select the new element
+            this.selectElement.call($element[0]);
+            
+            // Save template
+            this.saveTemplate();
+            
+            R2PDF.Admin.showNotification(`Added ${type} element`, 'success', 2000);
+        },
+
+        getDefaultWidth: function(type) {
+            const widths = {
+                text: 200,
+                image: 150,
+                line: 200,
+                rectangle: 150,
+                'qr-code': 100,
+                barcode: 200
+            };
+            return widths[type] || 150;
+        },
+
+        getDefaultHeight: function(type) {
+            const heights = {
+                text: 30,
+                image: 100,
+                line: 5,
+                rectangle: 100,
+                'qr-code': 100,
+                barcode: 50
+            };
+            return heights[type] || 30;
+        },
+
+        getDefaultContent: function(type) {
+            const contents = {
+                text: 'Text Element',
+                image: '',
+                line: '',
+                rectangle: '',
+                'qr-code': 'https://example.com',
+                barcode: '123456789'
+            };
+            return contents[type] || '';
+        },
+
+        selectElement: function() {
+            // Remove previous selection
+            $('.pdf-element').removeClass('selected');
+            
+            // Select current element
+            const $element = $(this);
+            $element.addClass('selected');
+            R2PDF.Builder.selectedElement = $element;
+            
+            // Update properties panel
+            R2PDF.Builder.updatePropertiesPanel($element);
+        },
+
+        deselectAll: function(e) {
+            if ($(e.target).hasClass('pdf-canvas') || $(e.target).hasClass('page')) {
+                $('.pdf-element').removeClass('selected');
+                R2PDF.Builder.selectedElement = null;
+                R2PDF.Builder.clearPropertiesPanel();
+            }
+        },
+
+        updatePropertiesPanel: function($element) {
+            const elementData = this.getElementData($element);
+            const propertiesHtml = this.generatePropertiesHtml(elementData);
+            $('#element-properties').html(propertiesHtml);
+        },
+
+        clearPropertiesPanel: function() {
+            $('#element-properties').html('<p>Select an element to edit its properties.</p>');
+        },
+
+        getElementData: function($element) {
+            return {
+                id: $element.data('id'),
+                type: $element.data('type'),
+                x: parseInt($element.css('left')),
+                y: parseInt($element.css('top')),
+                width: $element.width(),
+                height: $element.height(),
+                content: $element.find('.element-text').text() || $element.data('content') || '',
+                fontSize: parseInt($element.css('font-size')) || 12,
+                fontWeight: $element.css('font-weight') || 'normal',
+                color: $element.css('color') || '#000000',
+                backgroundColor: $element.css('background-color') || 'transparent',
+                textAlign: $element.css('text-align') || 'left'
+            };
+        },
+
+        generatePropertiesHtml: function(data) {
+            let html = `<h5>Element Properties</h5>`;
+            
+            // Basic properties
+            html += `
+                <div class="property-group">
+                    <h6>Position & Size</h6>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <label>X Position</label>
+                            <input type="number" class="property-input" data-property="x" value="${data.x}">
+                        </div>
+                        <div>
+                            <label>Y Position</label>
+                            <input type="number" class="property-input" data-property="y" value="${data.y}">
+                        </div>
+                        <div>
+                            <label>Width</label>
+                            <input type="number" class="property-input" data-property="width" value="${data.width}">
+                        </div>
+                        <div>
+                            <label>Height</label>
+                            <input type="number" class="property-input" data-property="height" value="${data.height}">
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Content property
+            if (data.type === 'text' || data.type === 'qr-code' || data.type === 'barcode') {
+                html += `
+                    <div class="property-group">
+                        <h6>Content</h6>
+                        <textarea class="property-input" data-property="content" rows="3">${data.content}</textarea>
+                    </div>
+                `;
             }
             
-            if (e.key === 'Delete' && this.selectedElement) {
-                this.deleteElement();
+            // Typography properties
+            if (data.type === 'text') {
+                html += `
+                    <div class="property-group">
+                        <h6>Typography</h6>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div>
+                                <label>Font Size</label>
+                                <input type="number" class="property-input" data-property="fontSize" value="${data.fontSize}">
+                            </div>
+                            <div>
+                                <label>Font Weight</label>
+                                <select class="property-input" data-property="fontWeight">
+                                    <option value="normal" ${data.fontWeight === 'normal' ? 'selected' : ''}>Normal</option>
+                                    <option value="bold" ${data.fontWeight === 'bold' ? 'selected' : ''}>Bold</option>
+                                    <option value="600" ${data.fontWeight === '600' ? 'selected' : ''}>Semi Bold</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <label>Text Alignment</label>
+                            <select class="property-input" data-property="textAlign">
+                                <option value="left" ${data.textAlign === 'left' ? 'selected' : ''}>Left</option>
+                                <option value="center" ${data.textAlign === 'center' ? 'selected' : ''}>Center</option>
+                                <option value="right" ${data.textAlign === 'right' ? 'selected' : ''}>Right</option>
+                                <option value="justify" ${data.textAlign === 'justify' ? 'selected' : ''}>Justify</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
             }
+            
+            // Color properties
+            html += `
+                <div class="property-group">
+                    <h6>Colors</h6>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <label>Text Color</label>
+                            <input type="color" class="property-input" data-property="color" value="${this.rgbToHex(data.color)}">
+                        </div>
+                        <div>
+                            <label>Background</label>
+                            <input type="color" class="property-input" data-property="backgroundColor" value="${this.rgbToHex(data.backgroundColor)}">
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return html;
+        },
+
+        updateElementProperty: function() {
+            const $input = $(this);
+            const property = $input.data('property');
+            const value = $input.val();
+            
+            if (!R2PDF.Builder.selectedElement) return;
+            
+            const $element = R2PDF.Builder.selectedElement;
+            
+            // Update element style/position
+            switch (property) {
+                case 'x':
+                    $element.css('left', value + 'px');
+                    break;
+                case 'y':
+                    $element.css('top', value + 'px');
+                    break;
+                case 'width':
+                    $element.width(value);
+                    break;
+                case 'height':
+                    $element.height(value);
+                    break;
+                case 'content':
+                    $element.find('.element-text').text(value);
+                    $element.data('content', value);
+                    break;
+                case 'fontSize':
+                    $element.css('font-size', value + 'px');
+                    break;
+                case 'fontWeight':
+                    $element.css('font-weight', value);
+                    break;
+                case 'color':
+                    $element.css('color', value);
+                    break;
+                case 'backgroundColor':
+                    $element.css('background-color', value);
+                    break;
+                case 'textAlign':
+                    $element.css('text-align', value);
+                    break;
+            }
+            
+            // Update template data
+            R2PDF.Builder.updateElementData($element);
+            R2PDF.Builder.saveTemplate();
+        },
+
+        updateElementData: function($element) {
+            const elementId = $element.data('id');
+            const pageIndex = $element.closest('.page').data('page') - 1;
+            
+            if (!this.currentTemplate.pages[pageIndex].elements) return;
+            
+            const elementIndex = this.currentTemplate.pages[pageIndex].elements.findIndex(el => el.id === elementId);
+            if (elementIndex === -1) return;
+            
+            // Update element data
+            const updatedData = {
+                id: elementId,
+                type: $element.data('type'),
+                x: parseInt($element.css('left')),
+                y: parseInt($element.css('top')),
+                width: $element.width(),
+                height: $element.height(),
+                content: $element.find('.element-text').text() || $element.data('content') || '',
+                fontSize: parseInt($element.css('font-size')) || 12,
+                fontWeight: $element.css('font-weight') || 'normal',
+                color: $element.css('color') || '#000000',
+                backgroundColor: $element.css('background-color') || 'transparent',
+                textAlign: $element.css('text-align') || 'left'
+            };
+            
+            this.currentTemplate.pages[pageIndex].elements[elementIndex] = updatedData;
+        },
+
+        saveTemplate: function() {
+            $('#template-data').val(JSON.stringify(this.currentTemplate));
+        },
+
+        // Utility functions
+        rgbToHex: function(rgb) {
+            if (!rgb || rgb === 'transparent') return '#000000';
+            
+            const result = rgb.match(/\d+/g);
+            if (result && result.length >= 3) {
+                return "#" + ((1 << 24) + (parseInt(result[0]) << 16) + (parseInt(result[1]) << 8) + parseInt(result[2])).toString(16).slice(1);
+            }
+            return rgb;
+        },
+
+        // Zoom functions
+        zoomIn: function() {
+            this.zoom = Math.min(this.zoom * 1.2, 3);
+            this.applyZoom();
+        },
+
+        zoomOut: function() {
+            this.zoom = Math.max(this.zoom / 1.2, 0.3);
+            this.applyZoom();
+        },
+
+        zoomFit: function() {
+            const containerWidth = $('.builder-canvas').width();
+            const pageWidth = 595;
+            this.zoom = Math.min(containerWidth / pageWidth * 0.9, 1);
+            this.applyZoom();
+        },
+
+        applyZoom: function() {
+            this.canvas.css('transform', `scale(${this.zoom})`);
+            $('.zoom-level').text(Math.round(this.zoom * 100) + '%');
+        },
+
+        // Keyboard shortcuts
+        handleKeyboard: function(e) {
+            if (!this.selectedElement) return;
+            
+            const step = e.shiftKey ? 10 : 1;
+            
+            switch (e.keyCode) {
+                case 37: // Left arrow
+                    e.preventDefault();
+                    this.moveElement(this.selectedElement, -step, 0);
+                    break;
+                case 38: // Up arrow
+                    e.preventDefault();
+                    this.moveElement(this.selectedElement, 0, -step);
+                    break;
+                case 39: // Right arrow
+                    e.preventDefault();
+                    this.moveElement(this.selectedElement, step, 0);
+                    break;
+                case 40: // Down arrow
+                    e.preventDefault();
+                    this.moveElement(this.selectedElement, 0, step);
+                    break;
+                case 46: // Delete
+                    e.preventDefault();
+                    this.deleteElement();
+                    break;
+            }
+        },
+
+        moveElement: function($element, deltaX, deltaY) {
+            const currentX = parseInt($element.css('left'));
+            const currentY = parseInt($element.css('top'));
+            
+            $element.css({
+                left: Math.max(0, currentX + deltaX) + 'px',
+                top: Math.max(0, currentY + deltaY) + 'px'
+            });
+            
+            this.updateElementData($element);
+            this.updatePropertiesPanel($element);
+            this.saveTemplate();
+        },
+
+        deleteElement: function() {
+            if (!this.selectedElement) return;
+            
+            if (confirm('Are you sure you want to delete this element?')) {
+                const elementId = this.selectedElement.data('id');
+                const pageIndex = this.selectedElement.closest('.page').data('page') - 1;
+                
+                // Remove from template data
+                this.currentTemplate.pages[pageIndex].elements = 
+                    this.currentTemplate.pages[pageIndex].elements.filter(el => el.id !== elementId);
+                
+                // Remove from DOM
+                this.selectedElement.remove();
+                this.selectedElement = null;
+                this.clearPropertiesPanel();
+                this.saveTemplate();
+                
+                R2PDF.Admin.showNotification('Element deleted', 'success', 2000);
+            }
+        },
+
+        duplicateElement: function() {
+            if (!this.selectedElement) return;
+            
+            const elementData = this.getElementData(this.selectedElement);
+            elementData.id = 'element_' + Date.now();
+            elementData.x += 20;
+            elementData.y += 20;
+            
+            const pageIndex = this.selectedElement.closest('.page').data('page') - 1;
+            this.currentTemplate.pages[pageIndex].elements.push(elementData);
+            
+            const $newElement = this.createElement(elementData);
+            this.selectedElement.closest('.page').append($newElement);
+            
+            this.selectElement.call($newElement[0]);
+            this.saveTemplate();
+            
+            R2PDF.Admin.showNotification('Element duplicated', 'success', 2000);
+        },
+
+        addPage: function() {
+            const newPageId = 'page_' + Date.now();
+            const newPage = {
+                id: newPageId,
+                width: 595,
+                height: 842,
+                elements: []
+            };
+            
+            this.currentTemplate.pages.push(newPage);
+            
+            const $newPage = this.createPageElement(newPage, this.currentTemplate.pages.length - 1);
+            this.canvas.append($newPage);
+            
+            this.saveTemplate();
+            R2PDF.Admin.showNotification('New page added', 'success', 2000);
         }
     };
-    
-    // Initialize when document is ready
+
+    // Initialize when document ready
     $(document).ready(function() {
-        if ($('#reverse2pdf-builder-container').length) {
-            Reverse2PDF_Builder.init();
+        if ($('.reverse2pdf-builder').length > 0) {
+            R2PDF.Builder.init();
         }
     });
-    
+
+    // Expose to global scope
+    window.Reverse2PDF = R2PDF;
+
 })(jQuery);
+
+// Additional CSS for template builder
+const builderCSS = `
+<style>
+.pdf-element {
+    border: 2px dashed transparent;
+    cursor: move;
+    min-width: 10px;
+    min-height: 10px;
+}
+
+.pdf-element:hover {
+    border-color: rgba(99, 102, 241, 0.5);
+}
+
+.pdf-element.selected {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 1px #6366f1;
+}
+
+.pdf-element .element-controls {
+    position: absolute;
+    top: -30px;
+    right: 0;
+    display: none;
+    gap: 4px;
+}
+
+.pdf-element.selected .element-controls {
+    display: flex;
+}
+
+.control-btn {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: #6366f1;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.control-btn:hover {
+    background: #4f46e5;
+}
+
+.page {
+    position: relative;
+    background: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    border: 1px solid #e5e7eb;
+}
+
+.page.drop-hover {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.page-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.page-number {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.element-item.ui-draggable-dragging {
+    transform: scale(1.05);
+    opacity: 0.8;
+    z-index: 1000;
+}
+
+.property-group {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.property-group:last-child {
+    border-bottom: none;
+}
+
+.property-group h6 {
+    margin: 0 0 10px 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.property-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.zoom-level {
+    font-weight: 600;
+    color: #374151;
+}
+
+@media (max-width: 1024px) {
+    .builder-workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+    }
+    
+    .builder-sidebar {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .pdf-element .element-controls {
+        top: -35px;
+    }
+}
+</style>
+`;
+
+document.head.insertAdjacentHTML('beforeend', builderCSS);
