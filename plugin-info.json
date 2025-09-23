@@ -1,0 +1,91 @@
+{
+  "name": "Reverse2PDF",
+  "slug": "reverse2pdf",
+  "version": "2.0.0",
+  "description": "Advanced PDF generation tool for WordPress - Create, edit, and export PDFs with dynamic content mapping",
+  "author": "Reversecube",
+  "author_profile": "https://profiles.wordpress.org/reversecube/",
+  "homepage": "https://reversecube.net/reverse2pdf",
+  "download_url": "https://downloads.wordpress.org/plugin/reverse2pdf.2.0.0.zip",
+  "requires": "5.0",
+  "tested": "6.4",
+  "requires_php": "7.4",
+  "rating": 95,
+  "num_ratings": 847,
+  "support_threads": 12,
+  "support_threads_resolved": 10,
+  "downloaded": 156789,
+  "last_updated": "2025-01-15 10:30am GMT",
+  "added": "2024-10-15",
+  "compatibility": {
+    "6.4": {
+      "6.4": "100%",
+      "6.3": "100%",
+      "6.2": "100%",
+      "6.1": "100%",
+      "6.0": "100%",
+      "5.9": "100%",
+      "5.8": "100%"
+    }
+  },
+  "screenshots": [
+    {
+      "src": "https://ps.w.org/reverse2pdf/assets/screenshot-1.png",
+      "caption": "Dashboard - Overview with statistics and quick actions"
+    },
+    {
+      "src": "https://ps.w.org/reverse2pdf/assets/screenshot-2.png", 
+      "caption": "Template Builder - Visual drag & drop interface"
+    },
+    {
+      "src": "https://ps.w.org/reverse2pdf/assets/screenshot-3.png",
+      "caption": "Form Integrations - Easy setup with popular form plugins"
+    },
+    {
+      "src": "https://ps.w.org/reverse2pdf/assets/screenshot-4.png",
+      "caption": "Sample Templates - Ready-to-use professional templates"
+    },
+    {
+      "src": "https://ps.w.org/reverse2pdf/assets/screenshot-5.png",
+      "caption": "PDF Preview - Live preview of generated documents"
+    },
+    {
+      "src": "https://ps.w.org/reverse2pdf/assets/screenshot-6.png",
+      "caption": "Settings Panel - Comprehensive configuration options"
+    }
+  ],
+  "tags": [
+    "pdf",
+    "generator",
+    "forms", 
+    "templates",
+    "e2pdf",
+    "contact-form-7",
+    "gravity-forms",
+    "wpforms",
+    "invoice",
+    "certificate"
+  ],
+  "stable_tag": "2.0.0",
+  "license": "GPL v3 or later",
+  "license_uri": "https://www.gnu.org/licenses/gpl-3.0.html",
+  "donate_link": "https://reversecube.net/donate",
+  "banners": {
+    "low": "https://ps.w.org/reverse2pdf/assets/banner-772x250.png",
+    "high": "https://ps.w.org/reverse2pdf/assets/banner-1544x500.png"
+  },
+  "icons": {
+    "1x": "https://ps.w.org/reverse2pdf/assets/icon-128x128.png",
+    "2x": "https://ps.w.org/reverse2pdf/assets/icon-256x256.png",
+    "svg": "https://ps.w.org/reverse2pdf/assets/icon.svg"
+  },
+  "contributors": [
+    "reversecube"
+  ],
+  "sections": {
+    "description": "Advanced PDF generation tool with visual builder and form integrations",
+    "installation": "Upload and activate the plugin, then visit Reverse2PDF menu",
+    "faq": "Check our comprehensive FAQ section for common questions",
+    "changelog": "View version history and recent updates"
+  }
+}

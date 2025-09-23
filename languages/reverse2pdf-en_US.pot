@@ -1,0 +1,569 @@
+# Reverse2PDF English Translation
+# Copyright (C) 2025 Reversecube
+msgid ""
+msgstr ""
+"Project-Id-Version: Reverse2PDF 2.0.0\n"
+"Report-Msgid-Bugs-To: support@reversecube.net\n"
+"POT-Creation-Date: 2025-01-01 12:00+0000\n"
+"PO-Revision-Date: 2025-01-01 12:00+0000\n"
+"Last-Translator: Reversecube Team\n"
+"Language-Team: English\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# Plugin Name and Description
+msgid "Reverse2PDF"
+msgstr "Reverse2PDF"
+
+msgid "Advanced PDF generation tool for WordPress - Create, edit, and export PDFs with dynamic content mapping"
+msgstr "Advanced PDF generation tool for WordPress - Create, edit, and export PDFs with dynamic content mapping"
+
+# Menu Items
+msgid "Templates"
+msgstr "Templates"
+
+msgid "Add New"
+msgstr "Add New"
+
+msgid "Add New Template"
+msgstr "Add New Template"
+
+msgid "Template Builder"
+msgstr "Template Builder"
+
+msgid "Builder"
+msgstr "Builder"
+
+msgid "Form Integrations"
+msgstr "Form Integrations"
+
+msgid "Integrations"
+msgstr "Integrations"
+
+msgid "Sample Templates"
+msgstr "Sample Templates"
+
+msgid "Samples"
+msgstr "Samples"
+
+msgid "Settings"
+msgstr "Settings"
+
+msgid "Help & Support"
+msgstr "Help & Support"
+
+msgid "Help"
+msgstr "Help"
+
+msgid "Logs"
+msgstr "Logs"
+
+# Dashboard
+msgid "Reverse2PDF Dashboard"
+msgstr "Reverse2PDF Dashboard"
+
+msgid "Welcome to Reverse2PDF"
+msgstr "Welcome to Reverse2PDF"
+
+msgid "Create professional PDF documents with our advanced template builder and form integrations."
+msgstr "Create professional PDF documents with our advanced template builder and form integrations."
+
+msgid "Get Started"
+msgstr "Get Started"
+
+msgid "Create Your First Template"
+msgstr "Create Your First Template"
+
+msgid "Start with our visual template builder to create professional PDFs."
+msgstr "Start with our visual template builder to create professional PDFs."
+
+msgid "Explore Features"
+msgstr "Explore Features"
+
+msgid "Visual Template Builder"
+msgstr "Visual Template Builder"
+
+msgid "Need Help?"
+msgstr "Need Help?"
+
+msgid "Documentation"
+msgstr "Documentation"
+
+msgid "Video Tutorials"
+msgstr "Video Tutorials"
+
+msgid "Support Forum"
+msgstr "Support Forum"
+
+msgid "Total Templates"
+msgstr "Total Templates"
+
+msgid "%d active"
+msgstr "%d active"
+
+msgid "Connected forms"
+msgstr "Connected forms"
+
+msgid "Generated PDFs"
+msgstr "Generated PDFs"
+
+msgid "Total generations"
+msgstr "Total generations"
+
+msgid "PDF Caching"
+msgstr "PDF Caching"
+
+msgid "Performance boost"
+msgstr "Performance boost"
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "Disabled"
+msgstr "Disabled"
+
+msgid "Recent Activity"
+msgstr "Recent Activity"
+
+# Templates
+msgid "PDF Templates"
+msgstr "PDF Templates"
+
+msgid "Browse Samples"
+msgstr "Browse Samples"
+
+msgid "Template deleted successfully."
+msgstr "Template deleted successfully."
+
+msgid "Template saved successfully."
+msgstr "Template saved successfully."
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Form Integration"
+msgstr "Form Integration"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Created"
+msgstr "Created"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "Active"
+msgstr "Active"
+
+msgid "Inactive"
+msgstr "Inactive"
+
+msgid "Edit"
+msgstr "Edit"
+
+msgid "Delete"
+msgstr "Delete"
+
+msgid "Preview"
+msgstr "Preview"
+
+msgid "Duplicate"
+msgstr "Duplicate"
+
+msgid "No templates found"
+msgstr "No templates found"
+
+msgid "Create your first PDF template to get started."
+msgstr "Create your first PDF template to get started."
+
+msgid "Create Template"
+msgstr "Create Template"
+
+# Template Builder
+msgid "Edit Template"
+msgstr "Edit Template"
+
+msgid "Create Template"
+msgstr "Create Template"
+
+msgid "Template Name"
+msgstr "Template Name"
+
+msgid "Description (optional)"
+msgstr "Description (optional)"
+
+msgid "Add Page"
+msgstr "Add Page"
+
+msgid "Previous Page"
+msgstr "Previous Page"
+
+msgid "Next Page"
+msgstr "Next Page"
+
+msgid "Delete Page"
+msgstr "Delete Page"
+
+msgid "Zoom Out"
+msgstr "Zoom Out"
+
+msgid "Zoom In"
+msgstr "Zoom In"
+
+msgid "Fit to Page"
+msgstr "Fit to Page"
+
+msgid "Undo"
+msgstr "Undo"
+
+msgid "Redo"
+msgstr "Redo"
+
+msgid "Save Template"
+msgstr "Save Template"
+
+msgid "Generate PDF"
+msgstr "Generate PDF"
+
+# Elements
+msgid "Elements"
+msgstr "Elements"
+
+msgid "Pages"
+msgstr "Pages"
+
+msgid "Properties"
+msgstr "Properties"
+
+msgid "Layers"
+msgstr "Layers"
+
+msgid "Search elements..."
+msgstr "Search elements..."
+
+msgid "Select an element to edit its properties"
+msgstr "Select an element to edit its properties"
+
+msgid "Text"
+msgstr "Text"
+
+msgid "Image"
+msgstr "Image"
+
+msgid "Line"
+msgstr "Line"
+
+msgid "Rectangle"
+msgstr "Rectangle"
+
+msgid "Input Field"
+msgstr "Input Field"
+
+msgid "Textarea"
+msgstr "Textarea"
+
+msgid "Checkbox"
+msgstr "Checkbox"
+
+msgid "Table"
+msgstr "Table"
+
+msgid "QR Code"
+msgstr "QR Code"
+
+msgid "Barcode"
+msgstr "Barcode"
+
+msgid "Signature Field"
+msgstr "Signature Field"
+
+msgid "Post Title"
+msgstr "Post Title"
+
+msgid "Post Content"
+msgstr "Post Content"
+
+msgid "Featured Image"
+msgstr "Featured Image"
+
+# Settings
+msgid "General Settings"
+msgstr "General Settings"
+
+msgid "PDF Generation"
+msgstr "PDF Generation"
+
+msgid "Performance"
+msgstr "Performance"
+
+msgid "PDF Engine"
+msgstr "PDF Engine"
+
+msgid "Choose the PDF generation engine"
+msgstr "Choose the PDF generation engine"
+
+msgid "Default Paper Size"
+msgstr "Default Paper Size"
+
+msgid "Default Font"
+msgstr "Default Font"
+
+msgid "Enable Caching"
+msgstr "Enable Caching"
+
+msgid "Enable PDF caching for better performance"
+msgstr "Enable PDF caching for better performance"
+
+msgid "Debug Mode"
+msgstr "Debug Mode"
+
+msgid "Enable debug logging"
+msgstr "Enable debug logging"
+
+# Form Integrations
+msgid "Setup Integration"
+msgstr "Setup Integration"
+
+msgid "Select Form Type"
+msgstr "Select Form Type"
+
+msgid "Select Form"
+msgstr "Select Form"
+
+msgid "Select Template"
+msgstr "Select Template"
+
+msgid "Available Fields"
+msgstr "Available Fields"
+
+msgid "No integration"
+msgstr "No integration"
+
+# Messages
+msgid "Template created successfully"
+msgstr "Template created successfully"
+
+msgid "Template updated successfully"
+msgstr "Template updated successfully"
+
+msgid "PDF generated successfully!"
+msgstr "PDF generated successfully!"
+
+msgid "Error occurred"
+msgstr "Error occurred"
+
+msgid "Saving..."
+msgstr "Saving..."
+
+msgid "Saved"
+msgstr "Saved"
+
+msgid "Loading..."
+msgstr "Loading..."
+
+msgid "Generating PDF..."
+msgstr "Generating PDF..."
+
+msgid "PDF generation failed"
+msgstr "PDF generation failed"
+
+msgid "Template ID required"
+msgstr "Template ID required"
+
+msgid "Form Submission PDF"
+msgstr "Form Submission PDF"
+
+msgid "Please find attached the PDF for your form submission."
+msgstr "Please find attached the PDF for your form submission."
+
+# Conditional Logic Operators
+msgid "Equals"
+msgstr "Equals"
+
+msgid "Not Equals"
+msgstr "Not Equals"
+
+msgid "Greater Than"
+msgstr "Greater Than"
+
+msgid "Less Than"
+msgstr "Less Than"
+
+msgid "Greater Than or Equal"
+msgstr "Greater Than or Equal"
+
+msgid "Less Than or Equal"
+msgstr "Less Than or Equal"
+
+msgid "Contains"
+msgstr "Contains"
+
+msgid "Does Not Contain"
+msgstr "Does Not Contain"
+
+msgid "Starts With"
+msgstr "Starts With"
+
+msgid "Ends With"
+msgstr "Ends With"
+
+msgid "In Array"
+msgstr "In Array"
+
+msgid "Not In Array"
+msgstr "Not In Array"
+
+msgid "Is Empty"
+msgstr "Is Empty"
+
+msgid "Is Not Empty"
+msgstr "Is Not Empty"
+
+msgid "Matches RegEx"
+msgstr "Matches RegEx"
+
+msgid "Between"
+msgstr "Between"
+
+msgid "Not Between"
+msgstr "Not Between"
+
+# Sample Templates
+msgid "Business Invoice"
+msgstr "Business Invoice"
+
+msgid "Professional invoice template with company branding"
+msgstr "Professional invoice template with company branding"
+
+msgid "Contact Form PDF"
+msgstr "Contact Form PDF"
+
+msgid "PDF generation for contact form submissions"
+msgstr "PDF generation for contact form submissions"
+
+msgid "Achievement Certificate"
+msgstr "Achievement Certificate"
+
+msgid "Professional certificate template for awards"
+msgstr "Professional certificate template for awards"
+
+msgid "Business Report"
+msgstr "Business Report"
+
+msgid "Structured report template with data tables"
+msgstr "Structured report template with data tables"
+
+msgid "Company Letterhead"
+msgstr "Company Letterhead"
+
+msgid "Professional letterhead for business correspondence"
+msgstr "Professional letterhead for business correspondence"
+
+msgid "Price Quote"
+msgstr "Price Quote"
+
+msgid "Professional quote template for services"
+msgstr "Professional quote template for services"
+
+# Confirmation Messages
+msgid "Are you sure you want to delete this template?"
+msgstr "Are you sure you want to delete this template?"
+
+msgid "Are you sure you want to delete this page?"
+msgstr "Are you sure you want to delete this page?"
+
+msgid "Are you sure you want to delete this element?"
+msgstr "Are you sure you want to delete this element?"
+
+# Media
+msgid "Select Image"
+msgstr "Select Image"
+
+msgid "Use Image"
+msgstr "Use Image"
+
+msgid "Select Media"
+msgstr "Select Media"
+
+msgid "Use Media"
+msgstr "Use Media"
+
+# Time/Date
+msgid "ago"
+msgstr "ago"
+
+msgid "Page %d of %d"
+msgstr "Page %d of %d"
+
+# Common Actions
+msgid "Apply"
+msgstr "Apply"
+
+msgid "Search"
+msgstr "Search"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Close"
+msgstr "Close"
+
+msgid "Continue"
+msgstr "Continue"
+
+msgid "Dismiss"
+msgstr "Dismiss"
+
+# Bulk Actions
+msgid "Bulk Actions"
+msgstr "Bulk Actions"
+
+msgid "Activate"
+msgstr "Activate"
+
+msgid "Deactivate"
+msgstr "Deactivate"
+
+# Portrait/Landscape
+msgid "Portrait"
+msgstr "Portrait"
+
+msgid "Landscape"
+msgstr "Landscape"
+
+# Grid/Rulers
+msgid "Grid"
+msgstr "Grid"
+
+msgid "Snap"
+msgstr "Snap"
+
+msgid "Rulers"
+msgstr "Rulers"
+
+# Move Actions
+msgid "Move Up"
+msgstr "Move Up"
+
+msgid "Move Down"
+msgstr "Move Down"
+
+# No Items Found
+msgid "No elements on this page"
+msgstr "No elements on this page"
+
+msgid "No recent activity found."
+msgstr "No recent activity found."
+
+msgid "View All Logs"
+msgstr "View All Logs"
