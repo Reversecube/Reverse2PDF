@@ -42,13 +42,16 @@ class Reverse2PDF_Core {
         add_action('wp_enqueue_scripts', array($this, 'frontend_scripts'));
         add_action('admin_enqueue_scripts', array($this, 'admin_scripts'));
         
+        if (is_admin()) {
+            $admin = new Reverse2PDF_Admin();
+            $admin->handle_ajax_requests();
+        }
         // AJAX handlers
         add_action('wp_ajax_reverse2pdf_generate_pdf', array($this, 'ajax_generate_pdf'));
         add_action('wp_ajax_nopriv_reverse2pdf_generate_pdf', array($this, 'ajax_generate_pdf'));
         add_action('wp_ajax_reverse2pdf_save_template', array($this, 'ajax_save_template'));
         add_action('wp_ajax_reverse2pdf_load_template', array($this, 'ajax_load_template'));
 
-        // Add these to the existing init_hooks() method in class-reverse2pdf-core.php
 
         // Template AJAX handlers
         add_action('wp_ajax_reverse2pdf_delete_template', array($this, 'ajax_delete_template'));

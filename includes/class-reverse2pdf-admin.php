@@ -895,1691 +895,1366 @@ private function render_recent_templates_premium() {
     }
     
     public function builder_page() {
-    $template_id = isset($_GET['template_id']) ? intval($_GET['template_id']) : 0;
-    $template = null;
-    
-    if ($template_id) {
-        global $wpdb;
-        $template = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM {$wpdb->prefix}" . REVERSE2PDF_TABLE_TEMPLATES . " WHERE id = %d",
-            $template_id
-        ));
-    }
-    ?>
-    <div class="wrap reverse2pdf-builder-wrap">
-        <style>
-            /* Enhanced Builder Styles */
-            .reverse2pdf-builder-wrap {
-                margin: -10px -20px -20px -20px;
-                background: #f8fafc;
-                min-height: 100vh;
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            }
-            
-            .builder-header {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 20px 30px;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-                position: sticky;
-                top: 32px;
-                z-index: 100;
-            }
-            
-            .builder-header h1 {
-                margin: 0 0 15px 0;
-                font-size: 1.8rem;
-                font-weight: 700;
-                color: white;
-            }
-            
-            .builder-controls {
-                display: flex;
-                align-items: center;
-                gap: 15px;
-                flex-wrap: wrap;
-            }
-            
-            .builder-input {
-                background: rgba(255,255,255,0.15);
-                border: 2px solid rgba(255,255,255,0.3);
-                color: white;
-                padding: 10px 15px;
-                border-radius: 8px;
-                font-size: 16px;
-                min-width: 250px;
-                backdrop-filter: blur(10px);
-                transition: all 0.3s ease;
-            }
-            
-            .builder-input:focus {
-                background: rgba(255,255,255,0.25);
-                border-color: rgba(255,255,255,0.6);
-                outline: none;
-                box-shadow: 0 0 0 4px rgba(255,255,255,0.1);
-            }
-            
-            .builder-input::placeholder {
-                color: rgba(255,255,255,0.7);
-            }
-            
-            .builder-btn {
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                padding: 10px 20px;
-                background: rgba(255,255,255,0.2);
-                color: white;
-                border: 2px solid rgba(255,255,255,0.3);
-                border-radius: 8px;
-                font-weight: 600;
-                text-decoration: none;
-                transition: all 0.3s ease;
-                backdrop-filter: blur(10px);
-                cursor: pointer;
-                font-size: 14px;
-            }
-            
-            .builder-btn:hover {
-                background: rgba(255,255,255,0.3);
-                border-color: rgba(255,255,255,0.5);
-                transform: translateY(-1px);
-                color: white;
-                text-decoration: none;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            }
-            
-            .builder-btn:disabled {
-                opacity: 0.6;
-                cursor: not-allowed;
-                transform: none !important;
-            }
-            
-            .builder-btn.primary {
-                background: rgba(255,255,255,0.9);
-                color: #667eea;
-                border-color: transparent;
-            }
-            
-            .builder-btn.primary:hover {
-                background: white;
-                color: #4f46e5;
-            }
-            
-            .builder-workspace {
-                display: grid;
-                grid-template-columns: 340px 1fr;
-                height: calc(100vh - 140px);
-                gap: 0;
-            }
-            
-            .builder-sidebar {
-                background: white;
-                border-right: 1px solid #e5e7eb;
-                display: flex;
-                flex-direction: column;
-                overflow: hidden;
-            }
-            
-            .sidebar-header {
-                background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-                padding: 20px;
-                border-bottom: 2px solid #e5e7eb;
-                font-weight: 700;
-                color: #1f2937;
-                font-size: 14px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-            
-            .sidebar-content {
-                flex: 1;
-                overflow-y: auto;
-                padding: 20px;
-            }
-            
-            .element-library {
-                margin-bottom: 30px;
-            }
-            
-            .element-group-title {
-                font-size: 12px;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                color: #6b7280;
-                margin-bottom: 15px;
-                padding-bottom: 8px;
-                border-bottom: 1px solid #f3f4f6;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-            
-            .element-item {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                padding: 12px 15px;
-                margin-bottom: 8px;
-                background: #f8fafc;
-                border: 2px solid transparent;
-                border-radius: 10px;
-                cursor: grab;
-                transition: all 0.3s ease;
-                user-select: none;
-                font-weight: 500;
-                position: relative;
-                overflow: hidden;
-            }
-            
-            .element-item::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                transition: left 0.3s ease;
-                z-index: 1;
-            }
-            
-            .element-item:hover::before {
-                left: 0;
-            }
-            
-            .element-item:hover {
-                color: white;
-                border-color: #667eea;
-                transform: translateX(8px) scale(1.02);
-                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-            }
-            
-            .element-item:active {
-                cursor: grabbing;
-                transform: translateX(8px) scale(0.98);
-            }
-            
-            .element-item > * {
-                position: relative;
-                z-index: 2;
-            }
-            
-            .element-icon {
-                font-size: 18px;
-                width: 20px;
-                height: 20px;
-                text-align: center;
-            }
-            
-            .element-description {
-                font-size: 11px;
-                color: #9ca3af;
-                font-weight: 400;
-                margin-top: 2px;
-            }
-            
-            .element-item:hover .element-description {
-                color: rgba(255,255,255,0.8);
-            }
-            
-            .properties-panel {
-                background: white;
-                border-radius: 10px;
-                padding: 20px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-                border: 1px solid #e5e7eb;
-            }
-            
-            .properties-title {
-                font-size: 16px;
-                font-weight: 700;
-                color: #1f2937;
-                margin-bottom: 20px;
-                padding-bottom: 10px;
-                border-bottom: 2px solid #f3f4f6;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-            
-            .property-group {
-                margin-bottom: 20px;
-                padding-bottom: 15px;
-                border-bottom: 1px solid #f3f4f6;
-            }
-            
-            .property-group:last-child {
-                border-bottom: none;
-                margin-bottom: 0;
-            }
-            
-            .property-group h6 {
-                margin-bottom: 12px;
-                font-size: 13px;
-                font-weight: 600;
-                color: #374151;
-                display: flex;
-                align-items: center;
-                gap: 6px;
-            }
-            
-            .property-label {
-                font-size: 11px;
-                font-weight: 600;
-                color: #6b7280;
-                margin-bottom: 4px;
-                display: block;
-            }
-            
-            .property-input, .property-select, .property-textarea {
-                width: 100%;
-                padding: 8px 12px;
-                border: 2px solid #e5e7eb;
-                border-radius: 6px;
-                font-size: 13px;
-                transition: all 0.3s ease;
-                background: white;
-            }
-            
-            .property-input:focus, .property-select:focus, .property-textarea:focus {
-                border-color: #667eea;
-                outline: none;
-                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            }
-            
-            .property-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
-            }
-            
-            .property-grid-3 {
-                display: grid;
-                grid-template-columns: 1fr 1fr 1fr;
-                gap: 8px;
-            }
-            
-            .file-upload-btn {
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                padding: 8px 12px;
-                background: #667eea;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                font-size: 12px;
-                cursor: pointer;
-                transition: all 0.3s ease;
-            }
-            
-            .file-upload-btn:hover {
-                background: #4f46e5;
-                transform: translateY(-1px);
-            }
-            
-            .color-input-wrapper {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                border: 2px solid #e5e7eb;
-                border-radius: 6px;
-                padding: 4px;
-                background: white;
-                transition: all 0.3s ease;
-            }
-            
-            .color-input-wrapper:focus-within {
-                border-color: #667eea;
-                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            }
-            
-            .color-preview {
-                width: 24px;
-                height: 24px;
-                border-radius: 4px;
-                border: 1px solid #d1d5db;
-                cursor: pointer;
-            }
-            
-            .color-input {
-                border: none;
-                background: transparent;
-                font-size: 13px;
-                flex: 1;
-                padding: 4px;
-            }
-            
-            .color-input:focus {
-                outline: none;
-            }
-            
-            .builder-canvas {
-                background: 
-                    radial-gradient(circle at 20px 20px, #d1d5db 1px, transparent 1px),
-                    linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
-                background-size: 20px 20px, 100% 100%;
-                padding: 30px;
-                overflow: auto;
-                display: flex;
-                justify-content: center;
-                align-items: flex-start;
-                min-height: 100%;
-            }
-            
-            .canvas-container {
-                position: relative;
-            }
-            
-            .pdf-canvas {
-                background: white;
-                box-shadow: 
-                    0 25px 50px -12px rgba(0, 0, 0, 0.25),
-                    0 0 0 1px rgba(0, 0, 0, 0.05);
-                border-radius: 12px;
-                position: relative;
-                transition: all 0.3s ease;
-                overflow: hidden;
-            }
-            
-            .pdf-canvas:hover {
-                box-shadow: 
-                    0 32px 64px -12px rgba(0, 0, 0, 0.35),
-                    0 0 0 1px rgba(102, 126, 234, 0.1);
-            }
-            
-            .pdf-page {
-                background: white;
-                position: relative;
-                margin-bottom: 20px;
-                width: 595px;
-                min-height: 842px;
-                border-radius: 8px;
-                border: 1px solid rgba(0,0,0,0.05);
-                transition: all 0.3s ease;
-            }
-            
-            .pdf-page:last-child {
-                margin-bottom: 0;
-            }
-            
-            .pdf-page.drop-zone {
-                border: 2px dashed #667eea;
-                background: rgba(102, 126, 234, 0.02);
-            }
-            
-            .page-number {
-                position: absolute;
-                top: 10px;
-                right: 15px;
-                background: rgba(0, 0, 0, 0.7);
-                color: white;
-                padding: 6px 12px;
-                border-radius: 6px;
-                font-size: 12px;
-                font-weight: 600;
-                z-index: 10;
-            }
-            
-            .page-controls {
-                position: absolute;
-                top: 10px;
-                left: 15px;
-                display: flex;
-                gap: 5px;
-                z-index: 10;
-            }
-            
-            .page-control-btn {
-                background: rgba(0, 0, 0, 0.7);
-                color: white;
-                border: none;
-                width: 24px;
-                height: 24px;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: all 0.3s ease;
-            }
-            
-            .page-control-btn:hover {
-                background: rgba(0, 0, 0, 0.9);
-                transform: scale(1.1);
-            }
-            
-            .pdf-element {
-                position: absolute;
-                border: 2px dashed transparent;
-                cursor: move;
-                min-width: 20px;
-                min-height: 20px;
-                transition: all 0.3s ease;
-                z-index: 5;
-            }
-            
-            .pdf-element:hover {
-                border-color: rgba(102, 126, 234, 0.5);
-                box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
-            }
-            
-            .pdf-element.selected {
-                border-color: #667eea;
-                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-            }
-            
-            .element-controls {
-                position: absolute;
-                top: -35px;
-                right: 0;
-                display: none;
-                gap: 4px;
-                z-index: 10;
-            }
-            
-            .pdf-element.selected .element-controls {
-                display: flex;
-            }
-            
-            .control-btn {
-                width: 26px;
-                height: 26px;
-                border: none;
-                background: #667eea;
-                color: white;
-                border-radius: 6px;
-                cursor: pointer;
-                font-size: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: all 0.3s ease;
-            }
-            
-            .control-btn:hover {
-                background: #4f46e5;
-                transform: scale(1.1);
-            }
-            
-            .empty-state {
-                text-align: center;
-                padding: 60px 30px;
-                color: #6b7280;
-            }
-            
-            .empty-icon {
-                font-size: 4rem;
-                margin-bottom: 20px;
-                opacity: 0.5;
-            }
-            
-            .empty-title {
-                font-size: 1.5rem;
-                font-weight: 600;
-                color: #374151;
-                margin-bottom: 10px;
-            }
-            
-            .empty-text {
-                font-size: 1rem;
-                margin-bottom: 25px;
-                max-width: 400px;
-                margin-left: auto;
-                margin-right: auto;
-            }
-            
-            /* Loading Animation */
-            @keyframes spin {
-                from { transform: rotate(0deg); }
-                to { transform: rotate(360deg); }
-            }
-            
-            .reverse2pdf-spin {
-                animation: spin 1s linear infinite;
-            }
-            
-            /* Hidden file input */
-            .hidden-file-input {
-                display: none;
-            }
-            
-            /* Responsive Design */
-            @media (max-width: 1024px) {
-                .builder-workspace {
-                    grid-template-columns: 300px 1fr;
-                }
-            }
-            
-            @media (max-width: 768px) {
-                .builder-workspace {
-                    grid-template-columns: 1fr;
-                    grid-template-rows: auto 1fr;
-                    height: auto;
+        $template_id = isset($_GET['template_id']) ? intval($_GET['template_id']) : 0;
+        $template = null;
+        
+        if ($template_id) {
+            global $wpdb;
+            $template = $wpdb->get_row($wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}" . REVERSE2PDF_TABLE_TEMPLATES . " WHERE id = %d",
+                $template_id
+            ));
+        }
+        
+        // Enqueue required scripts
+        wp_enqueue_script('jquery');
+        wp_enqueue_script('jquery-ui-draggable');
+        wp_enqueue_script('jquery-ui-droppable');
+        wp_enqueue_script('jquery-ui-resizable');
+        ?>
+        <div class="wrap reverse2pdf-builder-wrap">
+            <style>
+                /* Complete Enhanced Styles for Perfect Functionality */
+                .reverse2pdf-builder-wrap {
+                    margin: -10px -20px -20px -20px;
+                    background: #f8fafc;
+                    min-height: 100vh;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                 }
                 
-                .builder-sidebar {
-                    border-right: none;
-                    border-bottom: 1px solid #e5e7eb;
-                    max-height: 400px;
+                .builder-header {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 20px 30px;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                    position: sticky;
+                    top: 32px;
+                    z-index: 100;
+                }
+                
+                .builder-header h1 {
+                    margin: 0 0 15px 0;
+                    font-size: 1.8rem;
+                    font-weight: 700;
+                    color: white;
                 }
                 
                 .builder-controls {
-                    flex-direction: column;
-                    align-items: stretch;
-                    gap: 10px;
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                    flex-wrap: wrap;
                 }
                 
                 .builder-input {
-                    min-width: auto;
+                    background: rgba(255,255,255,0.15);
+                    border: 2px solid rgba(255,255,255,0.3);
+                    color: white;
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    min-width: 250px;
+                    backdrop-filter: blur(10px);
+                    transition: all 0.3s ease;
+                }
+                
+                .builder-input:focus {
+                    background: rgba(255,255,255,0.25);
+                    border-color: rgba(255,255,255,0.6);
+                    outline: none;
+                    box-shadow: 0 0 0 4px rgba(255,255,255,0.1);
+                }
+                
+                .builder-input::placeholder {
+                    color: rgba(255,255,255,0.7);
+                }
+                
+                .builder-btn {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 10px 20px;
+                    background: rgba(255,255,255,0.2);
+                    color: white;
+                    border: 2px solid rgba(255,255,255,0.3);
+                    border-radius: 8px;
+                    font-weight: 600;
+                    text-decoration: none;
+                    transition: all 0.3s ease;
+                    backdrop-filter: blur(10px);
+                    cursor: pointer;
+                    font-size: 14px;
+                }
+                
+                .builder-btn:hover {
+                    background: rgba(255,255,255,0.3);
+                    border-color: rgba(255,255,255,0.5);
+                    transform: translateY(-1px);
+                    color: white;
+                    text-decoration: none;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                }
+                
+                .builder-btn:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                    transform: none !important;
+                }
+                
+                .builder-btn.primary {
+                    background: rgba(255,255,255,0.9);
+                    color: #667eea;
+                    border-color: transparent;
+                }
+                
+                .builder-btn.primary:hover {
+                    background: white;
+                    color: #4f46e5;
+                }
+                
+                .builder-workspace {
+                    display: grid;
+                    grid-template-columns: 340px 1fr;
+                    height: calc(100vh - 140px);
+                    gap: 0;
+                }
+                
+                .builder-sidebar {
+                    background: white;
+                    border-right: 1px solid #e5e7eb;
+                    display: flex;
+                    flex-direction: column;
+                    overflow: hidden;
+                }
+                
+                .sidebar-header {
+                    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+                    padding: 20px;
+                    border-bottom: 2px solid #e5e7eb;
+                    font-weight: 700;
+                    color: #1f2937;
+                    font-size: 14px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+                
+                .sidebar-content {
+                    flex: 1;
+                    overflow-y: auto;
+                    padding: 20px;
+                }
+                
+                .element-library {
+                    margin-bottom: 30px;
+                }
+                
+                .element-group-title {
+                    font-size: 12px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    color: #6b7280;
+                    margin-bottom: 15px;
+                    padding-bottom: 8px;
+                    border-bottom: 1px solid #f3f4f6;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+                
+                .element-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 12px 15px;
+                    margin-bottom: 8px;
+                    background: #f8fafc;
+                    border: 2px solid transparent;
+                    border-radius: 10px;
+                    cursor: grab;
+                    transition: all 0.3s ease;
+                    user-select: none;
+                    font-weight: 500;
+                    position: relative;
+                    overflow: hidden;
+                }
+                
+                .element-item:active {
+                    cursor: grabbing;
+                }
+                
+                .element-item::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    transition: left 0.3s ease;
+                    z-index: 1;
+                }
+                
+                .element-item:hover::before {
+                    left: 0;
+                }
+                
+                .element-item:hover {
+                    color: white;
+                    border-color: #667eea;
+                    transform: translateX(8px) scale(1.02);
+                    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+                }
+                
+                .element-item > * {
+                    position: relative;
+                    z-index: 2;
+                }
+                
+                .element-icon {
+                    font-size: 18px;
+                    width: 20px;
+                    height: 20px;
+                    text-align: center;
+                }
+                
+                .element-description {
+                    font-size: 11px;
+                    color: #9ca3af;
+                    font-weight: 400;
+                    margin-top: 2px;
+                }
+                
+                .element-item:hover .element-description {
+                    color: rgba(255,255,255,0.8);
+                }
+                
+                .properties-panel {
+                    background: white;
+                    border-radius: 10px;
+                    padding: 20px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                    border: 1px solid #e5e7eb;
+                }
+                
+                .properties-title {
+                    font-size: 16px;
+                    font-weight: 700;
+                    color: #1f2937;
+                    margin-bottom: 20px;
+                    padding-bottom: 10px;
+                    border-bottom: 2px solid #f3f4f6;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+                
+                .property-group {
+                    margin-bottom: 20px;
+                    padding-bottom: 15px;
+                    border-bottom: 1px solid #f3f4f6;
+                }
+                
+                .property-group:last-child {
+                    border-bottom: none;
+                    margin-bottom: 0;
+                }
+                
+                .property-group h6 {
+                    margin-bottom: 12px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #374151;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                }
+                
+                .property-label {
+                    font-size: 11px;
+                    font-weight: 600;
+                    color: #6b7280;
+                    margin-bottom: 4px;
+                    display: block;
+                }
+                
+                .property-input, .property-select, .property-textarea {
+                    width: 100%;
+                    padding: 8px 12px;
+                    border: 2px solid #e5e7eb;
+                    border-radius: 6px;
+                    font-size: 13px;
+                    transition: all 0.3s ease;
+                    background: white;
+                }
+                
+                .property-input:focus, .property-select:focus, .property-textarea:focus {
+                    border-color: #667eea;
+                    outline: none;
+                    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+                }
+                
+                .property-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 10px;
+                }
+                
+                .builder-canvas {
+                    background: 
+                        radial-gradient(circle at 20px 20px, #d1d5db 1px, transparent 1px),
+                        linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+                    background-size: 20px 20px, 100% 100%;
+                    padding: 30px;
+                    overflow: auto;
+                    display: flex;
+                    justify-content: center;
+                    align-items: flex-start;
+                    min-height: 100%;
+                }
+                
+                .canvas-container {
+                    position: relative;
+                }
+                
+                .pdf-canvas {
+                    background: white;
+                    box-shadow: 
+                        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+                        0 0 0 1px rgba(0, 0, 0, 0.05);
+                    border-radius: 12px;
+                    position: relative;
+                    transition: all 0.3s ease;
+                    overflow: visible;
                 }
                 
                 .pdf-page {
-                    width: 100%;
-                    max-width: 595px;
+                    background: white;
+                    position: relative;
+                    margin-bottom: 20px;
+                    width: 595px;
+                    min-height: 842px;
+                    border-radius: 8px;
+                    border: 1px solid rgba(0,0,0,0.05);
+                    transition: all 0.3s ease;
+                    overflow: visible;
                 }
-            }
-        </style>
-        
-        <!-- Builder Header -->
-        <div class="builder-header">
-            <h1><?php echo $template ? 'Edit Template: ' . esc_html($template->name) : '🎨 Create New PDF Template'; ?></h1>
-            <div class="builder-controls">
-                <input type="text" id="template-name" class="builder-input" 
-                       placeholder="Enter template name..." 
-                       value="<?php echo $template ? esc_attr($template->name) : ''; ?>" />
                 
-                <button type="button" id="save-template" class="builder-btn primary">
-                    <span class="dashicons dashicons-yes"></span> 
-                    Save Template
-                </button>
+                .pdf-page:last-child {
+                    margin-bottom: 0;
+                }
                 
-                <button type="button" id="preview-template" class="builder-btn">
-                    <span class="dashicons dashicons-visibility"></span> 
-                    Preview
-                </button>
+                .pdf-page.drop-hover {
+                    border: 2px dashed #667eea !important;
+                    background: rgba(102, 126, 234, 0.02) !important;
+                }
                 
-                <button type="button" id="test-template" class="builder-btn">
-                    <span class="dashicons dashicons-media-document"></span> 
-                    Test PDF
-                </button>
+                .page-number {
+                    position: absolute;
+                    top: 10px;
+                    right: 15px;
+                    background: rgba(0, 0, 0, 0.7);
+                    color: white;
+                    padding: 6px 12px;
+                    border-radius: 6px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    z-index: 10;
+                    pointer-events: none;
+                }
                 
-                <button type="button" id="add-page" class="builder-btn">
-                    <span class="dashicons dashicons-plus-alt2"></span> 
-                    Add Page
-                </button>
-            </div>
-        </div>
-        
-        <!-- Builder Workspace -->
-        <div class="builder-workspace">
-            <!-- Sidebar -->
-            <div class="builder-sidebar">
-                <div class="sidebar-header">
-                    <span class="dashicons dashicons-admin-tools"></span>
-                    PDF Design Studio
+                .page-controls {
+                    position: absolute;
+                    top: 10px;
+                    left: 15px;
+                    display: flex;
+                    gap: 5px;
+                    z-index: 10;
+                }
+                
+                .page-control-btn {
+                    background: rgba(0, 0, 0, 0.7);
+                    color: white;
+                    border: none;
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.3s ease;
+                }
+                
+                .page-control-btn:hover {
+                    background: rgba(0, 0, 0, 0.9);
+                    transform: scale(1.1);
+                }
+                
+                .pdf-element {
+                    position: absolute !important;
+                    border: 2px dashed transparent;
+                    cursor: move;
+                    min-width: 20px;
+                    min-height: 20px;
+                    transition: all 0.3s ease;
+                    z-index: 5;
+                    overflow: visible;
+                }
+                
+                .pdf-element:hover {
+                    border-color: rgba(102, 126, 234, 0.5) !important;
+                    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+                }
+                
+                .pdf-element.selected {
+                    border-color: #667eea !important;
+                    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2) !important;
+                }
+                
+                .element-controls {
+                    position: absolute;
+                    top: -35px;
+                    right: 0;
+                    display: none;
+                    gap: 4px;
+                    z-index: 15;
+                }
+                
+                .pdf-element.selected .element-controls {
+                    display: flex !important;
+                }
+                
+                .control-btn {
+                    width: 26px;
+                    height: 26px;
+                    border: none;
+                    background: #667eea;
+                    color: white;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.3s ease;
+                }
+                
+                .control-btn:hover {
+                    background: #4f46e5;
+                    transform: scale(1.1);
+                }
+                
+                .empty-state {
+                    text-align: center;
+                    padding: 60px 30px;
+                    color: #6b7280;
+                }
+                
+                .empty-icon {
+                    font-size: 4rem;
+                    margin-bottom: 20px;
+                    opacity: 0.5;
+                }
+                
+                .empty-title {
+                    font-size: 1.5rem;
+                    font-weight: 600;
+                    color: #374151;
+                    margin-bottom: 10px;
+                }
+                
+                .empty-text {
+                    font-size: 1rem;
+                    margin-bottom: 25px;
+                    max-width: 400px;
+                    margin-left: auto;
+                    margin-right: auto;
+                }
+                
+                /* jQuery UI Enhancements */
+                .ui-draggable-dragging {
+                    z-index: 1000 !important;
+                    opacity: 0.8 !important;
+                }
+                
+                .ui-resizable-handle {
+                    background: #667eea !important;
+                    border: 1px solid #4f46e5 !important;
+                }
+                
+                .ui-resizable-se {
+                    width: 12px !important;
+                    height: 12px !important;
+                    right: 1px !important;
+                    bottom: 1px !important;
+                }
+                
+                .ui-resizable-s, .ui-resizable-e, .ui-resizable-n, .ui-resizable-w {
+                    background: #667eea !important;
+                }
+                
+                /* Loading Animation */
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+                
+                .reverse2pdf-spin {
+                    animation: spin 1s linear infinite;
+                }
+                
+                /* Responsive Design */
+                @media (max-width: 768px) {
+                    .builder-workspace {
+                        grid-template-columns: 1fr;
+                        grid-template-rows: auto 1fr;
+                    }
+                    
+                    .builder-sidebar {
+                        border-right: none;
+                        border-bottom: 1px solid #e5e7eb;
+                        max-height: 400px;
+                    }
+                }
+            </style>
+            
+            <!-- Builder Header -->
+            <div class="builder-header">
+                <h1><?php echo $template ? '✏️ Edit: ' . esc_html($template->name) : '🎨 Create PDF Template'; ?></h1>
+                <div class="builder-controls">
+                    <input type="text" id="template-name" class="builder-input" 
+                        placeholder="Enter template name..." 
+                        value="<?php echo $template ? esc_attr($template->name) : ''; ?>" />
+                    
+                    <button type="button" id="save-template" class="builder-btn primary">
+                        <span class="dashicons dashicons-yes"></span> 
+                        Save Template
+                    </button>
+                    
+                    <button type="button" id="test-template" class="builder-btn">
+                        <span class="dashicons dashicons-media-document"></span> 
+                        Test PDF
+                    </button>
+                    
+                    <button type="button" id="add-page" class="builder-btn">
+                        <span class="dashicons dashicons-plus-alt2"></span> 
+                        Add Page
+                    </button>
                 </div>
-                
-                <div class="sidebar-content">
-                    <!-- Element Library -->
-                    <div class="element-library">
-                        <div class="element-group">
-                            <div class="element-group-title">
-                                📝 Text & Content
-                            </div>
-                            
-                            <div class="element-item" data-type="text" draggable="true">
-                                <span class="element-icon dashicons dashicons-editor-textcolor"></span>
-                                <div>
-                                    <div>Text Element</div>
-                                    <div class="element-description">Add editable text content</div>
-                                </div>
-                            </div>
-                            
-                            <div class="element-item" data-type="heading" draggable="true">
-                                <span class="element-icon dashicons dashicons-heading"></span>
-                                <div>
-                                    <div>Heading</div>
-                                    <div class="element-description">Large title text</div>
-                                </div>
-                            </div>
-                            
-                            <div class="element-item" data-type="paragraph" draggable="true">
-                                <span class="element-icon dashicons dashicons-editor-paragraph"></span>
-                                <div>
-                                    <div>Paragraph</div>
-                                    <div class="element-description">Multi-line text block</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="element-group">
-                            <div class="element-group-title">
-                                🖼️ Media Elements
-                            </div>
-                            
-                            <div class="element-item" data-type="image" draggable="true">
-                                <span class="element-icon dashicons dashicons-format-image"></span>
-                                <div>
-                                    <div>Image</div>
-                                    <div class="element-description">Upload and display images</div>
-                                </div>
-                            </div>
-                            
-                            <div class="element-item" data-type="logo" draggable="true">
-                                <span class="element-icon dashicons dashicons-businessperson"></span>
-                                <div>
-                                    <div>Logo</div>
-                                    <div class="element-description">Company or brand logo</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="element-group">
-                            <div class="element-group-title">
-                                📋 Form Data
-                            </div>
-                            
-                            <div class="element-item" data-type="form-field" draggable="true">
-                                <span class="element-icon dashicons dashicons-edit"></span>
-                                <div>
-                                    <div>Form Field</div>
-                                    <div class="element-description">Dynamic form data</div>
-                                </div>
-                            </div>
-                            
-                            <div class="element-item" data-type="checkbox" draggable="true">
-                                <span class="element-icon dashicons dashicons-yes-alt"></span>
-                                <div>
-                                    <div>Checkbox</div>
-                                    <div class="element-description">Checkable option</div>
-                                </div>
-                            </div>
-                            
-                            <div class="element-item" data-type="signature" draggable="true">
-                                <span class="element-icon dashicons dashicons-edit-large"></span>
-                                <div>
-                                    <div>Signature Field</div>
-                                    <div class="element-description">Digital signature area</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="element-group">
-                            <div class="element-group-title">
-                                🔧 Layout Elements
-                            </div>
-                            
-                            <div class="element-item" data-type="line" draggable="true">
-                                <span class="element-icon dashicons dashicons-minus"></span>
-                                <div>
-                                    <div>Line</div>
-                                    <div class="element-description">Horizontal divider</div>
-                                </div>
-                            </div>
-                            
-                            <div class="element-item" data-type="rectangle" draggable="true">
-                                <span class="element-icon dashicons dashicons-admin-page"></span>
-                                <div>
-                                    <div>Rectangle</div>
-                                    <div class="element-description">Shape container</div>
-                                </div>
-                            </div>
-                            
-                            <div class="element-item" data-type="table" draggable="true">
-                                <span class="element-icon dashicons dashicons-grid-view"></span>
-                                <div>
-                                    <div>Table</div>
-                                    <div class="element-description">Data table layout</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="element-group">
-                            <div class="element-group-title">
-                                📊 Advanced Elements
-                            </div>
-                            
-                            <div class="element-item" data-type="qr-code" draggable="true">
-                                <span class="element-icon dashicons dashicons-screenoptions"></span>
-                                <div>
-                                    <div>QR Code</div>
-                                    <div class="element-description">Generate QR codes</div>
-                                </div>
-                            </div>
-                            
-                            <div class="element-item" data-type="barcode" draggable="true">
-                                <span class="element-icon dashicons dashicons-admin-links"></span>
-                                <div>
-                                    <div>Barcode</div>
-                                    <div class="element-description">Product barcode</div>
-                                </div>
-                            </div>
-                            
-                            <div class="element-item" data-type="date" draggable="true">
-                                <span class="element-icon dashicons dashicons-calendar-alt"></span>
-                                <div>
-                                    <div>Date Field</div>
-                                    <div class="element-description">Current date display</div>
-                                </div>
-                            </div>
-                        </div>
+            </div>
+            
+            <!-- Builder Workspace -->
+            <div class="builder-workspace">
+                <!-- Sidebar -->
+                <div class="builder-sidebar">
+                    <div class="sidebar-header">
+                        <span class="dashicons dashicons-admin-tools"></span>
+                        PDF Design Studio
                     </div>
                     
-                    <!-- Properties Panel -->
-                    <div class="properties-panel">
-                        <div class="properties-title">
-                            <span class="dashicons dashicons-admin-settings"></span>
-                            Element Properties
+                    <div class="sidebar-content">
+                        <!-- Element Library -->
+                        <div class="element-library">
+                            <div class="element-group">
+                                <div class="element-group-title">
+                                    📝 Text Elements
+                                </div>
+                                
+                                <div class="element-item" data-type="text">
+                                    <span class="element-icon dashicons dashicons-editor-textcolor"></span>
+                                    <div>
+                                        <div>Text</div>
+                                        <div class="element-description">Simple text content</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="element-item" data-type="heading">
+                                    <span class="element-icon dashicons dashicons-heading"></span>
+                                    <div>
+                                        <div>Heading</div>
+                                        <div class="element-description">Large title text</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="element-group">
+                                <div class="element-group-title">
+                                    🖼️ Media
+                                </div>
+                                
+                                <div class="element-item" data-type="image">
+                                    <span class="element-icon dashicons dashicons-format-image"></span>
+                                    <div>
+                                        <div>Image</div>
+                                        <div class="element-description">Upload images</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="element-group">
+                                <div class="element-group-title">
+                                    📋 Form Fields
+                                </div>
+                                
+                                <div class="element-item" data-type="form-field">
+                                    <span class="element-icon dashicons dashicons-edit"></span>
+                                    <div>
+                                        <div>Form Field</div>
+                                        <div class="element-description">Dynamic data</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="element-group">
+                                <div class="element-group-title">
+                                    🔧 Shapes
+                                </div>
+                                
+                                <div class="element-item" data-type="line">
+                                    <span class="element-icon dashicons dashicons-minus"></span>
+                                    <div>
+                                        <div>Line</div>
+                                        <div class="element-description">Horizontal line</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="element-item" data-type="rectangle">
+                                    <span class="element-icon dashicons dashicons-admin-page"></span>
+                                    <div>
+                                        <div>Rectangle</div>
+                                        <div class="element-description">Shape box</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div id="element-properties">
-                            <div class="empty-state" style="padding: 30px 15px;">
-                                <div style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;">⚙️</div>
-                                <div style="font-size: 14px; color: #6b7280;">
-                                    Select an element to customize its properties
+                        
+                        <!-- Properties Panel -->
+                        <div class="properties-panel">
+                            <div class="properties-title">
+                                <span class="dashicons dashicons-admin-settings"></span>
+                                Properties
+                            </div>
+                            <div id="element-properties">
+                                <div class="empty-state" style="padding: 30px 15px;">
+                                    <div style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;">⚙️</div>
+                                    <div style="font-size: 14px; color: #6b7280;">
+                                        Click an element to edit properties
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Canvas Area -->
-            <div class="builder-canvas">
-                <div class="canvas-container">
-                    <div id="pdf-canvas" class="pdf-canvas">
-                        <?php if ($template && !empty($template->template_data)): ?>
-                            <!-- Load existing template -->
+                
+                <!-- Canvas Area -->
+                <div class="builder-canvas">
+                    <div class="canvas-container">
+                        <div id="pdf-canvas" class="pdf-canvas">
                             <div class="pdf-page" data-page="1">
                                 <div class="page-number">Page 1</div>
                                 <div class="page-controls">
-                                    <button type="button" class="page-control-btn delete-page-btn" title="Delete Page" data-page="1">✕</button>
+                                    <button type="button" class="page-control-btn delete-page-btn" title="Delete Page">✕</button>
                                 </div>
-                                <!-- Template elements will be loaded here via JavaScript -->
-                            </div>
-                        <?php else: ?>
-                            <!-- Empty template -->
-                            <div class="pdf-page" data-page="1">
-                                <div class="page-number">Page 1</div>
-                                <div class="page-controls">
-                                    <button type="button" class="page-control-btn delete-page-btn" title="Delete Page" data-page="1">✕</button>
-                                </div>
+                                <?php if (!($template && !empty($template->template_data))): ?>
                                 <div class="empty-state">
                                     <div class="empty-icon">📄</div>
-                                    <div class="empty-title">Start Building Your PDF Template</div>
+                                    <div class="empty-title">Start Building</div>
                                     <div class="empty-text">
-                                        Drag elements from the left sidebar to add them to your PDF.
-                                        Build professional documents with our drag-and-drop designer.
+                                        Drag elements from the left sidebar to create your PDF template
                                     </div>
-                                    <button type="button" class="builder-btn primary" onclick="addFirstElement()">
-                                        <span class="dashicons dashicons-plus-alt2"></span>
-                                        Add Your First Element
-                                    </button>
                                 </div>
+                                <?php endif; ?>
                             </div>
-                        <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>
+            
+            <!-- Hidden Fields -->
+            <input type="hidden" id="template-id" value="<?php echo $template_id; ?>" />
+            <input type="hidden" id="template-data" value="<?php echo $template ? esc_attr($template->template_data) : ''; ?>" />
         </div>
-        
-        <!-- Hidden Fields -->
-        <input type="hidden" id="template-id" value="<?php echo $template_id; ?>" />
-        <input type="hidden" id="template-data" value="<?php echo $template ? esc_attr($template->template_data) : ''; ?>" />
-        
-        <!-- Hidden File Inputs -->
-        <input type="file" id="image-file-input" class="hidden-file-input" accept="image/*" />
-    </div>
 
-    <script>
-    jQuery(document).ready(function($) {
-        let isDragging = false;
-        let currentElementId = 0;
-        let selectedElement = null;
-        
-        // Initialize drag and drop
-        $('.element-item').on('dragstart', function(e) {
-            e.originalEvent.dataTransfer.setData('text/plain', $(this).data('type'));
-            $(this).addClass('dragging');
-            isDragging = true;
-        });
-        
-        $('.element-item').on('dragend', function() {
-            $(this).removeClass('dragging');
-            isDragging = false;
-        });
-        
-        // Canvas drop zone events
-        $(document).on('dragover', '.pdf-page', function(e) {
-            e.preventDefault();
-            if (isDragging) {
-                $(this).addClass('drop-zone');
-            }
-        });
-        
-        $(document).on('dragleave', '.pdf-page', function(e) {
-            if (!$(e.relatedTarget).closest('.pdf-page').length) {
-                $(this).removeClass('drop-zone');
-            }
-        });
-        
-        $(document).on('drop', '.pdf-page', function(e) {
-            e.preventDefault();
-            $(this).removeClass('drop-zone');
+        <script>
+        jQuery(document).ready(function($) {
+            console.log('🚀 Initializing Reverse2PDF Builder');
             
-            if (!isDragging) return;
+            let selectedElement = null;
+            let elementCounter = 0;
             
-            const elementType = e.originalEvent.dataTransfer.getData('text/plain');
-            const rect = this.getBoundingClientRect();
-            const x = Math.max(10, e.originalEvent.clientX - rect.left - 10);
-            const y = Math.max(10, e.originalEvent.clientY - rect.top - 10);
+            // Initialize drag and drop
+            initializeDragDrop();
             
-            addElementToCanvas(elementType, x, y, $(this));
-        });
-        
-        // Add element to canvas function
-        function addElementToCanvas(type, x, y, $page) {
-            currentElementId++;
-            const elementId = 'element_' + Date.now() + '_' + currentElementId;
-            
-            let elementHtml = '';
-            let width = getDefaultElementWidth(type);
-            let height = getDefaultElementHeight(type);
-            let content = getDefaultElementContent(type);
-            
-            elementHtml = generateElementHtml(type, content, width, height);
-            
-            const $element = $(`
-                <div class="pdf-element" data-id="${elementId}" data-type="${type}" data-content="${content}"
-                     data-image-src="" data-font-size="14" data-font-weight="normal" data-text-color="#000000" data-bg-color="transparent"
-                     style="left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px;">
-                    ${elementHtml}
-                    <div class="element-controls">
-                        <button type="button" class="control-btn duplicate-btn" title="Duplicate">⧉</button>
-                        <button type="button" class="control-btn delete-btn" title="Delete">✕</button>
-                    </div>
-                </div>
-            `);
-            
-            $page.append($element);
-            makeElementInteractive($element);
-            selectElement($element);
-            updateTemplateData();
-            showNotification('Added ' + type + ' element successfully!', 'success');
-        }
-        
-        function getDefaultElementWidth(type) {
-            const widths = {
-                'text': 200, 'heading': 300, 'paragraph': 400,
-                'image': 200, 'logo': 150,
-                'form-field': 200, 'checkbox': 20, 'signature': 200,
-                'line': 300, 'rectangle': 200, 'table': 400,
-                'qr-code': 100, 'barcode': 200, 'date': 150
-            };
-            return widths[type] || 150;
-        }
-        
-        function getDefaultElementHeight(type) {
-            const heights = {
-                'text': 25, 'heading': 35, 'paragraph': 60,
-                'image': 150, 'logo': 80,
-                'form-field': 30, 'checkbox': 20, 'signature': 60,
-                'line': 2, 'rectangle': 100, 'table': 120,
-                'qr-code': 100, 'barcode': 50, 'date': 25
-            };
-            return heights[type] || 30;
-        }
-        
-        function getDefaultElementContent(type) {
-            const contents = {
-                'text': 'Sample Text',
-                'heading': 'Heading Text',
-                'paragraph': 'This is a paragraph of text that can span multiple lines and contain detailed information.',
-                'image': 'image.jpg',
-                'logo': 'logo.png',
-                'form-field': '{field_name}',
-                'checkbox': '☐',
-                'signature': '{signature}',
-                'line': '',
-                'rectangle': '',
-                'table': 'Table Content',
-                'qr-code': 'https://example.com',
-                'barcode': '123456789',
-                'date': '{current_date}'
-            };
-            return contents[type] || type;
-        }
-        
-        function generateElementHtml(type, content, width, height) {
-            switch(type) {
-                case 'text':
-                case 'form-field':
-                    return `<div class="element-content" style="padding: 5px; word-wrap: break-word; font-size: 14px;">${content}</div>`;
+            function initializeDragDrop() {
+                console.log('📋 Setting up drag and drop');
                 
-                case 'heading':
-                    return `<div class="element-content" style="padding: 5px; font-size: 24px; font-weight: bold; word-wrap: break-word;">${content}</div>`;
-                
-                case 'paragraph':
-                    return `<div class="element-content" style="padding: 5px; line-height: 1.5; word-wrap: break-word; font-size: 14px;">${content}</div>`;
-                
-                case 'image':
-                case 'logo':
-                    return `<div class="element-content" style="background: #f3f4f6; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 12px; border: 2px dashed #d1d5db; width: 100%; height: 100%; box-sizing: border-box;">📷 Click to upload image</div>`;
-                
-                case 'line':
-                    return `<div class="element-content" style="border-top: 2px solid #000; width: 100%; height: 2px; margin-top: 50%;"></div>`;
-                
-                case 'rectangle':
-                    return `<div class="element-content" style="border: 2px solid #000; width: 100%; height: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 12px;">Rectangle</div>`;
-                
-                case 'checkbox':
-                    return `<div class="element-content" style="font-size: 16px; display: flex; align-items: center; justify-content: center;">☐</div>`;
-                
-                case 'signature':
-                    return `<div class="element-content" style="border-bottom: 2px solid #000; height: 100%; display: flex; align-items: end; padding-bottom: 5px; font-size: 12px; color: #666;">Signature: ________________</div>`;
-                
-                case 'qr-code':
-                    return `<div class="element-content" style="background: #000; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; width: 100%; height: 100%;">QR</div>`;
-                
-                case 'barcode':
-                    return `<div class="element-content" style="width: 100%; height: 100%;"><div style="background: repeating-linear-gradient(90deg, #000 0px, #000 2px, #fff 2px, #fff 4px); height: 70%; margin-bottom: 5px;"></div><div style="text-align: center; font-size: 10px;">123456789</div></div>`;
-                
-                case 'date':
-                    return `<div class="element-content" style="padding: 5px; font-size: 14px;">${new Date().toLocaleDateString()}</div>`;
-                
-                case 'table':
-                    return `<div class="element-content" style="font-size: 12px; padding: 5px;">
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <tr><th style="border: 1px solid #ddd; padding: 4px;">Header 1</th><th style="border: 1px solid #ddd; padding: 4px;">Header 2</th></tr>
-                            <tr><td style="border: 1px solid #ddd; padding: 4px;">Data 1</td><td style="border: 1px solid #ddd; padding: 4px;">Data 2</td></tr>
-                        </table>
-                    </div>`;
-                
-                default:
-                    return `<div class="element-content" style="padding: 5px;">${content}</div>`;
-            }
-        }
-        
-        // Make element interactive
-        function makeElementInteractive($element) {
-            $element.off('click').on('click', function(e) {
-                e.stopPropagation();
-                selectElement($(this));
-            });
-            
-            // Make draggable
-            $element.draggable({
-                containment: 'parent',
-                grid: [5, 5],
-                stop: function() {
-                    updateTemplateData();
-                    updatePropertiesPanel($element);
-                }
-            });
-            
-            // Make resizable with better constraints
-            $element.resizable({
-                containment: 'parent',
-                grid: [5, 5],
-                handles: 'n, e, s, w, ne, nw, se, sw',
-                minWidth: 20,
-                minHeight: 10,
-                maxWidth: 575, // Page width minus margin
-                maxHeight: 822, // Page height minus margin
-                stop: function() {
-                    updateTemplateData();
-                    updatePropertiesPanel($element);
-                }
-            });
-        }
-        
-        // Select element function
-        function selectElement($element) {
-            $('.pdf-element').removeClass('selected');
-            $element.addClass('selected');
-            selectedElement = $element;
-            updatePropertiesPanel($element);
-        }
-        
-        // Update properties panel with enhanced options
-        function updatePropertiesPanel($element) {
-            if (!$element || !$element.length) {
-                $('#element-properties').html(getEmptyPropertiesHtml());
-                return;
-            }
-            
-            const type = $element.data('type');
-            const content = $element.data('content') || $element.find('.element-content').text();
-            const imageSrc = $element.data('image-src') || '';
-            const fontSize = $element.data('font-size') || '14';
-            const fontWeight = $element.data('font-weight') || 'normal';
-            const textColor = $element.data('text-color') || '#000000';
-            const bgColor = $element.data('bg-color') || 'transparent';
-            
-            let propertiesHtml = `
-                <div class="property-group">
-                    <h6><span class="dashicons dashicons-move"></span> Position & Size</h6>
-                    <div class="property-grid">
-                        <div>
-                            <label class="property-label">X Position</label>
-                            <input type="number" class="property-input" data-property="x" value="${parseInt($element.css('left'))}" min="0" max="575">
-                        </div>
-                        <div>
-                            <label class="property-label">Y Position</label>
-                            <input type="number" class="property-input" data-property="y" value="${parseInt($element.css('top'))}" min="0" max="822">
-                        </div>
-                        <div>
-                            <label class="property-label">Width</label>
-                            <input type="number" class="property-input" data-property="width" value="${$element.width()}" min="20" max="575">
-                        </div>
-                        <div>
-                            <label class="property-label">Height</label>
-                            <input type="number" class="property-input" data-property="height" value="${$element.height()}" min="10" max="822">
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Content properties for text-based elements
-            if (['text', 'heading', 'paragraph', 'form-field', 'qr-code', 'barcode', 'date'].includes(type)) {
-                propertiesHtml += `
-                    <div class="property-group">
-                        <h6><span class="dashicons dashicons-editor-textcolor"></span> Content</h6>
-                        <label class="property-label">Text Content</label>
-                        <textarea class="property-textarea" data-property="content" rows="3" placeholder="Enter your text content...">${content}</textarea>
-                    </div>
-                `;
-            }
-            
-            // Image properties for image elements
-            if (['image', 'logo'].includes(type)) {
-                propertiesHtml += `
-                    <div class="property-group">
-                        <h6><span class="dashicons dashicons-format-image"></span> Image</h6>
-                        <label class="property-label">Image Source</label>
-                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                            <button type="button" class="file-upload-btn" onclick="selectImageFile()">
-                                <span class="dashicons dashicons-upload"></span>
-                                Choose Image
-                            </button>
-                            <button type="button" class="file-upload-btn" onclick="removeImage()" style="background: #ef4444;">
-                                <span class="dashicons dashicons-no"></span>
-                                Remove
-                            </button>
-                        </div>
-                        <input type="url" class="property-input" data-property="image-src" value="${imageSrc}" placeholder="Or enter image URL...">
-                        ${imageSrc ? `<div style="margin-top: 10px;"><img src="${imageSrc}" style="max-width: 100%; max-height: 100px; border-radius: 4px; border: 1px solid #e5e7eb;"></div>` : ''}
-                    </div>
-                `;
-            }
-            
-            // Typography properties for text elements
-            if (['text', 'heading', 'paragraph', 'form-field'].includes(type)) {
-                propertiesHtml += `
-                    <div class="property-group">
-                        <h6><span class="dashicons dashicons-editor-bold"></span> Typography</h6>
-                        <div class="property-grid">
-                            <div>
-                                <label class="property-label">Font Size</label>
-                                <input type="number" class="property-input" data-property="font-size" value="${fontSize}" min="8" max="72">
-                            </div>
-                            <div>
-                                <label class="property-label">Font Weight</label>
-                                <select class="property-select" data-property="font-weight">
-                                    <option value="normal" ${fontWeight === 'normal' ? 'selected' : ''}>Normal</option>
-                                    <option value="bold" ${fontWeight === 'bold' ? 'selected' : ''}>Bold</option>
-                                    <option value="600" ${fontWeight === '600' ? 'selected' : ''}>Semi Bold</option>
-                                    <option value="300" ${fontWeight === '300' ? 'selected' : ''}>Light</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div style="margin-top: 10px;">
-                            <label class="property-label">Text Alignment</label>
-                            <select class="property-select" data-property="text-align">
-                                <option value="left">Left</option>
-                                <option value="center">Center</option>
-                                <option value="right">Right</option>
-                                <option value="justify">Justify</option>
-                            </select>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Color properties
-            propertiesHtml += `
-                <div class="property-group">
-                    <h6><span class="dashicons dashicons-art"></span> Colors & Style</h6>
-                    <div class="property-grid">
-                        <div>
-                            <label class="property-label">Text Color</label>
-                            <div class="color-input-wrapper">
-                                <div class="color-preview" style="background-color: ${textColor};" onclick="$(this).next().trigger('click')"></div>
-                                <input type="color" class="property-input" data-property="text-color" value="${textColor}" style="border: none; padding: 0;">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="property-label">Background</label>
-                            <div class="color-input-wrapper">
-                                <div class="color-preview" style="background-color: ${bgColor === 'transparent' ? '#ffffff' : bgColor};" onclick="$(this).next().trigger('click')"></div>
-                                <input type="color" class="property-input" data-property="bg-color" value="${bgColor === 'transparent' ? '#ffffff' : bgColor}">
-                            </div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 10px;">
-                        <button type="button" class="file-upload-btn" onclick="clearBackground()" style="background: #6b7280; font-size: 11px; padding: 6px 10px;">
-                            <span class="dashicons dashicons-dismiss"></span>
-                            Clear Background
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            $('#element-properties').html(propertiesHtml);
-            
-            // Bind property changes
-            $('.property-input, .property-select, .property-textarea').off('input change').on('input change', function() {
-                updateElementProperty($(this), $element);
-            });
-        }
-        
-        function updateElementProperty($input, $element) {
-            const property = $input.data('property');
-            const value = $input.val();
-            
-            switch(property) {
-                case 'x':
-                    $element.css('left', Math.max(0, Math.min(575, value)) + 'px');
-                    break;
-                case 'y':
-                    $element.css('top', Math.max(0, Math.min(822, value)) + 'px');
-                    break;
-                case 'width':
-                    $element.width(Math.max(20, Math.min(575, value)));
-                    break;
-                case 'height':
-                    $element.height(Math.max(10, Math.min(822, value)));
-                    break;
-                case 'content':
-                    $element.data('content', value);
-                    if (['text', 'heading', 'paragraph', 'form-field', 'date'].includes($element.data('type'))) {
-                        $element.find('.element-content').text(value);
-                    }
-                    break;
-                case 'image-src':
-                    $element.data('image-src', value);
-                    if (value && ['image', 'logo'].includes($element.data('type'))) {
-                        $element.find('.element-content').html(`<img src="${value}" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.parentElement.innerHTML='📷 Image not found';">`);
-                    }
-                    break;
-                case 'font-size':
-                    $element.data('font-size', value);
-                    $element.find('.element-content').css('font-size', value + 'px');
-                    break;
-                case 'font-weight':
-                    $element.data('font-weight', value);
-                    $element.find('.element-content').css('font-weight', value);
-                    break;
-                case 'text-color':
-                    $element.data('text-color', value);
-                    $element.find('.element-content').css('color', value);
-                    $input.prev('.color-preview').css('background-color', value);
-                    break;
-                case 'bg-color':
-                    $element.data('bg-color', value);
-                    $element.find('.element-content').css('background-color', value);
-                    $input.prev('.color-preview').css('background-color', value);
-                    break;
-                case 'text-align':
-                    $element.find('.element-content').css('text-align', value);
-                    break;
-            }
-            
-            updateTemplateData();
-        }
-        
-        function getEmptyPropertiesHtml() {
-            return `
-                <div class="empty-state" style="padding: 30px 15px;">
-                    <div style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;">⚙️</div>
-                    <div style="font-size: 14px; color: #6b7280;">
-                        Select an element to customize its properties
-                    </div>
-                </div>
-            `;
-        }
-        
-        // Image selection functions
-        window.selectImageFile = function() {
-            $('#image-file-input').trigger('click');
-        };
-        
-        $('#image-file-input').on('change', function(e) {
-            const file = e.target.files[0];
-            if (file && selectedElement) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const imageSrc = e.target.result;
-                    selectedElement.data('image-src', imageSrc);
-                    selectedElement.find('.element-content').html(`<img src="${imageSrc}" style="width: 100%; height: 100%; object-fit: contain;">`);
-                    updatePropertiesPanel(selectedElement);
-                    updateTemplateData();
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-        
-        window.removeImage = function() {
-            if (selectedElement) {
-                selectedElement.data('image-src', '');
-                selectedElement.find('.element-content').html('📷 Click to upload image');
-                updatePropertiesPanel(selectedElement);
-                updateTemplateData();
-            }
-        };
-        
-        window.clearBackground = function() {
-            if (selectedElement) {
-                selectedElement.data('bg-color', 'transparent');
-                selectedElement.find('.element-content').css('background-color', 'transparent');
-                updatePropertiesPanel(selectedElement);
-                updateTemplateData();
-            }
-        };
-        
-        // Clear selection when clicking canvas
-        $(document).on('click', '.pdf-page', function(e) {
-            if (e.target === this || $(e.target).hasClass('empty-state') || $(e.target).parent().hasClass('empty-state')) {
-                $('.pdf-element').removeClass('selected');
-                selectedElement = null;
-                $('#element-properties').html(getEmptyPropertiesHtml());
-            }
-        });
-        
-        // Delete element
-        $(document).on('click', '.delete-btn', function(e) {
-            e.stopPropagation();
-            if (confirm('Are you sure you want to delete this element?')) {
-                $(this).closest('.pdf-element').remove();
-                selectedElement = null;
-                $('#element-properties').html(getEmptyPropertiesHtml());
-                updateTemplateData();
-                showNotification('Element deleted', 'success');
-            }
-        });
-        
-        // Duplicate element
-        $(document).on('click', '.duplicate-btn', function(e) {
-            e.stopPropagation();
-            const $original = $(this).closest('.pdf-element');
-            const $clone = $original.clone();
-            
-            // Update position
-            const newLeft = parseInt($original.css('left')) + 20;
-            const newTop = parseInt($original.css('top')) + 20;
-            $clone.css({ left: newLeft + 'px', top: newTop + 'px' });
-            
-            // Update ID
-            currentElementId++;
-            const newId = 'element_' + Date.now() + '_' + currentElementId;
-            $clone.data('id', newId).attr('data-id', newId);
-            
-            $original.parent().append($clone);
-            makeElementInteractive($clone);
-            selectElement($clone);
-            updateTemplateData();
-            showNotification('Element duplicated', 'success');
-        });
-        
-        // Delete page
-        $(document).on('click', '.delete-page-btn', function(e) {
-            e.stopPropagation();
-            const $page = $(this).closest('.pdf-page');
-            const pageCount = $('.pdf-page').length;
-            
-            if (pageCount <= 1) {
-                showNotification('Cannot delete the last page', 'warning');
-                return;
-            }
-            
-            if (confirm('Are you sure you want to delete this page and all its elements?')) {
-                $page.remove();
-                renumberPages();
-                updateTemplateData();
-                showNotification('Page deleted successfully', 'success');
-            }
-        });
-        
-        // Save template
-        $('#save-template').on('click', function() {
-            const templateName = $('#template-name').val().trim();
-            if (!templateName) {
-                showNotification('Please enter a template name', 'warning');
-                $('#template-name').focus();
-                return;
-            }
-            
-            const $btn = $(this);
-            const originalText = $btn.html();
-            $btn.prop('disabled', true).html('<span class="dashicons dashicons-update reverse2pdf-spin"></span> Saving...');
-            
-            const templateData = collectTemplateData();
-            
-            $.ajax({
-                url: ajaxurl,
-                type: 'POST',
-                data: {
-                    action: 'reverse2pdf_save_template',
-                    template_id: $('#template-id').val(),
-                    template_name: templateName,
-                    template_data: JSON.stringify(templateData),
-                    nonce: '<?php echo wp_create_nonce('reverse2pdf_nonce'); ?>'
-                },
-                success: function(response) {
-                    if (response.success) {
-                        showNotification('Template saved successfully! ✨', 'success');
-                        if (!$('#template-id').val() && response.data.template_id) {
-                            $('#template-id').val(response.data.template_id);
-                            const newUrl = new URL(window.location);
-                            newUrl.searchParams.set('template_id', response.data.template_id);
-                            history.replaceState({}, '', newUrl);
-                        }
-                    } else {
-                        showNotification('Save failed: ' + (response.data || 'Unknown error'), 'error');
-                    }
-                },
-                error: function() {
-                    showNotification('Save request failed', 'error');
-                },
-                complete: function() {
-                    $btn.prop('disabled', false).html(originalText);
-                }
-            });
-        });
-        
-        // Test PDF generation
-        $('#test-template').on('click', function() {
-            const templateId = $('#template-id').val();
-            if (!templateId) {
-                showNotification('Please save the template first', 'warning');
-                return;
-            }
-            
-            const $btn = $(this);
-            const originalText = $btn.html();
-            $btn.prop('disabled', true).html('<span class="dashicons dashicons-update reverse2pdf-spin"></span> Generating...');
-            
-            $.ajax({
-                url: ajaxurl,
-                type: 'POST',
-                data: {
-                    action: 'reverse2pdf_generate_pdf',
-                    template_id: templateId,
-                    form_data: { 
-                        test_name: 'John Doe', 
-                        test_email: 'john@example.com',
-                        test_message: 'This is a test message for PDF generation.',
-                        field_name: 'Sample Field Value',
-                        current_date: new Date().toLocaleDateString()
+                // Make elements draggable
+                $('.element-item').draggable({
+                    helper: function() {
+                        const $helper = $(this).clone();
+                        $helper.css({
+                            'width': $(this).width(),
+                            'opacity': '0.8',
+                            'z-index': '9999',
+                            'pointer-events': 'none'
+                        });
+                        return $helper;
                     },
-                    nonce: '<?php echo wp_create_nonce('reverse2pdf_nonce'); ?>'
-                },
-                success: function(response) {
-                    if (response.success) {
-                        showNotification('Test PDF generated successfully! 🎉', 'success');
-                        window.open(response.data.pdf_url, '_blank');
-                    } else {
-                        showNotification('PDF generation failed: ' + (response.data || 'Unknown error'), 'error');
+                    appendTo: 'body',
+                    zIndex: 9999,
+                    cursor: 'grabbing',
+                    start: function(event, ui) {
+                        console.log('🎯 Drag started:', $(this).data('type'));
+                        $(this).addClass('dragging');
                     }
-                },
-                error: function() {
-                    showNotification('Generation request failed', 'error');
-                },
-                complete: function() {
-                    $btn.prop('disabled', false).html(originalText);
-                }
-            });
-        });
-        
-        // Add page
-        $('#add-page').on('click', function() {
-            const pageNumber = $('.pdf-page').length + 1;
-            const $newPage = $(`
-                <div class="pdf-page" data-page="${pageNumber}">
-                    <div class="page-number">Page ${pageNumber}</div>
-                    <div class="page-controls">
-                        <button type="button" class="page-control-btn delete-page-btn" title="Delete Page" data-page="${pageNumber}">✕</button>
-                    </div>
-                </div>
-            `);
-            
-            $('#pdf-canvas').append($newPage);
-            showNotification('New page added successfully', 'success');
-            updateTemplateData();
-            $newPage[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-        });
-        
-        // Preview template
-        $('#preview-template').on('click', function() {
-            const templateData = collectTemplateData();
-            if (!templateData.pages || templateData.pages.length === 0) {
-                showNotification('No template content to preview', 'warning');
-                return;
+                });
+                
+                // Make pages droppable
+                $('.pdf-page').droppable({
+                    accept: '.element-item',
+                    tolerance: 'pointer',
+                    over: function(event, ui) {
+                        console.log('📍 Drag over page');
+                        $(this).addClass('drop-hover');
+                    },
+                    out: function(event, ui) {
+                        $(this).removeClass('drop-hover');
+                    },
+                    drop: function(event, ui) {
+                        console.log('🎯 Element dropped!');
+                        $(this).removeClass('drop-hover');
+                        
+                        const elementType = ui.draggable.data('type');
+                        const pageOffset = $(this).offset();
+                        const dropX = event.pageX - pageOffset.left - 10;
+                        const dropY = event.pageY - pageOffset.top - 10;
+                        
+                        addElementToCanvas(elementType, dropX, dropY, $(this));
+                    }
+                });
             }
             
-            const previewWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes');
-            const previewHtml = generatePreviewHtml(templateData);
-            
-            previewWindow.document.write(previewHtml);
-            previewWindow.document.close();
-            
-            showNotification('Preview opened in new window', 'info');
-        });
-        
-        // Utility functions
-        function updateTemplateData() {
-            const templateData = collectTemplateData();
-            $('#template-data').val(JSON.stringify(templateData));
-        }
-        
-        function collectTemplateData() {
-            const pages = [];
-            
-            $('.pdf-page').each(function(index) {
-                const elements = [];
-                $(this).find('.pdf-element').each(function() {
-                    const $el = $(this);
-                    elements.push({
-                        id: $el.data('id'),
-                        type: $el.data('type'),
-                        x: parseInt($el.css('left')),
-                        y: parseInt($el.css('top')),
-                        width: $el.width(),
-                        height: $el.height(),
-                        content: $el.data('content') || $el.find('.element-content').text() || '',
-                        imageSrc: $el.data('image-src') || '',
-                        fontSize: $el.data('font-size') || '14',
-                        fontWeight: $el.data('font-weight') || 'normal',
-                        textColor: $el.data('text-color') || '#000000',
-                        bgColor: $el.data('bg-color') || 'transparent'
-                    });
-                });
+            function addElementToCanvas(type, x, y, $page) {
+                console.log('➕ Adding element:', type, 'at', x, y);
                 
-                pages.push({
-                    id: 'page_' + (index + 1),
-                    width: 595,
-                    height: 842,
-                    elements: elements
-                });
-            });
-            
-            return { pages: pages };
-        }
-        
-        function renumberPages() {
-            $('.pdf-page').each(function(index) {
-                const pageNum = index + 1;
-                $(this).data('page', pageNum);
-                $(this).find('.page-number').text('Page ' + pageNum);
-                $(this).find('.delete-page-btn').data('page', pageNum);
-            });
-        }
-        
-        function generatePreviewHtml(templateData) {
-            let html = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Template Preview - Reverse2PDF</title>
-                    <style>
-                        body { 
-                            font-family: Arial, sans-serif; 
-                            margin: 20px; 
-                            background: #f5f5f5; 
-                        }
-                        .preview-page { 
-                            background: white; 
-                            width: 595px; 
-                            min-height: 842px; 
-                            margin: 0 auto 20px; 
-                            box-shadow: 0 0 10px rgba(0,0,0,0.1); 
-                            position: relative;
-                            page-break-after: always;
-                        }
-                        .preview-element { 
-                            position: absolute; 
-                            overflow: hidden;
-                        }
-                        .preview-element img {
-                            width: 100%;
-                            height: 100%;
-                            object-fit: contain;
-                        }
-                    </style>
-                </head>
-                <body>
-            `;
-            
-            templateData.pages.forEach((page) => {
-                html += `<div class="preview-page">`;
+                elementCounter++;
+                const elementId = 'element_' + elementCounter + '_' + Date.now();
                 
-                if (page.elements) {
-                    page.elements.forEach(element => {
-                        let elementStyle = `left: ${element.x}px; top: ${element.y}px; width: ${element.width}px; height: ${element.height}px;`;
-                        if (element.fontSize) elementStyle += ` font-size: ${element.fontSize}px;`;
-                        if (element.fontWeight) elementStyle += ` font-weight: ${element.fontWeight};`;
-                        if (element.textColor) elementStyle += ` color: ${element.textColor};`;
-                        if (element.bgColor && element.bgColor !== 'transparent') elementStyle += ` background-color: ${element.bgColor};`;
-                        
-                        let elementContent = element.content || element.type;
-                        if (element.imageSrc && ['image', 'logo'].includes(element.type)) {
-                            elementContent = `<img src="${element.imageSrc}" style="width: 100%; height: 100%; object-fit: contain;">`;
-                        }
-                        
-                        html += `<div class="preview-element" style="${elementStyle}">${elementContent}</div>`;
-                    });
-                }
+                // Element properties
+                const props = getElementDefaults(type);
                 
-                html += `</div>`;
-            });
-            
-            html += `</body></html>`;
-            return html;
-        }
-        
-        function showNotification(message, type) {
-            const typeClass = type === 'error' ? 'error' : (type === 'warning' ? 'warning' : 'success');
-            const $notification = $(`
-                <div class="notice notice-${typeClass} is-dismissible" style="position: fixed; top: 50px; right: 20px; z-index: 999999; max-width: 350px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                    <p><strong>${message}</strong></p>
-                </div>
-            `);
-            
-            $('body').append($notification);
-            
-            setTimeout(() => {
-                $notification.fadeOut(500, function() {
-                    $(this).remove();
-                });
-            }, 4000);
-        }
-        
-        // Add first element helper
-        window.addFirstElement = function() {
-            addElementToCanvas('text', 50, 100, $('.pdf-page').first());
-        };
-        
-        // Load existing template data if available
-        const existingData = $('#template-data').val();
-        if (existingData && existingData !== '') {
-            try {
-                const templateData = JSON.parse(existingData);
-                loadTemplateData(templateData);
-            } catch (e) {
-                console.warn('Could not parse template data:', e);
-            }
-        }
-        
-        function loadTemplateData(data) {
-            if (!data.pages || !data.pages.length) return;
-            
-            $('#pdf-canvas').empty();
-            
-            data.pages.forEach((page, pageIndex) => {
-                const pageNum = pageIndex + 1;
-                const $page = $(`
-                    <div class="pdf-page" data-page="${pageNum}">
-                        <div class="page-number">Page ${pageNum}</div>
-                        <div class="page-controls">
-                            <button type="button" class="page-control-btn delete-page-btn" title="Delete Page" data-page="${pageNum}">✕</button>
+                // Create element HTML
+                const $element = $(`
+                    <div class="pdf-element" 
+                        data-id="${elementId}" 
+                        data-type="${type}"
+                        data-content="${props.content}"
+                        style="left: ${Math.max(0, x)}px; top: ${Math.max(0, y)}px; width: ${props.width}px; height: ${props.height}px;">
+                        <div class="element-content">${props.html}</div>
+                        <div class="element-controls">
+                            <button type="button" class="control-btn duplicate-btn" title="Duplicate">⧉</button>
+                            <button type="button" class="control-btn delete-btn" title="Delete">✕</button>
                         </div>
                     </div>
                 `);
                 
-                $('#pdf-canvas').append($page);
+                $page.append($element);
                 
-                if (page.elements && page.elements.length) {
-                    page.elements.forEach(element => {
-                        const elementHtml = generateElementHtml(element.type, element.content, element.width, element.height);
-                        
-                        const $element = $(`
-                            <div class="pdf-element" data-id="${element.id}" data-type="${element.type}" data-content="${element.content || ''}"
-                                 data-image-src="${element.imageSrc || ''}" data-font-size="${element.fontSize || '14'}" 
-                                 data-font-weight="${element.fontWeight || 'normal'}" data-text-color="${element.textColor || '#000000'}" 
-                                 data-bg-color="${element.bgColor || 'transparent'}"
-                                 style="left: ${element.x}px; top: ${element.y}px; width: ${element.width}px; height: ${element.height}px;">
-                                ${elementHtml}
-                                <div class="element-controls">
-                                    <button type="button" class="control-btn duplicate-btn" title="Duplicate">⧉</button>
-                                    <button type="button" class="control-btn delete-btn" title="Delete">✕</button>
-                                </div>
+                // Make element interactive
+                makeElementInteractive($element);
+                
+                // Select the new element
+                selectElement($element);
+                
+                showNotification('✅ Added ' + type + ' element', 'success');
+            }
+            
+            function getElementDefaults(type) {
+                const defaults = {
+                    'text': {
+                        width: 200, height: 30, content: 'Sample Text',
+                        html: '<div style="padding: 5px; font-size: 14px;">Sample Text</div>'
+                    },
+                    'heading': {
+                        width: 300, height: 40, content: 'Heading',
+                        html: '<div style="padding: 5px; font-size: 24px; font-weight: bold;">Heading</div>'
+                    },
+                    'image': {
+                        width: 150, height: 100, content: 'image.jpg',
+                        html: '<div style="background: #f3f4f6; border: 2px dashed #d1d5db; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #9ca3af; width: 100%; height: 100%;">📷 Image</div>'
+                    },
+                    'form-field': {
+                        width: 200, height: 25, content: '{field_name}',
+                        html: '<div style="padding: 5px; background: #f9fafb; border: 1px solid #d1d5db; font-size: 14px;">{field_name}</div>'
+                    },
+                    'line': {
+                        width: 200, height: 2, content: '',
+                        html: '<div style="width: 100%; height: 2px; background: #000;"></div>'
+                    },
+                    'rectangle': {
+                        width: 150, height: 80, content: '',
+                        html: '<div style="width: 100%; height: 100%; border: 2px solid #000; box-sizing: border-box;"></div>'
+                    }
+                };
+                
+                return defaults[type] || defaults['text'];
+            }
+            
+            function makeElementInteractive($element) {
+                // Click to select
+                $element.on('click', function(e) {
+                    e.stopPropagation();
+                    selectElement($(this));
+                });
+                
+                // Make draggable within page
+                $element.draggable({
+                    containment: 'parent',
+                    grid: [5, 5],
+                    start: function() {
+                        selectElement($(this));
+                    },
+                    stop: function() {
+                        updatePropertiesPanel();
+                        saveTemplateData();
+                    }
+                });
+                
+                // Make resizable
+                $element.resizable({
+                    containment: 'parent',
+                    grid: [5, 5],
+                    handles: 'n, e, s, w, ne, nw, se, sw',
+                    minWidth: 20,
+                    minHeight: 10,
+                    stop: function() {
+                        updatePropertiesPanel();
+                        saveTemplateData();
+                    }
+                });
+            }
+            
+            function selectElement($element) {
+                // Remove previous selection
+                $('.pdf-element').removeClass('selected');
+                
+                // Select new element
+                $element.addClass('selected');
+                selectedElement = $element;
+                
+                console.log('🎯 Selected element:', $element.data('type'));
+                
+                // Update properties panel
+                updatePropertiesPanel();
+            }
+            
+            function updatePropertiesPanel() {
+                if (!selectedElement) {
+                    $('#element-properties').html(`
+                        <div class="empty-state" style="padding: 30px 15px;">
+                            <div style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;">⚙️</div>
+                            <div style="font-size: 14px; color: #6b7280;">
+                                Click an element to edit properties
                             </div>
-                        `);
-                        
-                        // Apply saved styles
-                        if (element.fontSize) $element.find('.element-content').css('font-size', element.fontSize + 'px');
-                        if (element.fontWeight) $element.find('.element-content').css('font-weight', element.fontWeight);
-                        if (element.textColor) $element.find('.element-content').css('color', element.textColor);
-                        if (element.bgColor && element.bgColor !== 'transparent') $element.find('.element-content').css('background-color', element.bgColor);
-                        if (element.imageSrc && ['image', 'logo'].includes(element.type)) {
-                            $element.find('.element-content').html(`<img src="${element.imageSrc}" style="width: 100%; height: 100%; object-fit: contain;">`);
+                        </div>
+                    `);
+                    return;
+                }
+                
+                const type = selectedElement.data('type');
+                const content = selectedElement.data('content') || '';
+                
+                let html = `
+                    <div class="property-group">
+                        <h6><span class="dashicons dashicons-move"></span> Position & Size</h6>
+                        <div class="property-grid">
+                            <div>
+                                <label class="property-label">X</label>
+                                <input type="number" class="property-input" data-property="x" value="${parseInt(selectedElement.css('left'))}" min="0">
+                            </div>
+                            <div>
+                                <label class="property-label">Y</label>
+                                <input type="number" class="property-input" data-property="y" value="${parseInt(selectedElement.css('top'))}" min="0">
+                            </div>
+                            <div>
+                                <label class="property-label">Width</label>
+                                <input type="number" class="property-input" data-property="width" value="${selectedElement.width()}" min="20">
+                            </div>
+                            <div>
+                                <label class="property-label">Height</label>
+                                <input type="number" class="property-input" data-property="height" value="${selectedElement.height()}" min="10">
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Content properties for text elements
+                if (['text', 'heading', 'form-field'].includes(type)) {
+                    html += `
+                        <div class="property-group">
+                            <h6><span class="dashicons dashicons-editor-textcolor"></span> Content</h6>
+                            <label class="property-label">Text</label>
+                            <textarea class="property-textarea" data-property="content" rows="3">${content}</textarea>
+                        </div>
+                    `;
+                }
+                
+                $('#element-properties').html(html);
+                
+                // Bind property change events
+                $('.property-input, .property-textarea').on('input change', function() {
+                    updateElementProperty($(this));
+                });
+            }
+            
+            function updateElementProperty($input) {
+                if (!selectedElement) return;
+                
+                const property = $input.data('property');
+                const value = $input.val();
+                
+                switch(property) {
+                    case 'x':
+                        selectedElement.css('left', Math.max(0, value) + 'px');
+                        break;
+                    case 'y':
+                        selectedElement.css('top', Math.max(0, value) + 'px');
+                        break;
+                    case 'width':
+                        selectedElement.width(Math.max(20, value));
+                        break;
+                    case 'height':
+                        selectedElement.height(Math.max(10, value));
+                        break;
+                    case 'content':
+                        selectedElement.data('content', value);
+                        if (['text', 'heading', 'form-field'].includes(selectedElement.data('type'))) {
+                            selectedElement.find('.element-content').text(value);
                         }
-                        
-                        $page.append($element);
-                        makeElementInteractive($element);
-                    });
+                        break;
+                }
+                
+                saveTemplateData();
+            }
+            
+            // Clear selection when clicking page
+            $(document).on('click', '.pdf-page', function(e) {
+                if (e.target === this) {
+                    $('.pdf-element').removeClass('selected');
+                    selectedElement = null;
+                    updatePropertiesPanel();
                 }
             });
+            
+            // Delete element
+            $(document).on('click', '.delete-btn', function(e) {
+                e.stopPropagation();
+                if (confirm('Delete this element?')) {
+                    $(this).closest('.pdf-element').remove();
+                    selectedElement = null;
+                    updatePropertiesPanel();
+                    saveTemplateData();
+                    showNotification('🗑️ Element deleted', 'success');
+                }
+            });
+            
+            // Duplicate element
+            $(document).on('click', '.duplicate-btn', function(e) {
+                e.stopPropagation();
+                const $original = $(this).closest('.pdf-element');
+                const $clone = $original.clone();
+                
+                // Update position
+                $clone.css({
+                    left: (parseInt($original.css('left')) + 20) + 'px',
+                    top: (parseInt($original.css('top')) + 20) + 'px'
+                });
+                
+                // Update ID
+                elementCounter++;
+                const newId = 'element_' + elementCounter + '_' + Date.now();
+                $clone.data('id', newId).attr('data-id', newId);
+                
+                $original.parent().append($clone);
+                makeElementInteractive($clone);
+                selectElement($clone);
+                saveTemplateData();
+                showNotification('📋 Element duplicated', 'success');
+            });
+            
+            // Save template
+            $('#save-template').on('click', function() {
+                const templateName = $('#template-name').val().trim();
+                if (!templateName) {
+                    showNotification('⚠️ Please enter template name', 'warning');
+                    $('#template-name').focus();
+                    return;
+                }
+                
+                const $btn = $(this);
+                const originalHtml = $btn.html();
+                $btn.prop('disabled', true).html('<span class="dashicons dashicons-update reverse2pdf-spin"></span> Saving...');
+                
+                const templateData = collectTemplateData();
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'reverse2pdf_save_template',
+                        template_id: $('#template-id').val() || 0,
+                        template_name: templateName,
+                        template_data: JSON.stringify(templateData),
+                        nonce: '<?php echo wp_create_nonce('reverse2pdf_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        console.log('💾 Save response:', response);
+                        if (response.success) {
+                            showNotification('✅ Template saved successfully!', 'success');
+                            if (!$('#template-id').val()) {
+                                $('#template-id').val(response.data.template_id);
+                            }
+                        } else {
+                            showNotification('❌ Save failed: ' + (response.data || 'Unknown error'), 'error');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('💥 Save error:', error);
+                        showNotification('❌ Save request failed', 'error');
+                    },
+                    complete: function() {
+                        $btn.prop('disabled', false).html(originalHtml);
+                    }
+                });
+            });
+            
+            // Test PDF
+            $('#test-template').on('click', function() {
+                const templateId = $('#template-id').val();
+                if (!templateId) {
+                    showNotification('⚠️ Save template first', 'warning');
+                    return;
+                }
+                
+                const $btn = $(this);
+                const originalHtml = $btn.html();
+                $btn.prop('disabled', true).html('<span class="dashicons dashicons-update reverse2pdf-spin"></span> Generating...');
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'reverse2pdf_generate_pdf',
+                        template_id: templateId,
+                        form_data: {
+                            field_name: 'Test Value',
+                            name: 'John Doe',
+                            email: 'john@example.com'
+                        },
+                        nonce: '<?php echo wp_create_nonce('reverse2pdf_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        console.log('📄 PDF response:', response);
+                        if (response.success) {
+                            showNotification('🎉 PDF generated successfully!', 'success');
+                            window.open(response.data.pdf_url, '_blank');
+                        } else {
+                            showNotification('❌ PDF failed: ' + (response.data || 'Unknown error'), 'error');
+                        }
+                    },
+                    error: function() {
+                        showNotification('❌ PDF request failed', 'error');
+                    },
+                    complete: function() {
+                        $btn.prop('disabled', false).html(originalHtml);
+                    }
+                });
+            });
+            
+            // Add page
+            $('#add-page').on('click', function() {
+                const pageNum = $('.pdf-page').length + 1;
+                const $newPage = $(`
+                    <div class="pdf-page" data-page="${pageNum}">
+                        <div class="page-number">Page ${pageNum}</div>
+                        <div class="page-controls">
+                            <button type="button" class="page-control-btn delete-page-btn" title="Delete Page">✕</button>
+                        </div>
+                    </div>
+                `);
+                
+                $('#pdf-canvas').append($newPage);
+                
+                // Make new page droppable
+                $newPage.droppable({
+                    accept: '.element-item',
+                    tolerance: 'pointer',
+                    over: function() { $(this).addClass('drop-hover'); },
+                    out: function() { $(this).removeClass('drop-hover'); },
+                    drop: function(event, ui) {
+                        $(this).removeClass('drop-hover');
+                        const elementType = ui.draggable.data('type');
+                        const pageOffset = $(this).offset();
+                        const dropX = event.pageX - pageOffset.left - 10;
+                        const dropY = event.pageY - pageOffset.top - 10;
+                        addElementToCanvas(elementType, dropX, dropY, $(this));
+                    }
+                });
+                
+                saveTemplateData();
+                showNotification('📄 New page added', 'success');
+            });
+            
+            // Delete page
+            $(document).on('click', '.delete-page-btn', function(e) {
+                e.stopPropagation();
+                if ($('.pdf-page').length <= 1) {
+                    showNotification('⚠️ Cannot delete last page', 'warning');
+                    return;
+                }
+                
+                if (confirm('Delete this page?')) {
+                    $(this).closest('.pdf-page').remove();
+                    renumberPages();
+                    saveTemplateData();
+                    showNotification('🗑️ Page deleted', 'success');
+                }
+            });
+            
+            // Utility functions
+            function collectTemplateData() {
+                const pages = [];
+                $('.pdf-page').each(function(index) {
+                    const elements = [];
+                    $(this).find('.pdf-element').each(function() {
+                        const $el = $(this);
+                        elements.push({
+                            id: $el.data('id'),
+                            type: $el.data('type'),
+                            x: parseInt($el.css('left')),
+                            y: parseInt($el.css('top')),
+                            width: $el.width(),
+                            height: $el.height(),
+                            content: $el.data('content') || ''
+                        });
+                    });
+                    
+                    pages.push({
+                        id: 'page_' + (index + 1),
+                        elements: elements
+                    });
+                });
+                
+                return { pages: pages };
+            }
+            
+            function saveTemplateData() {
+                const data = collectTemplateData();
+                $('#template-data').val(JSON.stringify(data));
+            }
+            
+            function renumberPages() {
+                $('.pdf-page').each(function(index) {
+                    const pageNum = index + 1;
+                    $(this).data('page', pageNum);
+                    $(this).find('.page-number').text('Page ' + pageNum);
+                });
+            }
+            
+            function showNotification(message, type) {
+                const typeClass = type === 'error' ? 'error' : (type === 'warning' ? 'warning' : 'success');
+                const $notice = $(`
+                    <div class="notice notice-${typeClass} is-dismissible" style="position: fixed; top: 50px; right: 20px; z-index: 9999; max-width: 350px;">
+                        <p><strong>${message}</strong></p>
+                    </div>
+                `);
+                
+                $('body').append($notice);
+                setTimeout(() => {
+                    $notice.fadeOut(500, function() { $(this).remove(); });
+                }, 4000);
+            }
+            
+            // Load existing template data
+            const existingData = $('#template-data').val();
+            if (existingData) {
+                try {
+                    const templateData = JSON.parse(existingData);
+                    loadTemplateData(templateData);
+                } catch (e) {
+                    console.warn('Failed to parse template data:', e);
+                }
+            }
+            
+            function loadTemplateData(data) {
+                if (!data.pages) return;
+                
+                $('#pdf-canvas').empty();
+                
+                data.pages.forEach((page, pageIndex) => {
+                    const pageNum = pageIndex + 1;
+                    const $page = $(`
+                        <div class="pdf-page" data-page="${pageNum}">
+                            <div class="page-number">Page ${pageNum}</div>
+                            <div class="page-controls">
+                                <button type="button" class="page-control-btn delete-page-btn" title="Delete Page">✕</button>
+                            </div>
+                        </div>
+                    `);
+                    
+                    $('#pdf-canvas').append($page);
+                    
+                    // Make droppable
+                    $page.droppable({
+                        accept: '.element-item',
+                        tolerance: 'pointer',
+                        over: function() { $(this).addClass('drop-hover'); },
+                        out: function() { $(this).removeClass('drop-hover'); },
+                        drop: function(event, ui) {
+                            $(this).removeClass('drop-hover');
+                            const elementType = ui.draggable.data('type');
+                            const pageOffset = $(this).offset();
+                            const dropX = event.pageX - pageOffset.left - 10;
+                            const dropY = event.pageY - pageOffset.top - 10;
+                            addElementToCanvas(elementType, dropX, dropY, $(this));
+                        }
+                    });
+                    
+                    if (page.elements) {
+                        page.elements.forEach(element => {
+                            const props = getElementDefaults(element.type);
+                            const $element = $(`
+                                <div class="pdf-element" 
+                                    data-id="${element.id}" 
+                                    data-type="${element.type}"
+                                    data-content="${element.content}"
+                                    style="left: ${element.x}px; top: ${element.y}px; width: ${element.width}px; height: ${element.height}px;">
+                                    <div class="element-content">${element.content || props.html}</div>
+                                    <div class="element-controls">
+                                        <button type="button" class="control-btn duplicate-btn" title="Duplicate">⧉</button>
+                                        <button type="button" class="control-btn delete-btn" title="Delete">✕</button>
+                                    </div>
+                                </div>
+                            `);
+                            
+                            $page.append($element);
+                            makeElementInteractive($element);
+                        });
+                    }
+                });
+            }
+            
+            console.log('✅ Reverse2PDF Builder loaded successfully');
+        });
+        </script>
+        <?php
+    }
+
+
+// Add this method to the existing class-reverse2pdf-admin.php file
+
+public function handle_ajax_requests() {
+    // Save template AJAX
+    add_action('wp_ajax_reverse2pdf_save_template', array($this, 'ajax_save_template'));
+    
+    // Generate PDF AJAX  
+    add_action('wp_ajax_reverse2pdf_generate_pdf', array($this, 'ajax_generate_pdf'));
+    
+    // Get templates AJAX
+    add_action('wp_ajax_reverse2pdf_get_templates', array($this, 'ajax_get_templates'));
+}
+
+public function ajax_save_template() {
+    // Security check
+    if (!wp_verify_nonce($_POST['nonce'] ?? '', 'reverse2pdf_nonce')) {
+        wp_send_json_error('Security check failed');
+    }
+    
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Permission denied');
+    }
+    
+    $template_id = intval($_POST['template_id'] ?? 0);
+    $template_name = sanitize_text_field($_POST['template_name'] ?? '');
+    $template_data = wp_unslash($_POST['template_data'] ?? '');
+    
+    if (empty($template_name)) {
+        wp_send_json_error('Template name is required');
+    }
+    
+    global $wpdb;
+    $table = $wpdb->prefix . REVERSE2PDF_TABLE_TEMPLATES;
+    
+    $data = array(
+        'name' => $template_name,
+        'template_data' => $template_data,
+        'modified_date' => current_time('mysql')
+    );
+    
+    if ($template_id) {
+        // Update existing template
+        $result = $wpdb->update($table, $data, array('id' => $template_id));
+        if ($result !== false) {
+            wp_send_json_success(array('template_id' => $template_id, 'message' => 'Template updated'));
         }
-    });
-    </script>
-    <?php
+    } else {
+        // Create new template
+        $data['created_by'] = get_current_user_id();
+        $data['created_date'] = current_time('mysql');
+        $data['active'] = 1;
+        
+        $result = $wpdb->insert($table, $data);
+        if ($result !== false) {
+            wp_send_json_success(array('template_id' => $wpdb->insert_id, 'message' => 'Template created'));
+        }
+    }
+    
+    wp_send_json_error('Failed to save template');
+}
+
+public function ajax_generate_pdf() {
+    if (!wp_verify_nonce($_POST['nonce'] ?? '', 'reverse2pdf_nonce')) {
+        wp_send_json_error('Security check failed');
+    }
+    
+    $template_id = intval($_POST['template_id'] ?? 0);
+    $form_data = $_POST['form_data'] ?? array();
+    
+    if (!$template_id) {
+        wp_send_json_error('Template ID required');
+    }
+    
+    try {
+        // Use the generator class
+        $generator = new Reverse2PDF_Generator();
+        $pdf_url = $generator->generate_pdf($template_id, $form_data);
+        
+        if ($pdf_url) {
+            wp_send_json_success(array('pdf_url' => $pdf_url));
+        } else {
+            wp_send_json_error('PDF generation failed');
+        }
+    } catch (Exception $e) {
+        wp_send_json_error('PDF generation error: ' . $e->getMessage());
+    }
+}
+
+public function ajax_get_templates() {
+    if (!wp_verify_nonce($_POST['nonce'] ?? '', 'reverse2pdf_nonce')) {
+        wp_send_json_error('Security check failed');
+    }
+    
+    global $wpdb;
+    $templates = $wpdb->get_results(
+        "SELECT id, name FROM {$wpdb->prefix}" . REVERSE2PDF_TABLE_TEMPLATES . " WHERE active = 1 ORDER BY name"
+    );
+    
+    wp_send_json_success($templates);
 }
 
     
