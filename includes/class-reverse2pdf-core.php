@@ -47,6 +47,14 @@ class Reverse2PDF_Core {
         add_action('wp_ajax_nopriv_reverse2pdf_generate_pdf', array($this, 'ajax_generate_pdf'));
         add_action('wp_ajax_reverse2pdf_save_template', array($this, 'ajax_save_template'));
         add_action('wp_ajax_reverse2pdf_load_template', array($this, 'ajax_load_template'));
+
+        // Add these to the existing init_hooks() method in class-reverse2pdf-core.php
+
+        // Template AJAX handlers
+        add_action('wp_ajax_reverse2pdf_delete_template', array($this, 'ajax_delete_template'));
+        add_action('wp_ajax_reverse2pdf_get_templates', array($this, 'ajax_get_templates'));
+
+
         
         // Add meta boxes
         add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
@@ -336,6 +344,47 @@ class Reverse2PDF_Core {
         }
     }
     
+    public function ajax_delete_template() {
+        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'reverse2pdf_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $template_id = intval($_POST['template_id'] ?? 0);
+        if (!$template_id) {
+            wp_send_json_error('Template ID required');
+        }
+        
+        global $wpdb;
+        $result = $wpdb->delete(
+            $wpdb->prefix . REVERSE2PDF_TABLE_TEMPLATES,
+            array('id' => $template_id),
+            array('%d')
+        );
+        
+        if ($result !== false) {
+            wp_send_json_success('Template deleted successfully');
+        } else {
+            wp_send_json_error('Failed to delete template');
+        }
+    }
+
+    public function ajax_get_templates() {
+        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'reverse2pdf_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        global $wpdb;
+        $templates = $wpdb->get_results(
+            "SELECT id, name, description FROM {$wpdb->prefix}" . REVERSE2PDF_TABLE_TEMPLATES . " WHERE active = 1 ORDER BY name"
+        );
+        
+        wp_send_json_success($templates);
+    }
+
     // Settings callbacks
     public function general_settings_callback() {
         echo '<p>General plugin settings</p>';
