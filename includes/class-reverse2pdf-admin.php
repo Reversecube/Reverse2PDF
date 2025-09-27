@@ -12,7 +12,7 @@ class Reverse2PDF_Admin {
     }
     
     public function add_admin_menu() {
-        // Main menu page
+        // Main menu page (this automatically creates the first submenu item)
         add_menu_page(
             'Reverse2PDF',
             'Reverse2PDF',
@@ -23,17 +23,17 @@ class Reverse2PDF_Admin {
             30
         );
         
-        // Dashboard submenu
+        // Rename the first submenu item to "Dashboard"
         add_submenu_page(
             'reverse2pdf',
             'Dashboard',
-            'Dashboard',
+            'Dashboard', 
             'manage_options',
-            'reverse2pdf',
+            'reverse2pdf',  // SAME slug as parent menu
             array($this, 'dashboard_page')
         );
         
-        // Templates submenu
+        // Other submenus with DIFFERENT slugs
         add_submenu_page(
             'reverse2pdf',
             'Templates',
@@ -42,8 +42,6 @@ class Reverse2PDF_Admin {
             'reverse2pdf-templates',
             array($this, 'templates_page')
         );
-        
-        // Visual Builder submenu
         add_submenu_page(
             'reverse2pdf',
             'Visual Builder',
@@ -52,8 +50,6 @@ class Reverse2PDF_Admin {
             'reverse2pdf-builder',
             array($this, 'builder_page')
         );
-        
-        // Integrations submenu
         add_submenu_page(
             'reverse2pdf',
             'Form Integrations',
@@ -62,8 +58,6 @@ class Reverse2PDF_Admin {
             'reverse2pdf-integrations',
             array($this, 'integrations_page')
         );
-        
-        // Settings submenu
         add_submenu_page(
             'reverse2pdf',
             'Settings',
@@ -72,8 +66,6 @@ class Reverse2PDF_Admin {
             'reverse2pdf-settings',
             array($this, 'settings_page')
         );
-        
-        // Logs submenu
         add_submenu_page(
             'reverse2pdf',
             'Logs',
@@ -83,6 +75,8 @@ class Reverse2PDF_Admin {
             array($this, 'logs_page')
         );
     }
+
+
     
     public function enqueue_admin_assets($hook) {
         if (strpos($hook, 'reverse2pdf') === false) {
@@ -1579,7 +1573,7 @@ private function render_recent_templates_premium() {
             <input type="hidden" id="template-id" value="<?php echo $template_id; ?>" />
             <input type="hidden" id="template-data" value="<?php echo $template ? esc_attr($template->template_data) : ''; ?>" />
         </div>
-            
+
         <script>
         jQuery(document).ready(function($) {
             console.log('🚀 Initializing Reverse2PDF Builder');
