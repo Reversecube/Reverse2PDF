@@ -1579,7 +1579,7 @@ private function render_recent_templates_premium() {
             <input type="hidden" id="template-id" value="<?php echo $template_id; ?>" />
             <input type="hidden" id="template-data" value="<?php echo $template ? esc_attr($template->template_data) : ''; ?>" />
         </div>
-
+            
         <script>
         jQuery(document).ready(function($) {
             console.log('🚀 Initializing Reverse2PDF Builder');
