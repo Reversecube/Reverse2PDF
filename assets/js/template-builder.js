@@ -44,6 +44,7 @@ jQuery(document).ready(function($) {
         console.log('Builder initialized');
     }
 
+    
     // Tab switching
     function setupTabs() {
         $('.r2pdf-tab-btn').on('click', function() {
