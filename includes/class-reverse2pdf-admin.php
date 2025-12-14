@@ -1821,52 +1821,65 @@ class Reverse2PDF_Admin {
         add_action('wp_ajax_reverse2pdf_get_templates', array($this, 'ajax_get_templates'));
     }
 
-    public function ajax_save_template() {
-        // Security check
-        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'reverse2pdf_nonce')) {
-            wp_send_json_error('Security check failed');
-        }
-        
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error('Permission denied');
-        }
-        
-        $template_id = intval($_POST['template_id'] ?? 0);
-        $template_name = sanitize_text_field($_POST['template_name'] ?? '');
-        $template_data = wp_unslash($_POST['template_data'] ?? '');
-        
-        if (empty($template_name)) {
-            wp_send_json_error('Template name is required');
-        }
-        
-        global $wpdb;
-        $table = $wpdb->prefix . REVERSE2PDF_TABLE_TEMPLATES;
-        
-        $data = array(
-            'name' => $template_name,
-            'template_data' => $template_data,
-            'modified_date' => current_time('mysql')
-        );
-        
-        if ($template_id) {
-            // Update existing template
+   public function ajax_save_template() {
+    // Security check
+    check_ajax_referer('reverse2pdf_builder_nonce', 'nonce');
+
+    // Permission check
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Insufficient permissions');
+    }
+
+    // Get data
+    $template_id = isset($_POST['template_id']) ? intval($_POST['template_id']) : 0;
+    $template_name = isset($_POST['template_name']) ? sanitize_text_field($_POST['template_name']) : 'Untitled';
+    $template_data = isset($_POST['template_data']) ? wp_kses_post($_POST['template_data']) : '';
+    $page_size = isset($_POST['page_size']) ? sanitize_text_field($_POST['page_size']) : 'A4';
+    $orientation = isset($_POST['orientation']) ? sanitize_text_field($_POST['orientation']) : 'portrait';
+
+    if (empty($template_data)) {
+        wp_send_json_error('No template data');
+    }
+
+    global $wpdb;
+    $table = $wpdb->prefix . REVERSE2PDF_TABLE_TEMPLATES;
+
+    $data = array(
+        'name' => $template_name,
+        'template_data' => $template_data,
+        'page_size' => $page_size,
+        'orientation' => $orientation,
+        'updated_at' => current_time('mysql')
+    );
+
+    if ($template_id > 0) {
+            // Update existing
             $result = $wpdb->update($table, $data, array('id' => $template_id));
+
             if ($result !== false) {
-                wp_send_json_success(array('template_id' => $template_id, 'message' => 'Template updated'));
+                wp_send_json_success(array(
+                    'message' => 'Template updated successfully',
+                    'template_id' => $template_id
+                ));
+            } else {
+                wp_send_json_error('Failed to update template');
             }
         } else {
-            // Create new template
-            $data['created_by'] = get_current_user_id();
-            $data['created_date'] = current_time('mysql');
-            $data['active'] = 1;
-            
+            // Create new
+            $data['created_at'] = current_time('mysql');
+            $data['author_id'] = get_current_user_id();
+
             $result = $wpdb->insert($table, $data);
-            if ($result !== false) {
-                wp_send_json_success(array('template_id' => $wpdb->insert_id, 'message' => 'Template created'));
+
+            if ($result) {
+                wp_send_json_success(array(
+                    'message' => 'Template created successfully',
+                    'template_id' => $wpdb->insert_id
+                ));
+            } else {
+                wp_send_json_error('Failed to create template');
             }
         }
-        
-        wp_send_json_error('Failed to save template');
     }
 
     public function ajax_generate_pdf() {
