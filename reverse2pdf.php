@@ -5,7 +5,7 @@
  * Description: Complete PDF generation solution - Visual builder, form integrations, conditional logic, math expressions, loops, and 25+ shortcodes
  * Version: 2.0.0
  * Author: Reversecube
- * Author URI: https://reversecube.com
+ * Author URI: https://reversecube.net
  * License: Commercial
  * Text Domain: reverse2pdf
  * Domain Path: /languages
@@ -563,24 +563,24 @@ function reverse2pdf_plugin_row_meta($links, $file) {
     return $links;
 }
 
-// add_filter('admin_footer_text', function($text) {
-//     $screen = function_exists('get_current_screen') ? get_current_screen() : null;
-//     // Only show on Reverse2PDF plugin pages:
-//     if ($screen && isset($screen->id) && strpos($screen->id, 'reverse2pdf') !== false) {
-//         if (!function_exists('get_plugin_data')) {
-//             require_once ABSPATH . 'wp-admin/includes/plugin.php';
-//         }
-//         $plugin = get_plugin_data(WP_PLUGIN_DIR . '/reverse2pdf/reverse2pdf.php');
-//         $name = isset($plugin['Name']) ? esc_html($plugin['Name']) : 'Reverse2PDF';
-//         $version = isset($plugin['Version']) ? esc_html($plugin['Version']) : '';
-//         return sprintf(
-//             '<span style="color:#0088ce;font-weight:700;">%s</span> <span style="color:#35caed;font-weight:600;">v%s</span> &mdash; <a href="https://reversecube.net" target="_blank" style="color:#0088ce; font-weight:600; text-decoration:none;">Created by Reversecube</a>',
-//             $name,
-//             $version
-//         );
-//     }
-//     return $text;
-// });
+add_filter('admin_footer_text', function($text) {
+    $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+    // Only show on Reverse2PDF plugin pages:
+    if ($screen && isset($screen->id) && strpos($screen->id, 'reverse2pdf') !== false) {
+        if (!function_exists('get_plugin_data')) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+        $plugin = get_plugin_data(WP_PLUGIN_DIR . '/reverse2pdf/reverse2pdf.php');
+        $name = isset($plugin['Name']) ? esc_html($plugin['Name']) : 'Reverse2PDF';
+        $version = isset($plugin['Version']) ? esc_html($plugin['Version']) : '';
+        return sprintf(
+            '<span style="color:#0088ce;font-weight:700;">%s</span> <span style="color:#35caed;font-weight:600;">v%s</span> &mdash; <a href="https://reversecube.net" target="_blank" style="color:#0088ce; font-weight:600; text-decoration:none;">Created by Reversecube</a>',
+            $name,
+            $version
+        );
+    }
+    return $text;
+});
 
 
 
