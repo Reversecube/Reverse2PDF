@@ -1,21 +1,25 @@
 /* ==========================================================================
-   Reverse2PDF Pro - Professional Admin Styles
+   Reverse2PDF Pro - NEW Admin UI
+   Clean, modern, animated interface for all admin pages
    ========================================================================== */
 
-/* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+/* Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* CSS Variables */
+/* Design Tokens */
 :root {
     --r2pdf-primary: #6366f1;
     --r2pdf-primary-hover: #4f46e5;
-    --r2pdf-primary-light: #e0e7ff;
+    --r2pdf-primary-soft: #eef2ff;
+
     --r2pdf-secondary: #10b981;
     --r2pdf-warning: #f59e0b;
     --r2pdf-danger: #ef4444;
-    --r2pdf-dark: #1f2937;
-    --r2pdf-light: #f8fafc;
-    --r2pdf-white: #ffffff;
+    --r2pdf-info: #0ea5e9;
+
+    --r2pdf-bg: #f4f5fb;
+    --r2pdf-surface: #ffffff;
+
     --r2pdf-gray-50: #f9fafb;
     --r2pdf-gray-100: #f3f4f6;
     --r2pdf-gray-200: #e5e7eb;
@@ -26,744 +30,702 @@
     --r2pdf-gray-700: #374151;
     --r2pdf-gray-800: #1f2937;
     --r2pdf-gray-900: #111827;
-    
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
-    --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    
-    /* Border Radius */
-    --radius-sm: 4px;
-    --radius: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
+
+    --radius-xs: 4px;
+    --radius-sm: 8px;
+    --radius: 12px;
+    --radius-lg: 18px;
     --radius-xl: 24px;
-    --radius-full: 9999px;
-    
-    /* Transitions */
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --radius-full: 999px;
+
+    --shadow-soft: 0 8px 20px rgba(15, 23, 42, 0.05);
+    --shadow-strong: 0 18px 40px rgba(15, 23, 42, 0.12);
+
+    --transition-fast: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Global Admin Overrides */
+/* Base Page */
 .reverse2pdf-page {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-    line-height: 1.6;
     color: var(--r2pdf-gray-900);
+    background: radial-gradient(circle at top left, #eef2ff 0, #f9fafb 40%, #f4f4f5 100%);
+    min-height: 100vh;
 }
 
-/* Remove default WordPress admin styles for our pages */
+/* Remove default WP wrap spacing so we control layout */
 .reverse2pdf-page .wrap {
     margin: 0;
     padding: 0;
 }
 
-/* Notifications */
+/* =========================
+   Global animations
+   ========================= */
+@keyframes r2pdf-fade-up {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes r2pdf-slide-right {
+    from { opacity: 0; transform: translateX(-40px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes r2pdf-float {
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-8px); }
+}
+
+@keyframes r2pdf-pulse-soft {
+    0%,100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.0); }
+    50%     { box-shadow: 0 0 0 12px rgba(99, 102, 241, 0.12); }
+}
+
+/* =========================
+   Notifications
+   ========================= */
 .reverse2pdf-notifications {
     position: fixed;
-    top: 32px;
-    right: 20px;
-    z-index: 999999;
-    max-width: 400px;
+    top: 24px;
+    right: 24px;
+    z-index: 99999;
+    max-width: 380px;
 }
 
 .reverse2pdf-notification {
-    background: var(--r2pdf-white);
-    border: 1px solid var(--r2pdf-gray-200);
-    border-left: 4px solid var(--r2pdf-primary);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-lg);
-    padding: 16px 20px;
-    margin-bottom: 12px;
     display: flex;
-    align-items: center;
-    gap: 12px;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding: 14px 16px;
+    border-radius: var(--radius);
+    border: 1px solid var(--r2pdf-gray-200);
+    background: var(--r2pdf-surface);
+    box-shadow: var(--shadow-soft);
+    font-size: 13px;
     font-weight: 500;
-    animation: slideInRight 0.3s ease;
+    animation: r2pdf-slide-right 0.35s ease-out;
     position: relative;
+    overflow: hidden;
+}
+
+.reverse2pdf-notification::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-radius: 0 var(--radius) var(--radius) 0;
 }
 
 .reverse2pdf-notification.success {
-    border-left-color: var(--r2pdf-secondary);
-    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
     color: #065f46;
+}
+.reverse2pdf-notification.success::before {
+    background: var(--r2pdf-secondary);
 }
 
 .reverse2pdf-notification.error {
-    border-left-color: var(--r2pdf-danger);
-    background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
     color: #991b1b;
+}
+.reverse2pdf-notification.error::before {
+    background: var(--r2pdf-danger);
 }
 
 .reverse2pdf-notification.warning {
-    border-left-color: var(--r2pdf-warning);
-    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
     color: #92400e;
+}
+.reverse2pdf-notification.warning::before {
+    background: var(--r2pdf-warning);
 }
 
 .reverse2pdf-notification.info {
-    border-left-color: var(--r2pdf-primary);
-    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
     color: #1e40af;
+}
+.reverse2pdf-notification.info::before {
+    background: var(--r2pdf-info);
 }
 
 .notification-close {
-    background: none;
+    margin-left: auto;
     border: none;
+    background: transparent;
     color: inherit;
     cursor: pointer;
-    margin-left: auto;
+    border-radius: var(--radius-full);
     padding: 4px;
-    border-radius: var(--radius-sm);
     opacity: 0.7;
-    transition: var(--transition);
+    transition: var(--transition-fast);
 }
-
 .notification-close:hover {
     opacity: 1;
-    background: rgba(0,0,0,0.1);
+    background: rgba(15,23,42,0.08);
+    transform: rotate(90deg);
 }
 
-/* Buttons */
+/* =========================
+   Buttons
+   ========================= */
 .reverse2pdf-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 12px 24px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    border-radius: var(--radius);
+    padding: 11px 22px;
+    border-radius: var(--radius-full);
     border: none;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
     cursor: pointer;
-    transition: var(--transition);
     text-decoration: none;
-    line-height: 1;
-    white-space: nowrap;
+    color: #ffffff;
     position: relative;
     overflow: hidden;
-    font-family: inherit;
+    background: var(--r2pdf-primary);
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition);
 }
 
 .reverse2pdf-btn::before {
-    content: '';
+    content: "";
     position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: left 0.5s;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(255,255,255,0.18), transparent 60%);
+    opacity: 0;
+    transform: translateX(-40%);
+    transition: var(--transition-slow);
 }
 
 .reverse2pdf-btn:hover::before {
-    left: 100%;
+    opacity: 1;
+    transform: translateX(40%);
+}
+
+.reverse2pdf-btn:hover {
+    background: var(--r2pdf-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-strong);
+}
+
+.reverse2pdf-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-soft);
 }
 
 .reverse2pdf-btn-primary {
-    background: var(--gradient-primary);
-    color: white;
-    box-shadow: var(--shadow);
-}
-
-.reverse2pdf-btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-    color: white;
-    text-decoration: none;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
 }
 
 .reverse2pdf-btn-secondary {
-    background: var(--r2pdf-white);
-    color: var(--r2pdf-gray-700);
-    border: 2px solid var(--r2pdf-gray-200);
+    background: #ffffff;
+    color: var(--r2pdf-gray-800);
+    border: 1px solid var(--r2pdf-gray-200);
+    box-shadow: none;
 }
-
 .reverse2pdf-btn-secondary:hover {
-    border-color: var(--r2pdf-primary);
     color: var(--r2pdf-primary);
-    transform: translateY(-1px);
-    text-decoration: none;
+    border-color: var(--r2pdf-primary-soft);
+    background: var(--r2pdf-primary-soft);
 }
 
 .reverse2pdf-btn-success {
-    background: var(--gradient-success);
-    color: white;
-}
-
-.reverse2pdf-btn-warning {
-    background: var(--gradient-warning);
-    color: white;
+    background: linear-gradient(135deg, #10b981, #059669);
 }
 
 .reverse2pdf-btn-danger {
-    background: var(--gradient-danger);
-    color: white;
-}
-
-.reverse2pdf-btn-lg {
-    padding: 16px 32px;
-    font-size: 1rem;
-    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, #ef4444, #dc2626);
 }
 
 .reverse2pdf-btn-sm {
-    padding: 8px 16px;
-    font-size: 0.75rem;
+    padding: 7px 14px;
+    font-size: 12px;
 }
 
-.reverse2pdf-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none !important;
+.reverse2pdf-btn-lg {
+    padding: 14px 26px;
+    font-size: 14px;
 }
 
-/* Loading States */
-.reverse2pdf-loading {
-    position: relative;
-    opacity: 0.7;
-    pointer-events: none;
-}
-
-.reverse2pdf-loading::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
-    animation: shimmer 1.5s infinite;
-}
-
-.reverse2pdf-spin {
-    animation: spin 1s linear infinite;
-}
-
-/* Tables */
-.reverse2pdf-table {
-    width: 100%;
-    background: var(--r2pdf-white);
+/* =========================
+   Cards & Layout
+   ========================= */
+.reverse2pdf-card {
+    background: var(--r2pdf-surface);
     border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--r2pdf-gray-200);
+    border: 1px solid rgba(148,163,184,0.25);
+    box-shadow: var(--shadow-soft);
     margin-bottom: 24px;
+    overflow: hidden;
+    animation: r2pdf-fade-up 0.4s ease-out;
 }
 
-.reverse2pdf-table thead {
-    background: linear-gradient(135deg, var(--r2pdf-gray-50) 0%, var(--r2pdf-gray-100) 100%);
-}
-
-.reverse2pdf-table th {
-    padding: 16px 24px;
-    text-align: left;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--r2pdf-gray-600);
-    border-bottom: 2px solid var(--r2pdf-gray-200);
-}
-
-.reverse2pdf-table td {
-    padding: 16px 24px;
+.reverse2pdf-card-header {
+    padding: 18px 22px;
     border-bottom: 1px solid var(--r2pdf-gray-100);
-    font-size: 0.875rem;
-    vertical-align: middle;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: linear-gradient(135deg, #f9fafb, #eef2ff);
 }
 
-.reverse2pdf-table tbody tr {
-    transition: var(--transition);
+.reverse2pdf-card-header h2,
+.reverse2pdf-card-header h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--r2pdf-gray-900);
 }
 
-.reverse2pdf-table tbody tr:hover {
-    background: var(--r2pdf-primary-light);
+.reverse2pdf-card-body {
+    padding: 20px 22px;
 }
 
-.reverse2pdf-table tbody tr:last-child td {
-    border-bottom: none;
+.reverse2pdf-card-footer {
+    padding: 16px 22px;
+    border-top: 1px solid var(--r2pdf-gray-100);
+    background: var(--r2pdf-gray-50);
 }
 
-/* Forms */
+/* Simple grid system */
+.reverse2pdf-grid {
+    display: grid;
+    gap: 18px;
+}
+.reverse2pdf-grid-2 {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.reverse2pdf-grid-3 {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* =========================
+   Forms
+   ========================= */
 .reverse2pdf-form {
-    background: var(--r2pdf-white);
+    background: var(--r2pdf-surface);
     border-radius: var(--radius-lg);
-    padding: 32px;
-    box-shadow: var(--shadow);
     border: 1px solid var(--r2pdf-gray-200);
+    padding: 24px 22px;
+    box-shadow: var(--shadow-soft);
 }
 
 .reverse2pdf-form-group {
-    margin-bottom: 24px;
+    margin-bottom: 18px;
 }
 
 .reverse2pdf-form-label {
     display: block;
-    font-size: 0.875rem;
+    font-size: 13px;
     font-weight: 600;
     color: var(--r2pdf-gray-700);
-    margin-bottom: 8px;
-    letter-spacing: 0.01em;
+    margin-bottom: 6px;
 }
 
 .reverse2pdf-form-input,
 .reverse2pdf-form-select,
 .reverse2pdf-form-textarea {
     width: 100%;
-    padding: 12px 16px;
-    border: 2px solid var(--r2pdf-gray-200);
-    border-radius: var(--radius);
-    font-size: 1rem;
-    transition: var(--transition);
-    background: var(--r2pdf-white);
-    font-family: inherit;
+    padding: 9px 11px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--r2pdf-gray-300);
+    font-size: 13px;
+    background: #ffffff;
+    transition: var(--transition-fast);
 }
 
 .reverse2pdf-form-input:focus,
 .reverse2pdf-form-select:focus,
 .reverse2pdf-form-textarea:focus {
-    border-color: var(--r2pdf-primary);
     outline: none;
-    box-shadow: 0 0 0 4px var(--r2pdf-primary-light);
+    border-color: var(--r2pdf-primary);
+    box-shadow: 0 0 0 3px var(--r2pdf-primary-soft);
 }
 
-.reverse2pdf-form-textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-/* Cards */
-.reverse2pdf-card {
-    background: var(--r2pdf-white);
+/* =========================
+   Tables
+   ========================= */
+.reverse2pdf-table {
+    width: 100%;
+    border-collapse: collapse;
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-    border: 1px solid var(--r2pdf-gray-200);
     overflow: hidden;
-    transition: var(--transition);
-    margin-bottom: 24px;
+    background: #ffffff;
+    box-shadow: var(--shadow-soft);
 }
 
-.reverse2pdf-card:hover {
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-2px);
+.reverse2pdf-table thead {
+    background: linear-gradient(135deg, #111827, #020617);
+    color: #e5e7eb;
 }
 
-.reverse2pdf-card-header {
-    background: var(--gradient-primary);
-    color: white;
-    padding: 20px 24px;
+.reverse2pdf-table th,
+.reverse2pdf-table td {
+    padding: 12px 14px;
+    font-size: 13px;
+}
+
+.reverse2pdf-table th {
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(148,163,184,0.5);
+}
+
+.reverse2pdf-table tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: var(--transition-fast);
+}
+.reverse2pdf-table tbody tr:last-child {
     border-bottom: none;
 }
 
-.reverse2pdf-card-header h2,
-.reverse2pdf-card-header h3 {
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.reverse2pdf-table tbody tr:hover {
+    background: #f9fafb;
+    transform: translateY(-1px);
 }
 
-.reverse2pdf-card-body {
-    padding: 24px;
-}
-
-.reverse2pdf-card-footer {
-    background: var(--r2pdf-gray-50);
-    padding: 16px 24px;
-    border-top: 1px solid var(--r2pdf-gray-200);
-}
-
-/* Grid System */
-.reverse2pdf-grid {
-    display: grid;
-    gap: 24px;
-    margin-bottom: 32px;
-}
-
-.reverse2pdf-grid-2 {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-}
-
-.reverse2pdf-grid-3 {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-}
-
-.reverse2pdf-grid-4 {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-}
-
-/* Visual Builder Styles */
+/* =========================
+   Builder Layout (class-reverse2pdf-visual-mapper.php)
+   ========================= */
 .reverse2pdf-builder {
-    background: var(--r2pdf-white);
+    background: #f3f4f6;
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
+    border: 1px solid #e5e7eb;
+    box-shadow: var(--shadow-soft);
+    margin-top: 18px;
     overflow: hidden;
-    margin: 20px 0;
-    border: 1px solid var(--r2pdf-gray-200);
 }
 
 .builder-header {
-    background: linear-gradient(135deg, var(--r2pdf-gray-900) 0%, var(--r2pdf-gray-800) 100%);
-    color: white;
-    padding: 24px;
+    background: radial-gradient(circle at top left, #111827, #020617);
+    color: #e5e7eb;
+    padding: 16px 18px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
+    justify-content: space-between;
+    gap: 14px;
 }
 
 .builder-controls {
     display: flex;
-    align-items: center;
-    gap: 16px;
     flex-wrap: wrap;
+    gap: 10px;
 }
 
 .builder-controls input[type="text"] {
-    background: rgba(255,255,255,0.1);
-    border: 2px solid rgba(255,255,255,0.2);
-    color: white;
-    padding: 12px 16px;
-    border-radius: var(--radius);
-    font-size: 1rem;
-    min-width: 280px;
-    transition: var(--transition);
-    backdrop-filter: blur(10px);
-}
-
-.builder-controls input[type="text"]:focus {
-    background: rgba(255,255,255,0.15);
-    border-color: rgba(255,255,255,0.4);
-    outline: none;
-    box-shadow: 0 0 0 4px rgba(255,255,255,0.1);
-}
-
-.builder-controls input[type="text"]::placeholder {
-    color: rgba(255,255,255,0.6);
+    background: rgba(15,23,42,0.6);
+    border-radius: var(--radius-full);
+    border: 1px solid rgba(148,163,184,0.4);
+    padding: 8px 14px;
+    color: #e5e7eb;
+    font-size: 13px;
 }
 
 .builder-workspace {
     display: grid;
-    grid-template-columns: 320px 1fr;
-    min-height: 70vh;
+    grid-template-columns: 280px minmax(0, 1fr);
+    min-height: 520px;
 }
 
+/* Left/right sidebars */
 .builder-sidebar {
-    background: var(--r2pdf-gray-50);
-    border-right: 1px solid var(--r2pdf-gray-200);
+    background: #ffffff;
+    border-right: 1px solid #e5e7eb;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+}
+.right-sidebar {
+    border-right: none;
+    border-left: 1px solid #e5e7eb;
 }
 
-.sidebar-section {
-    border-bottom: 1px solid var(--r2pdf-gray-200);
-}
-
-.sidebar-section:last-child {
-    border-bottom: none;
-    flex: 1;
-}
-
-.sidebar-section-header {
-    background: var(--r2pdf-white);
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--r2pdf-gray-200);
-    font-weight: 700;
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--r2pdf-gray-700);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-.sidebar-section-content {
-    padding: 20px;
-}
-
-/* Element Library */
-.element-group {
-    margin-bottom: 24px;
-}
-
-.element-group:last-child {
-    margin-bottom: 0;
-}
-
+/* Element library */
 .element-group-title {
-    font-size: 0.75rem;
-    font-weight: 700;
+    font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: .12em;
     color: var(--r2pdf-gray-500);
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--r2pdf-gray-200);
+    margin-bottom: 6px;
 }
 
 .element-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    margin-bottom: 8px;
-    background: var(--r2pdf-white);
-    border: 2px solid var(--r2pdf-gray-200);
-    border-radius: var(--radius);
+    gap: 9px;
+    padding: 9px 10px;
+    margin-bottom: 6px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
     cursor: grab;
-    transition: var(--transition);
-    user-select: none;
-    font-weight: 500;
-    position: relative;
-    overflow: hidden;
+    font-size: 13px;
+    transition: var(--transition-fast);
 }
-
-.element-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: var(--gradient-primary);
-    transition: left 0.3s ease;
-    z-index: 1;
-}
-
-.element-item:hover::before {
-    left: 0;
-}
-
 .element-item:hover {
-    color: white;
+    background: #eef2ff;
     border-color: var(--r2pdf-primary);
-    transform: translateX(8px) scale(1.02);
-    box-shadow: var(--shadow-md);
-}
-
-.element-item:active {
-    cursor: grabbing;
-    transform: translateX(8px) scale(0.98);
-}
-
-.element-item > * {
-    position: relative;
-    z-index: 2;
-}
-
-.element-item .dashicons {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
+    transform: translateX(3px);
+    box-shadow: var(--shadow-soft);
 }
 
 /* Canvas */
 .builder-canvas {
-    background: 
-        radial-gradient(circle at 20px 20px, var(--r2pdf-gray-300) 1px, transparent 1px),
-        linear-gradient(45deg, var(--r2pdf-gray-100) 0%, var(--r2pdf-gray-50) 100%);
-    background-size: 20px 20px, 100% 100%;
-    padding: 40px;
-    overflow: auto;
+    background:
+        radial-gradient(circle at 0 0, #e5e7eb 0, transparent 55%),
+        linear-gradient(135deg, #f9fafb, #e5e7eb);
+    padding: 20px;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    min-height: 100%;
-}
-
-.canvas-container {
-    position: relative;
 }
 
 .pdf-canvas {
-    background: var(--r2pdf-white);
-    box-shadow: var(--shadow-2xl);
+    background: #ffffff;
     border-radius: var(--radius);
-    position: relative;
-    transition: var(--transition);
-    border: 1px solid var(--r2pdf-gray-200);
+    border: 1px solid #e5e7eb;
+    box-shadow: var(--shadow-strong);
+    transition: var(--transition-slow);
 }
 
 .pdf-canvas:hover {
-    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25);
+    transform: translateY(-4px);
+    box-shadow: 0 22px 50px rgba(15,23,42,0.25);
 }
 
-.pdf-canvas .page {
-    background: var(--r2pdf-white);
-    position: relative;
-    margin-bottom: 20px;
-    min-height: 842px;
-    width: 595px;
-    border-radius: var(--radius);
-    overflow: hidden;
-    border: 1px solid var(--r2pdf-gray-100);
-}
-
-.pdf-canvas .page:last-child {
-    margin-bottom: 0;
-}
-
-/* Properties Panel */
-.element-properties {
-    background: var(--r2pdf-white);
-    border-radius: var(--radius);
-    padding: 20px;
-    border: 1px solid var(--r2pdf-gray-200);
-}
-
-.property-group {
-    margin-bottom: 20px;
-}
-
-.property-group:last-child {
-    margin-bottom: 0;
-}
-
-.property-group h5 {
-    margin: 0 0 12px 0;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--r2pdf-gray-700);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.property-input {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid var(--r2pdf-gray-300);
-    border-radius: var(--radius-sm);
-    font-size: 0.875rem;
-    transition: var(--transition);
-}
-
-.property-input:focus {
-    border-color: var(--r2pdf-primary);
-    outline: none;
-    box-shadow: 0 0 0 3px var(--r2pdf-primary-light);
-}
-
-/* Modal Styles */
+/* =========================
+   Modals
+   ========================= */
 .reverse2pdf-modal {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 999999;
-    opacity: 0;
-    visibility: hidden;
-    transition: var(--transition);
+    inset: 0;
+    z-index: 99999;
+    display: none;
 }
 
 .reverse2pdf-modal.active {
-    opacity: 1;
-    visibility: visible;
+    display: block;
 }
 
 .reverse2pdf-modal-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px);
+    inset: 0;
+    background: rgba(15,23,42,0.55);
+    backdrop-filter: blur(5px);
 }
 
 .reverse2pdf-modal-content {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    background: var(--r2pdf-white);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-2xl);
+    width: min(640px, 94vw);
     max-height: 90vh;
-    overflow-y: auto;
-    max-width: 90vw;
-    width: 600px;
+    transform: translate(-50%, -50%);
+    background: #ffffff;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-strong);
+    overflow: hidden;
+    animation: r2pdf-fade-up 0.33s ease-out;
 }
 
 .reverse2pdf-modal-header {
-    padding: 24px 28px 20px;
-    border-bottom: 1px solid var(--r2pdf-gray-200);
+    padding: 18px 20px;
+    background: linear-gradient(135deg, #111827, #1f2937);
+    color: #e5e7eb;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    background: var(--gradient-primary);
-    color: white;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    justify-content: space-between;
 }
 
 .reverse2pdf-modal-title {
     margin: 0;
-    font-size: 1.375rem;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 600;
 }
 
 .reverse2pdf-modal-close {
-    background: rgba(255,255,255,0.2);
     border: none;
-    color: white;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border-radius: var(--radius-full);
+    background: rgba(15,23,42,0.35);
+    color: #e5e7eb;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: var(--transition);
+    transition: var(--transition-fast);
 }
-
 .reverse2pdf-modal-close:hover {
-    background: rgba(255,255,255,0.3);
-    transform: scale(1.1);
+    background: rgba(15,23,42,0.7);
+    transform: rotate(90deg);
 }
 
 .reverse2pdf-modal-body {
-    padding: 28px;
+    padding: 20px 22px;
 }
 
-/* Animations */
-@keyframes slideInRight {
+/* =========================
+   Utilities
+   ========================= */
+.reverse2pdf-sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0;
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+    .builder-workspace {
+        grid-template-columns: 1fr;
+    }
+    .builder-sidebar {
+        border-right: none;
+        border-bottom: 1px solid #e5e7eb;
+        max-height: 240px;
+        overflow-y: auto;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+.reverse2pdf-dashboard {
+    background: #f8f9fa;
+    margin: -10px -20px;
+    padding: 0;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Hero Section */
+.reverse2pdf-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 60px 0 80px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
     from {
-        transform: translateX(100%);
         opacity: 0;
+        transform: translateY(-20px);
     }
     to {
-        transform: translateX(0);
         opacity: 1;
+        transform: translateY(0);
     }
 }
 
-@keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+.reverse2pdf-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="0,0 0,100 1000,100"/></svg>') no-repeat center bottom;
+    background-size: 100% 100px;
+    animation: wave 15s ease-in-out infinite;
 }
 
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+@keyframes wave {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(20px);
+    }
 }
+
+.reverse2pdf-hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 30px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.reverse2pdf-hero h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin: 0 0 20px 0;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    background: linear-gradient(45deg, #fff, #f0f8ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: slideDown 0.8s ease-out 0.2s both;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.reverse2pdf-hero p {
+    font-size: 1.25rem;
+    margin: 0 0 40px 0;
+    opacity: 0.95;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    animation: slideDown 0.8s ease-out 0.4s both;
+}
+
+/* Stats Row with Animations */
+.reverse2pdf-stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.reverse2pdf-hero-stat {
+    text-align: center;
+    padding: 20px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: fadeInUp 0.6s ease-out both;
+    cursor: default;
+}
+
+.reverse2pdf-hero-stat:nth-child(1) { animation-delay: 0.5s; }
+.reverse2pdf-hero-stat:nth-child(2) { animation-delay: 0.6s; }
+.reverse2pdf-hero-stat:nth-child(3) { animation-delay: 0.7s; }
+.reverse2pdf-hero-stat:nth-child(4) { animation-delay: 0.8s; }
 
 @keyframes fadeInUp {
     from {
@@ -776,7 +738,430 @@
     }
 }
 
+.reverse2pdf-hero-stat:hover {
+    transform: translateY(-8px) scale(1.05);
+    background: rgba(255,255,255,0.25);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+}
+
+.reverse2pdf-hero-stat-number {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 8px;
+    transition: transform 0.3s ease;
+}
+
+.reverse2pdf-hero-stat:hover .reverse2pdf-hero-stat-number {
+    transform: scale(1.15);
+}
+
+.reverse2pdf-hero-stat-label {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+/* Container */
+.reverse2pdf-container {
+    max-width: 1200px;
+    margin: -40px auto 0;
+    padding: 0 30px 60px;
+    position: relative;
+    z-index: 3;
+}
+
+/* Action Cards Grid */
+.reverse2pdf-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 50px;
+}
+
+/* Enhanced Action Cards with Icon Boxes */
+.reverse2pdf-action-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid #e2e8f0;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    animation: fadeInUp 0.6s ease-out both;
+}
+
+.reverse2pdf-action-card:nth-child(1) { animation-delay: 0.9s; }
+.reverse2pdf-action-card:nth-child(2) { animation-delay: 1s; }
+.reverse2pdf-action-card:nth-child(3) { animation-delay: 1.1s; }
+.reverse2pdf-action-card:nth-child(4) { animation-delay: 1.2s; }
+
+.reverse2pdf-action-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 1;
+}
+
+.reverse2pdf-action-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 2;
+}
+
+.reverse2pdf-action-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 50px rgba(102, 126, 234, 0.35);
+    text-decoration: none;
+    color: white;
+}
+
+.reverse2pdf-action-card:hover::before {
+    opacity: 1;
+}
+
+.reverse2pdf-action-card:hover::after {
+    opacity: 1;
+    animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.reverse2pdf-action-card > * {
+    position: relative;
+    z-index: 3;
+}
+
+/* IMPROVED ICON STYLING */
+.reverse2pdf-action-icon {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
+
+.reverse2pdf-action-icon::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.reverse2pdf-action-card:hover .reverse2pdf-action-icon {
+    background: white;
+    transform: scale(1.1) rotate(-5deg);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+}
+
+.reverse2pdf-action-card:hover .reverse2pdf-action-icon::before {
+    opacity: 1;
+}
+
+/* Icon text color changes */
+.reverse2pdf-action-icon::after {
+    content: attr(data-icon);
+    font-size: 3rem;
+    transition: transform 0.3s ease;
+}
+
+.reverse2pdf-action-card:hover .reverse2pdf-action-icon {
+    animation: bounce 0.6s ease;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: scale(1.1) rotate(-5deg) translateY(0);
+    }
+    50% {
+        transform: scale(1.1) rotate(-5deg) translateY(-10px);
+    }
+}
+
+.reverse2pdf-action-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    color: #1a202c;
+    transition: all 0.3s ease;
+}
+
+.reverse2pdf-action-card:hover .reverse2pdf-action-title {
+    color: white;
+    transform: translateY(-2px);
+}
+
+.reverse2pdf-action-description {
+    font-size: 1rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.6;
+    transition: all 0.3s ease;
+}
+
+.reverse2pdf-action-card:hover .reverse2pdf-action-description {
+    color: rgba(255,255,255,0.95);
+}
+
+/* Content Grid */
+.reverse2pdf-content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+/* Cards with Animations */
+.reverse2pdf-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: fadeInUp 0.6s ease-out both;
+}
+
+.reverse2pdf-content-grid .reverse2pdf-card:nth-child(1) {
+    animation-delay: 1.3s;
+}
+
+.reverse2pdf-content-grid .reverse2pdf-card:nth-child(2) {
+    animation-delay: 1.4s;
+}
+
+.reverse2pdf-card:hover {
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    transform: translateY(-6px);
+}
+
+.reverse2pdf-card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 24px 30px;
+    border-bottom: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.reverse2pdf-card-header::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+    animation: rotateGlow 20s linear infinite;
+}
+
+@keyframes rotateGlow {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.reverse2pdf-card-title {
+    font-size: 1.375rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.reverse2pdf-card-body {
+    padding: 30px;
+}
+
+/* Empty State */
+.reverse2pdf-empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #64748b;
+    animation: fadeIn 0.6s ease-out;
+}
+
+
+.reverse2pdf-empty-icon {
+    font-size: 4rem;
+    margin-bottom: 32px;  /* Doubled for better spacing */
+    opacity: 0.5;
+    animation: float 3s ease-in-out infinite;
+}
+
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.reverse2pdf-empty-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 8px 0;
+}
+
+.reverse2pdf-empty-text {
+    font-size: 1rem;
+    margin: 0 0 24px 0;
+}
+
+/* Enhanced Buttons */
+.reverse2pdf-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.reverse2pdf-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.3), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.reverse2pdf-btn:hover::before {
+    transform: translateX(100%);
+}
+
+.reverse2pdf-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.reverse2pdf-btn:active {
+    transform: translateY(0);
+}
+
+/* System Items */
+.reverse2pdf-system-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid #f1f5f9;
+    transition: all 0.3s ease;
+}
+
+.reverse2pdf-system-item:hover {
+    background: #f9fafb;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin: 0 -10px;
+}
+
+.reverse2pdf-system-item:last-child {
+    border-bottom: none;
+}
+
+.reverse2pdf-system-label {
+    font-weight: 500;
+    color: #374151;
+    transition: color 0.3s ease;
+}
+
+.reverse2pdf-system-item:hover .reverse2pdf-system-label {
+    color: #667eea;
+}
+
+.reverse2pdf-system-value {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+}
+
+.reverse2pdf-status-good {
+    color: #10b981;
+    font-weight: 600;
+    animation: pulse 2s ease-in-out infinite;
+}
+
 @keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.reverse2pdf-status-warning {
+    color: #f59e0b;
+    font-weight: 600;
+    animation: warning-blink 1.5s ease-in-out infinite;
+}
+
+@keyframes warning-blink {
     0%, 100% {
         opacity: 1;
     }
@@ -785,120 +1170,46 @@
     }
 }
 
-.reverse2pdf-fade-in {
-    animation: fadeInUp 0.6s ease;
-}
-
-.reverse2pdf-pulse {
-    animation: pulse 2s infinite;
-}
-
-/* Responsive Design */
-@media (max-width: 1200px) {
-    .builder-workspace {
-        grid-template-columns: 280px 1fr;
-    }
-    
-    .reverse2pdf-grid-4 {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    }
-}
-
-@media (max-width: 992px) {
-    .reverse2pdf-grid-2,
-    .reverse2pdf-grid-3,
-    .reverse2pdf-grid-4 {
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    }
-    
-    .builder-workspace {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
-    }
-    
-    .builder-sidebar {
-        border-right: none;
-        border-bottom: 1px solid var(--r2pdf-gray-200);
-        max-height: 300px;
-    }
-}
-
+/* Responsive */
 @media (max-width: 768px) {
-    .reverse2pdf-grid-2,
-    .reverse2pdf-grid-3,
-    .reverse2pdf-grid-4 {
+    .reverse2pdf-hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .reverse2pdf-hero-content {
+        padding: 0 20px;
+    }
+
+    .reverse2pdf-container {
+        padding: 0 20px 40px;
+    }
+
+    .reverse2pdf-content-grid {
         grid-template-columns: 1fr;
     }
-    
-    .builder-controls {
-        flex-direction: column;
-        align-items: stretch;
+
+    .reverse2pdf-actions-grid {
+        grid-template-columns: 1fr;
     }
-    
-    .builder-controls input[type="text"] {
-        min-width: auto;
+
+    .reverse2pdf-action-card {
+        min-height: 180px;
+        padding: 30px 24px;
     }
-    
-    .pdf-canvas .page {
-        width: 100%;
-        max-width: 595px;
-    }
-    
-    .reverse2pdf-modal-content {
-        width: 95vw;
-        margin: 20px;
-    }
-    
-    .reverse2pdf-modal-header,
-    .reverse2pdf-modal-body {
-        padding: 20px;
+
+    .reverse2pdf-action-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 2.5rem;
     }
 }
 
-@media (max-width: 480px) {
-    .reverse2pdf-card-body,
-    .reverse2pdf-form {
-        padding: 20px;
-    }
-    
-    .reverse2pdf-btn {
-        padding: 10px 20px;
-        font-size: 0.8125rem;
-    }
-    
-    .reverse2pdf-btn-lg {
-        padding: 14px 28px;
-        font-size: 0.9375rem;
-    }
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
 }
 
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --r2pdf-white: #1f2937;
-        --r2pdf-gray-50: #111827;
-        --r2pdf-gray-100: #1f2937;
-        --r2pdf-gray-200: #374151;
-        --r2pdf-gray-300: #4b5563;
-        --r2pdf-gray-900: #f9fafb;
-    }
-}
-
-/* High Contrast Mode */
-@media (prefers-contrast: high) {
-    .reverse2pdf-card,
-    .reverse2pdf-btn,
-    .reverse2pdf-form-input {
-        border-width: 2px;
-    }
-    
-    .reverse2pdf-btn-primary {
-        background: #000;
-        color: #fff;
-    }
-}
-
-/* Reduced Motion */
+/* Reduce motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -908,65 +1219,3 @@
         transition-duration: 0.01ms !important;
     }
 }
-
-/* Print Styles */
-@media print {
-    .reverse2pdf-builder,
-    .builder-sidebar,
-    .builder-header,
-    .reverse2pdf-modal {
-        display: none !important;
-    }
-    
-    .pdf-canvas {
-        box-shadow: none;
-        margin: 0;
-    }
-}
-
-/* Accessibility */
-.reverse2pdf-btn:focus,
-.reverse2pdf-form-input:focus,
-.reverse2pdf-form-select:focus,
-.reverse2pdf-form-textarea:focus {
-    outline: 2px solid var(--r2pdf-primary);
-    outline-offset: 2px;
-}
-
-.reverse2pdf-sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-/* Emergency Fix - Remove Empty Space */
-.wrap,
-.reverse2pdf-wrap,
-.reverse2pdf-builder-wrap {
-    margin-right: 0 !important;
-    padding-right: 0 !important;
-}
-
-.builder-workspace {
-    grid-template-columns: 320px 1fr !important;
-    gap: 0 !important;
-}
-
-.builder-canvas {
-    padding: 20px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-.pdf-canvas,
-.canvas-page {
-    margin: 0 auto !important;
-}
-
-
