@@ -1,16 +1,20 @@
 /* ============================================================================
-   Reverse2PDF Builder - FULLY RESPONSIVE
-   Mobile-first responsive design with all previous fixes
+   Reverse2PDF Template Builder - Complete CSS
+   Stable, production-ready stylesheet
    ============================================================================ */
 
-* { 
-    box-sizing: border-box; 
+/* Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 /* ============================================================================
-   HIDE BRANDING
+   WORDPRESS ADMIN OVERRIDES
    ============================================================================ */
 
+/* Hide footer branding */
 body.reverse2pdf_page_reverse2pdf-builder #wpfooter {
     display: none !important;
 }
@@ -20,10 +24,7 @@ body.reverse2pdf_page_reverse2pdf-builder #wpfooter {
     display: none !important;
 }
 
-/* ============================================================================
-   WORDPRESS ADMIN OVERRIDE
-   ============================================================================ */
-
+/* Override WP admin padding */
 body.reverse2pdf_page_reverse2pdf-builder #wpcontent {
     padding-left: 0 !important;
 }
@@ -47,8 +48,8 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
     left: 160px;
     right: 0;
     bottom: 0;
-    margin: 0 !important;
-    padding: 0 !important;
+    margin: 0;
+    padding: 0;
     background: #f0f2f5;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     overflow: hidden;
@@ -58,28 +59,26 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
 }
 
 /* ============================================================================
-   HEADER - RESPONSIVE
+   HEADER
    ============================================================================ */
 
 .r2pdf-builder-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 12px 16px;
+    padding: 12px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     position: relative;
     z-index: 1000;
-    margin: 0;
     flex-shrink: 0;
-    flex-wrap: wrap;
-    gap: 10px;
+    gap: 12px;
 }
 
 .r2pdf-header-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
     flex: 1;
     min-width: 0;
 }
@@ -87,12 +86,12 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
 .r2pdf-header-title {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     color: white;
 }
 
 .r2pdf-header-title h1 {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     color: white;
     margin: 0;
@@ -100,41 +99,41 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
 }
 
 .r2pdf-header-title .dashicons {
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
 }
 
-/* Template name input - responsive */
+/* Template name input */
 .r2pdf-template-name,
 #template-name {
-    background: rgba(255,255,255,0.95);
-    border: 2px solid rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     color: #1f2937;
-    padding: 10px 14px;
+    padding: 10px 16px;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
-    min-width: 200px;
-    max-width: 100%;
+    min-width: 250px;
     flex: 1;
+    max-width: 400px;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     outline: none;
 }
 
 .r2pdf-template-name:hover,
 #template-name:hover {
     background: white;
-    border-color: rgba(255,255,255,0.5);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .r2pdf-template-name:focus,
 #template-name:focus {
     background: white;
     border-color: white;
-    box-shadow: 0 0 0 3px rgba(255,255,255,0.3), 0 4px 16px rgba(0,0,0,0.2);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3), 0 4px 16px rgba(0, 0, 0, 0.2);
     transform: translateY(-1px);
 }
 
@@ -142,28 +141,29 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
 #template-name::placeholder {
     color: #6b7280;
     opacity: 0.7;
-    font-weight: 500;
 }
 
 .r2pdf-header-right {
     display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
 }
 
-/* Buttons - responsive */
+/* Header buttons */
 .r2pdf-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 10px 14px;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     border: none;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
     white-space: nowrap;
+    line-height: 1;
 }
 
 .r2pdf-btn .dashicons {
@@ -174,30 +174,35 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
 
 .r2pdf-btn-icon {
     padding: 10px;
-    background: rgba(255,255,255,0.15);
+    background: rgba(255, 255, 255, 0.15);
     color: white;
 }
 
 .r2pdf-btn-icon:hover {
-    background: rgba(255,255,255,0.25);
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
 }
 
 .r2pdf-btn-light {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255, 255, 255, 0.15);
     color: white;
 }
 
 .r2pdf-btn-light:hover {
-    background: rgba(255,255,255,0.25);
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
 }
 
 .r2pdf-btn-success {
     background: #10b981;
     color: white;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 .r2pdf-btn-success:hover {
     background: #059669;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    transform: translateY(-1px);
 }
 
 .r2pdf-btn-primary {
@@ -207,15 +212,20 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
 
 .r2pdf-btn-primary:hover {
     background: #f3f4f6;
+    transform: translateY(-1px);
 }
 
 .r2pdf-btn-small {
-    padding: 6px 10px;
-    font-size: 12px;
+    padding: 8px 12px;
+    font-size: 13px;
+}
+
+.r2pdf-btn .dashicons {
+    margin-right: -2px;
 }
 
 /* ============================================================================
-   MAIN LAYOUT - RESPONSIVE GRID
+   MAIN LAYOUT
    ============================================================================ */
 
 .r2pdf-builder-main {
@@ -223,13 +233,12 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
     grid-template-columns: 300px 1fr 280px;
     flex: 1;
     gap: 0;
-    margin: 0;
-    padding: 0;
     overflow: hidden;
+    height: 100%;
 }
 
 /* ============================================================================
-   SIDEBARS
+   SIDEBARS (LEFT & RIGHT)
    ============================================================================ */
 
 .r2pdf-sidebar {
@@ -237,7 +246,6 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    margin: 0;
     height: 100%;
 }
 
@@ -249,6 +257,7 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
     border-left: 1px solid #e5e7eb;
 }
 
+/* Sidebar tabs */
 .r2pdf-sidebar-tabs {
     display: flex;
     border-bottom: 1px solid #e5e7eb;
@@ -262,21 +271,23 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    padding: 10px 6px;
+    padding: 12px 8px;
     background: transparent;
     border: none;
     cursor: pointer;
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 700;
     color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     transition: all 0.2s;
     border-bottom: 3px solid transparent;
 }
 
 .r2pdf-tab-btn .dashicons {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
 }
 
 .r2pdf-tab-btn:hover {
@@ -294,7 +305,7 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 12px;
+    padding: 16px;
     min-height: 0;
 }
 
@@ -307,11 +318,11 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
 }
 
 /* ============================================================================
-   ELEMENTS
+   ELEMENTS (LEFT SIDEBAR)
    ============================================================================ */
 
 .element-category {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .element-category:last-child {
@@ -321,19 +332,21 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
 .category-header {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 0;
-    margin-bottom: 10px;
+    gap: 8px;
+    padding: 8px 0;
+    margin-bottom: 12px;
     border-bottom: 2px solid #e5e7eb;
 }
 
 .category-header .dashicons {
     color: #667eea;
-    font-size: 16px;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
 }
 
 .category-title {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     color: #6b7280;
     text-transform: uppercase;
@@ -343,172 +356,130 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
 .element-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: 10px;
 }
 
 .element-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
-    padding: 12px 8px;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 10px;
     background: #f9fafb;
     border: 2px solid #e5e7eb;
     border-radius: 8px;
     cursor: grab;
     transition: all 0.2s;
     text-align: center;
+    min-height: 70px;
 }
 
 .element-item:hover {
     background: #ede9fe;
     border-color: #667eea;
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(102,126,234,0.2);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.2);
 }
 
 .element-item:active {
     cursor: grabbing;
+    transform: translateY(0);
+}
+
+.element-item.dragging {
+    opacity: 0.5;
 }
 
 .element-item .dashicons {
     color: #667eea;
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
 }
 
 .element-label {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     color: #374151;
+    line-height: 1.2;
 }
 
 /* ============================================================================
-   PAGES, MAPPING, SETTINGS
+   PAGES TAB
    ============================================================================ */
 
 .pages-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
 }
 
-.pages-header h3,
-.mapping-header h3,
-.settings-section h3 {
-    font-size: 13px;
+.pages-header h3 {
+    font-size: 14px;
     font-weight: 700;
     color: #1f2937;
-    margin-bottom: 10px;
+    margin: 0;
 }
 
 .pages-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
+/* Page item with delete button */
 .page-item {
     background: #f9fafb;
     border: 2px solid #e5e7eb;
     border-radius: 8px;
-    padding: 10px;
+    padding: 14px;
     cursor: pointer;
     transition: all 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
 }
 
 .page-item:hover {
     border-color: #667eea;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
 }
 
 .page-item.active {
     border-color: #667eea;
     background: #ede9fe;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
-.r2pdf-select,
-.r2pdf-input {
-    width: 100%;
-    padding: 8px 10px;
-    border: 2px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 13px;
-    background: white;
-    color: #374151;
-    transition: all 0.2s;
+.page-item-info {
+    flex: 1;
+    min-width: 0;
 }
 
-.r2pdf-select:focus,
-.r2pdf-input:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
-}
-
-.settings-group {
-    margin-bottom: 14px;
-}
-
-.settings-group label {
-    display: block;
-    font-size: 11px;
+.page-item-name {
+    font-size: 14px;
     font-weight: 600;
-    color: #4b5563;
-    margin-bottom: 6px;
+    color: #1f2937;
+    margin-bottom: 4px;
 }
 
-.settings-group small {
-    display: block;
-    font-size: 10px;
-    color: #9ca3af;
-    margin-top: 4px;
+.page-item-size {
+    font-size: 11px;
+    color: #6b7280;
 }
 
-.mapping-empty {
-    text-align: center;
-    padding: 30px 15px;
-    color: #9ca3af;
-    font-size: 12px;
-}
-
-/* ============================================================================
-   CANVAS
-   ============================================================================ */
-
-.r2pdf-canvas-container {
+.page-item-actions {
     display: flex;
-    flex-direction: column;
-    background: #e5e7eb;
-    height: 100%;
-    overflow: hidden;
-}
-
-.r2pdf-canvas-toolbar {
-    background: white;
-    border-bottom: 1px solid #d1d5db;
-    padding: 8px 12px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-shrink: 0;
-    flex-wrap: wrap;
-}
-
-.toolbar-group {
-    display: flex;
-    align-items: center;
     gap: 6px;
-    padding-right: 12px;
-    border-right: 1px solid #e5e7eb;
+    align-items: center;
 }
 
-.toolbar-group:last-child {
-    border-right: none;
-}
-
-.toolbar-btn {
+/* Delete button */
+.page-delete-btn {
     width: 32px;
     height: 32px;
     display: flex;
@@ -519,7 +490,143 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s;
+    flex-shrink: 0;
+    color: #6b7280;
+    padding: 0;
+}
+
+.page-delete-btn:hover:not(:disabled) {
+    background: #fee2e2;
+    border-color: #ef4444;
+    color: #ef4444;
+    transform: scale(1.05);
+}
+
+.page-delete-btn .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.page-delete-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* ============================================================================
+   MAPPING & SETTINGS TABS
+   ============================================================================ */
+
+.mapping-header h3,
+.settings-section h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 12px;
+}
+
+.r2pdf-select,
+.r2pdf-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    color: #374151;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.r2pdf-select:focus,
+.r2pdf-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.settings-group {
+    margin-bottom: 16px;
+}
+
+.settings-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
     color: #4b5563;
+    margin-bottom: 8px;
+}
+
+.settings-group small {
+    display: block;
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 4px;
+}
+
+.mapping-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+.mapping-empty .dashicons {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    opacity: 0.3;
+    margin-bottom: 12px;
+}
+
+/* ============================================================================
+   CANVAS (CENTER)
+   ============================================================================ */
+
+.r2pdf-canvas-container {
+    display: flex;
+    flex-direction: column;
+    background: #e5e7eb;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Canvas toolbar */
+.r2pdf-canvas-toolbar {
+    background: white;
+    border-bottom: 1px solid #d1d5db;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+}
+
+.toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-right: 16px;
+    border-right: 1px solid #e5e7eb;
+}
+
+.toolbar-group:last-child {
+    border-right: none;
+}
+
+.toolbar-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #4b5563;
+    padding: 0;
 }
 
 .toolbar-btn:hover {
@@ -529,26 +636,27 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
 }
 
 .toolbar-btn .dashicons {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
 }
 
 #zoom-level {
-    width: 60px;
+    width: 70px;
     text-align: center;
-    padding: 6px;
+    padding: 8px;
     border: 2px solid #e5e7eb;
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     background: white;
 }
 
+/* Canvas workspace */
 .r2pdf-canvas-workspace {
     flex: 1;
     overflow: auto;
-    padding: 20px;
+    padding: 30px;
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -556,10 +664,10 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
 }
 
 .pdf-canvas {
-    background: white;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-    border-radius: 4px;
+    background: transparent;
     position: relative;
+    transform-origin: top center;
+    transition: transform 0.2s;
 }
 
 .canvas-page {
@@ -567,8 +675,9 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
     height: 842px;
     background: white;
     position: relative;
-    border: 1px solid #d1d5db;
-    margin-bottom: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    margin-bottom: 30px;
 }
 
 .canvas-page:last-child {
@@ -580,6 +689,7 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
     height: 595px;
 }
 
+/* Empty state */
 .canvas-empty-state {
     position: absolute;
     top: 50%;
@@ -587,26 +697,28 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
     transform: translate(-50%, -50%);
     text-align: center;
     color: #9ca3af;
+    pointer-events: none;
 }
 
 .canvas-empty-state .dashicons {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-    opacity: 0.25;
-    margin-bottom: 12px;
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    opacity: 0.2;
+    margin-bottom: 16px;
 }
 
 .canvas-empty-state h3 {
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 600;
     color: #6b7280;
     margin: 0 0 8px 0;
 }
 
 .canvas-empty-state p {
-    font-size: 12px;
+    font-size: 14px;
     margin: 0;
+    color: #9ca3af;
 }
 
 /* Canvas elements */
@@ -614,11 +726,13 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
     position: absolute;
     border: 2px dashed transparent;
     cursor: move;
-    transition: all 0.2s;
+    transition: border-color 0.2s;
     min-width: 40px;
     min-height: 30px;
     user-select: none;
-    padding: 4px;
+    padding: 6px;
+    word-wrap: break-word;
+    overflow: hidden;
 }
 
 .canvas-element:hover {
@@ -627,11 +741,11 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
 
 .canvas-element.selected {
     border-color: #667eea !important;
-    box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
     z-index: 100;
 }
 
-.canvas-element.dragging {
+.canvas-element.ui-draggable-dragging {
     opacity: 0.7;
     z-index: 1000;
 }
@@ -644,7 +758,7 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
     background: #667eea;
     border: 2px solid white;
     border-radius: 50%;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     display: none;
     z-index: 10;
 }
@@ -663,11 +777,11 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
 .resize-handle.w { left: -5px; top: 50%; transform: translateY(-50%); cursor: w-resize; }
 
 /* ============================================================================
-   PROPERTIES PANEL
+   PROPERTIES PANEL (RIGHT SIDEBAR)
    ============================================================================ */
 
 .r2pdf-sidebar-header {
-    padding: 12px 14px;
+    padding: 16px;
     border-bottom: 1px solid #e5e7eb;
     background: #f9fafb;
     flex-shrink: 0;
@@ -682,50 +796,53 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
     letter-spacing: 0.5px;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
 .r2pdf-sidebar-header .dashicons {
     color: #667eea;
-    font-size: 16px;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
 }
 
 .properties-empty {
-    padding: 40px 15px;
+    padding: 60px 20px;
     text-align: center;
     color: #9ca3af;
 }
 
 .properties-empty .dashicons {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-    opacity: 0.25;
-    margin-bottom: 12px;
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    opacity: 0.2;
+    margin-bottom: 16px;
 }
 
 .properties-empty p {
-    font-size: 12px;
+    font-size: 13px;
     margin: 0;
 }
 
 .property-group {
-    margin-bottom: 14px;
-    padding-bottom: 14px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
     border-bottom: 1px solid #e5e7eb;
 }
 
 .property-group:last-child {
     border-bottom: none;
+    padding-bottom: 0;
 }
 
 .property-label {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     color: #4b5563;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     display: block;
 }
 
@@ -733,12 +850,13 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
 .property-textarea,
 .property-select {
     width: 100%;
-    padding: 8px 10px;
+    padding: 10px 12px;
     border: 2px solid #e5e7eb;
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 13px;
     background: white;
     transition: all 0.2s;
+    font-family: inherit;
 }
 
 .property-input:focus,
@@ -746,53 +864,81 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
 .property-select:focus {
     outline: none;
     border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .property-textarea {
-    min-height: 80px;
+    min-height: 90px;
     resize: vertical;
-    font-family: inherit;
 }
 
 .property-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 12px;
+}
+
+.property-row small {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .property-color-picker {
     width: 100%;
-    height: 38px;
-    padding: 3px;
+    height: 42px;
+    padding: 4px;
     border: 2px solid #e5e7eb;
     border-radius: 6px;
     cursor: pointer;
+    transition: all 0.2s;
+}
+
+.property-color-picker:hover {
+    border-color: #667eea;
 }
 
 .property-btn {
     width: 100%;
-    padding: 8px;
+    padding: 12px;
     background: #ef4444;
     color: white;
     border: none;
     border-radius: 6px;
     font-weight: 600;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 13px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .property-btn:hover {
     background: #dc2626;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.property-btn .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
 }
 
 /* ============================================================================
-   SCROLLBAR
+   SCROLLBAR STYLING
    ============================================================================ */
 
 .r2pdf-sidebar-content::-webkit-scrollbar,
 .r2pdf-canvas-workspace::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
+    height: 8px;
 }
 
 .r2pdf-sidebar-content::-webkit-scrollbar-track,
@@ -803,7 +949,7 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
 .r2pdf-sidebar-content::-webkit-scrollbar-thumb,
 .r2pdf-canvas-workspace::-webkit-scrollbar-thumb {
     background: #cbd5e0;
-    border-radius: 3px;
+    border-radius: 4px;
 }
 
 .r2pdf-sidebar-content::-webkit-scrollbar-thumb:hover,
@@ -818,50 +964,37 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
 /* Large desktops (1600px+) */
 @media (min-width: 1600px) {
     .r2pdf-builder-main {
-        grid-template-columns: 340px 1fr 300px;
+        grid-template-columns: 340px 1fr 320px;
     }
 
     .r2pdf-sidebar-content {
-        padding: 16px;
+        padding: 20px;
     }
 
     .element-grid {
-        gap: 10px;
-    }
-
-    .category-title {
-        font-size: 11px;
-    }
-
-    .element-label {
-        font-size: 11px;
+        gap: 12px;
     }
 }
 
-/* Medium screens (1200px - 1599px) */
+/* Medium desktops (1200-1599px) */
 @media (max-width: 1599px) and (min-width: 1200px) {
     .r2pdf-builder-main {
-        grid-template-columns: 300px 1fr 280px;
+        grid-template-columns: 280px 1fr 260px;
     }
 }
 
-/* Small desktops / Large tablets (1024px - 1199px) */
+/* Small desktops (1024-1199px) */
 @media (max-width: 1199px) and (min-width: 1024px) {
     .r2pdf-builder-main {
         grid-template-columns: 260px 1fr 260px;
     }
 
-    .r2pdf-header-title h1 {
-        font-size: 16px;
-    }
-
-    .r2pdf-template-name,
-    #template-name {
-        min-width: 180px;
+    .element-grid {
+        grid-template-columns: 1fr;
     }
 }
 
-/* Tablets (768px - 1023px) */
+/* Tablets (768-1023px) */
 @media (max-width: 1023px) {
     .r2pdf-builder-wrap {
         left: 0;
@@ -871,31 +1004,22 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
         grid-template-columns: 240px 1fr;
     }
 
-    /* Hide right properties panel on tablets */
     .r2pdf-sidebar-right {
         display: none;
     }
 
-    .r2pdf-header-title h1 {
-        font-size: 15px;
-    }
-
-    .r2pdf-btn span {
-        display: none;
-    }
-
-    .r2pdf-btn-icon {
-        padding: 8px;
-    }
-
     .canvas-page {
-        width: 450px;
-        height: 636px;
-        transform-origin: top left;
+        width: 500px;
+        height: 707px;
+    }
+
+    .canvas-page.landscape {
+        width: 707px;
+        height: 500px;
     }
 }
 
-/* Mobile landscape (600px - 767px) */
+/* Mobile landscape (600-767px) */
 @media (max-width: 767px) and (min-width: 600px) {
     .r2pdf-builder-main {
         grid-template-columns: 200px 1fr;
@@ -905,27 +1029,34 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
         grid-template-columns: 1fr;
     }
 
-    .r2pdf-header {
-        padding: 8px 12px;
-    }
-
-    .r2pdf-template-name,
-    #template-name {
-        min-width: 150px;
-        font-size: 13px;
-    }
-
     .canvas-page {
-        width: 400px;
-        height: 566px;
+        width: 100%;
+        max-width: 420px;
+        height: auto;
+        aspect-ratio: 1 / 1.414;
+    }
+
+    .r2pdf-header-title h1 {
+        font-size: 16px;
     }
 }
 
-/* Mobile portrait (< 600px) */
+/* Mobile portrait (<600px) */
 @media (max-width: 599px) {
     .r2pdf-builder-wrap {
         left: 0;
         top: 46px;
+    }
+
+    .r2pdf-builder-header {
+        flex-wrap: wrap;
+        padding: 10px;
+    }
+
+    .r2pdf-template-name,
+    #template-name {
+        min-width: 100%;
+        max-width: 100%;
     }
 
     .r2pdf-builder-main {
@@ -943,68 +1074,205 @@ body.reverse2pdf_page_reverse2pdf-builder .wrap {
         display: none;
     }
 
-    .r2pdf-header-title h1 {
-        font-size: 14px;
-    }
-
-    .r2pdf-header-left {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
-
-    .r2pdf-template-name,
-    #template-name {
-        width: 100%;
-        min-width: 0;
-    }
-
     .element-grid {
         grid-template-columns: 1fr 1fr;
-        gap: 6px;
-    }
-
-    .element-item {
-        padding: 10px 6px;
     }
 
     .canvas-page {
         width: 100%;
         max-width: 350px;
         height: auto;
-        aspect-ratio: 1/1.414;
+        aspect-ratio: 1 / 1.414;
     }
 
-    .canvas-empty-state h3 {
-        font-size: 13px;
-    }
-
-    .canvas-empty-state p {
-        font-size: 11px;
+    .r2pdf-canvas-workspace {
+        padding: 15px;
     }
 }
 
-/* Very small mobile (< 400px) */
+/* Very small screens (<400px) */
 @media (max-width: 399px) {
-    .r2pdf-btn {
-        padding: 8px 10px;
-        font-size: 11px;
+    .r2pdf-header-title h1 {
+        display: none;
     }
 
-    .r2pdf-header {
-        padding: 6px 8px;
-    }
-
-    .element-item {
-        padding: 8px 4px;
-    }
-
-    .element-label {
-        font-size: 9px;
+    .element-grid {
+        grid-template-columns: 1fr;
     }
 
     .canvas-page {
-        max-width: 300px;
+        max-width: 280px;
     }
 }
 
+/* ============================================================================
+   PRINT STYLES (hidden in print)
+   ============================================================================ */
+
+@media print {
+    .r2pdf-builder-wrap {
+        display: none;
+    }
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mb-0 { margin-bottom: 0 !important; }
+.mt-2 { margin-top: 8px !important; }
+.mb-2 { margin-bottom: 8px !important; }
+
+/* ============================================================================
+   RESIZE HANDLES - FIXED VERSION
+   ============================================================================ */
+
+/* jQuery UI Resizable handles */
+.ui-resizable-handle {
+    position: absolute;
+    font-size: 0.1px;
+    display: block;
+    touch-action: none;
+    z-index: 1000;
+}
+
+/* Visible resize handles for selected elements */
+.canvas-element.ui-resizable {
+    position: absolute;
+}
+
+/* Corner handles */
+.canvas-element .ui-resizable-se,
+.canvas-element .ui-resizable-sw,
+.canvas-element .ui-resizable-ne,
+.canvas-element .ui-resizable-nw {
+    width: 10px;
+    height: 10px;
+    background: #667eea;
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+}
+
+.canvas-element .ui-resizable-se {
+    bottom: -5px;
+    right: -5px;
+    cursor: se-resize;
+}
+
+.canvas-element .ui-resizable-sw {
+    bottom: -5px;
+    left: -5px;
+    cursor: sw-resize;
+}
+
+.canvas-element .ui-resizable-ne {
+    top: -5px;
+    right: -5px;
+    cursor: ne-resize;
+}
+
+.canvas-element .ui-resizable-nw {
+    top: -5px;
+    left: -5px;
+    cursor: nw-resize;
+}
+
+/* Edge handles */
+.canvas-element .ui-resizable-n,
+.canvas-element .ui-resizable-s,
+.canvas-element .ui-resizable-e,
+.canvas-element .ui-resizable-w {
+    background: #667eea;
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+}
+
+.canvas-element .ui-resizable-n,
+.canvas-element .ui-resizable-s {
+    width: 10px;
+    height: 10px;
+    left: 50%;
+    margin-left: -5px;
+}
+
+.canvas-element .ui-resizable-e,
+.canvas-element .ui-resizable-w {
+    width: 10px;
+    height: 10px;
+    top: 50%;
+    margin-top: -5px;
+}
+
+.canvas-element .ui-resizable-n {
+    top: -5px;
+    cursor: n-resize;
+}
+
+.canvas-element .ui-resizable-s {
+    bottom: -5px;
+    cursor: s-resize;
+}
+
+.canvas-element .ui-resizable-e {
+    right: -5px;
+    cursor: e-resize;
+}
+
+.canvas-element .ui-resizable-w {
+    left: -5px;
+    cursor: w-resize;
+}
+
+/* Show handles only when element is selected */
+.canvas-element:not(.selected) .ui-resizable-handle {
+    display: none !important;
+}
+
+.canvas-element.selected .ui-resizable-handle {
+    display: block !important;
+}
+
+/* Element selection state */
+.canvas-element {
+    border: 2px dashed transparent;
+    cursor: move;
+    transition: border-color 0.2s;
+}
+
+.canvas-element:hover {
+    border-color: #cbd5e0;
+}
+
+.canvas-element.selected {
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+    z-index: 100;
+}
+
+.canvas-element.ui-draggable-dragging {
+    opacity: 0.8;
+    z-index: 1000;
+    cursor: grabbing !important;
+}
+
+.canvas-element.ui-resizable-resizing {
+    opacity: 0.9;
+    z-index: 1000;
+}
+
+/* Remove custom resize handles (we're using jQuery UI's) */
+.resize-handle {
+    display: none !important;
+}
